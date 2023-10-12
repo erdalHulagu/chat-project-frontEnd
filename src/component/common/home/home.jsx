@@ -7,21 +7,24 @@ import { BiFilter } from 'react-icons/bi'
 import { PiUserListFill } from 'react-icons/pi'
 import { BsFillChatLeftDotsFill, BsArrowDownSquareFill } from 'react-icons/bs'
 import Chat from '../../user/chat/chat';
-import CurrentMessage from '../../user/chat/currentMessage';
+import MessageCard from '../../user/chat/message-card';
 
 
 const Home = () => {
 
     const [query, setQuery] = useState(false)
     const [isOdd, setIsOdd] = useState([])
+    const [search, setSearch] = useState("")
+
+    const handleSearch = () => { }
 
     const handleQuery = () => {
         setQuery(true);
     }
- const handleCurrentMessage=(num)=>{
+    const handleCurrentMessage = (num) => {
 
-   setIsOdd(num / 2===0);
- }
+        setIsOdd(num / 2 === 0);
+    }
 
 
     return (
@@ -35,12 +38,12 @@ const Home = () => {
                                 <img className=' hover:border-blue-900 border-2 cursor-pointer w-24 h-24 rounded-full my-5 mx-4' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
                                 <p className='cursor-pointer text-blue-950 hover:text-red-700 '>user name</p>
                             </div>
-                            <div className=' w-[40%] mr-2'>
+                            <div className=' w-[40%] mr-5'>
                                 <ul className='left-0 text-decoration: none flex justify-between items-center'>
-                                    <li className=' '><HiUserGroup className='text-blue-950 hover:text-red-700 cursor-pointer' /></li>
-                                    <li className=''><SiInstatus className='text-blue-950  hover:text-red-700 cursor-pointer' /></li>
-                                    <li className=''><BsFillChatLeftDotsFill className='text-blue-950  hover:text-red-700 cursor-pointer' /></li>
-                                    <li className='' ><BsArrowDownSquareFill className='text-blue-950  hover:text-red-700 cursor-pointer' /></li>
+                                    <li className=''><HiUserGroup className='text-2xl text-blue-950 hover:text-red-700 cursor-pointer' /></li>
+                                    <li className=''><SiInstatus className='text-xl text-blue-950  hover:text-red-700 cursor-pointer' /></li>
+                                    <li className=''><BsFillChatLeftDotsFill className='text-xl text-blue-950  hover:text-red-700 cursor-pointer' /></li>
+                                    <li className='' ><BsArrowDownSquareFill className='text-xl text-blue-950  hover:text-red-700 cursor-pointer' /></li>
 
                                 </ul>
                             </div>
@@ -52,7 +55,17 @@ const Home = () => {
                                 <div className='flex justify-between'>
                                     {/* search */}
                                     <div className=' relative my[15%] w-[80%]  pt-3 mx-3  mt-3'>
-                                        <input className='w-[100%] h-10 rounded pl-10 text-blue-950' placeholder='search or start new chat' />
+
+                                        <input className='w-[100%] h-10 rounded pl-10 text-blue-950'
+
+                                            type="text"
+                                            placeholder="search..."
+                                            onChange={(e) => {
+                                                setSearch(e.target.value)
+                                                handleSearch(e.target.value)
+                                            }}
+                                            value={search}
+                                        />
                                         <ImSearch className='absolute top-7 left-2 text-blue-950' />
                                     </div>
                                     <BiFilter className='mt-10 mr-3 text-2xl hover:text-red-700 cursor-pointer' />
@@ -62,25 +75,33 @@ const Home = () => {
                                     <PiUserListFill className='text-2xl  hover:text-red-700 text-blue-950 ml-4' />
                                     <p className='ml-2'>Chat List</p>
                                 </div>
-                                <div className=' border-b border-blue-950'>
+                                <div >
                                     {/* Chat burata geklecek */}
-                                    {[1, 1, 1, 1, 1, 1, 1, 1, 1].map((item) => <div onClick={handleQuery} className='overflow-hidden bg  border-blue-950 '><Chat /></div>)}
+                                    {search && [1, 1, 1, 1, 1, 1, 1, 1, 1].map((item) => <div onClick={handleQuery} className='mx-2 border-b border-blue-950 overflow-hidden bg  border-blue-950 '><Chat /></div>)}
                                 </div>
 
 
                             </div>
                             {/* right column */}
 
-                            <div className='bootom-0 overflow-scroll w-[65%] h-[75vh] border-red-700'>
+                            <div className='relative border-blue-900 overflow-scroll w-[65%] h-[75vh]'>
                                 {query ?
                                     <div className='h-30 w-full bg-slate-300 '>
                                         <Chat />
-                                        
-                                        {[1, 1, 1, 1, 1, 1, 1, 1, 1].map((item) => <div className='overflow-hidden '><CurrentMessage/></div>)}
-                                        
+
+                                        {[1, 1, 1, 1, 1, 1, 1, 1, 1].map((item) => <div className='overflow-hidden '><MessageCard /></div>)}
+
                                     </div>
-                                    : <div className=' object-cover h-full w-full'><img className='object-cover w-full min-h-screen-sm' src="https://cdn.pixabay.com/photo/2016/08/11/23/48/mountains-1587287_1280.jpg" alt="" /></div>}
+                                    : <div className=' object-cover h-full w-full'><img className='object-cover w-full min-h-screen-sm' src="https://cdn.pixabay.com/photo/2016/08/11/23/48/mountains-1587287_1280.jpg" alt="" />
+                                     <div className='bootom-0 mx-20 my-20'>
+                                    <input className='w-[100%] h-10 rounded pl-10 text-blue-950' />
+                                </div>
+                                    </div>}
+                                    <footer className='rounded flex items-center  bg-slate-200 h-[10%] absolute border-blue-900 bottom-2  mx-3 w-[95%]'>
+                                    <input className='mx-4 bg-slate-100 w-[100%] h-10 rounded pl-10 text-blue-950' />
+                               </footer>
                             </div>
+                            
                         </div>
                     </div>
 

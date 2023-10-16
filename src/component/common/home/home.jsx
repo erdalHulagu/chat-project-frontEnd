@@ -6,7 +6,7 @@ import { ImSearch } from 'react-icons/im'
 import { BiFilter } from 'react-icons/bi'
 import { PiUserListFill } from 'react-icons/pi'
 import { BsFillChatLeftDotsFill, BsArrowDownSquareFill } from 'react-icons/bs'
-import Chat from '../../user/chat/chat';
+import Chat from '../../user/chat/chat-card';
 import MessageCard from '../../user/chat/message-card';
 
 
@@ -15,6 +15,12 @@ const Home = () => {
     const [query, setQuery] = useState(false)
     const [isOdd, setIsOdd] = useState([])
     const [search, setSearch] = useState("")
+    const [userList, setUserList] = useState(false)
+
+    const hadleUserList = () => {
+        setUserList(true);
+    }
+
 
     const handleSearch = () => { }
 
@@ -51,12 +57,12 @@ const Home = () => {
                         {/* ------------------- */}
                         <div className='w-full flex'>
                             {/* left column */}
-                            <div className='min-w-28 overflow-y-scroll w-[40%] h-[75vh] bg-gradient-to-b from-slate-300  to-slate-100 '>
-                                <div className='flex justify-between'>
+                            <div className=' min-w-28 overflow-y-scroll w-[40%] h-[75vh] bg-gradient-to-b from-slate-300  to-slate-100 '>
+                                <div className='sticky top-0 flex justify-between'>
                                     {/* search */}
-                                    <div className=' relative my[15%] w-[80%]  pt-3 mx-3  mt-3'>
+                                    < div className=' relative my[10%] w-[100%]  pt-3  top-0    bg-slate-400'>
 
-                                        <input className='w-[100%] h-10 rounded pl-10 text-blue-950'
+                                        <input className='w-[73%] h-10 rounded mt-3 mx-3 pl-10 text-blue-950'
 
                                             type="text"
                                             placeholder="search..."
@@ -66,42 +72,58 @@ const Home = () => {
                                             }}
                                             value={search}
                                         />
-                                        <ImSearch className='absolute top-7 left-2 text-blue-950' />
+                                        <ImSearch className='absolute  top-11 left-6 text-blue-950' />
+                                        <div className='right-1 absolute top-10'>
+                                            <BiFilter className='hover:text-red-700 cursor-pointer text-2xl' />
+                                        </div>
+                                        <div className='hover:text-red-700 cursor-pointer' onClick={hadleUserList}>
+                                            <div className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mx-2 mt-3 border-b border-blue-950'>
+                                                <PiUserListFill className='text-2xl  hover:text-red-700 text-blue-950 ml-4' />
+                                                <p className='ml-2'>Chat List</p>
+
+                                            </div>
+                                        </div>
+                                        {/* <BiFilter className='mt-10 mr-3 text-2xl hover:text-red-700 cursor-pointer' /> */}
                                     </div>
-                                    <BiFilter className='mt-10 mr-3 text-2xl hover:text-red-700 cursor-pointer' />
+                                    {/*                                     
+                                    <div className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mx-2 my-3 border-b border-blue-950'>
+                                        <PiUserListFill className='text-2xl  hover:text-red-700 text-blue-950 ml-4' />
+                                        <p className='ml-2'>Chat List</p>
+                                    </div> */}
                                 </div>
                                 {/* list of chat */}
-                                <div className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mx-2 my-3 border-b border-blue-950'>
+                                {/* <div className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mx-2 my-3 border-b border-blue-950'>
                                     <PiUserListFill className='text-2xl  hover:text-red-700 text-blue-950 ml-4' />
                                     <p className='ml-2'>Chat List</p>
-                                </div>
+                                </div> */}
                                 <div >
                                     {/* Chat burata geklecek */}
-                                    {search && [1, 1, 1, 1, 1, 1, 1, 1, 1].map((item) => <div onClick={handleQuery} className='mx-2 border-b border-blue-950 overflow-hidden bg  border-blue-950 '><Chat /></div>)}
+                                    {(search || userList) && [1, 1, 1, 1, 1, 1, 1, 1, 1].map((item) => <div onClick={handleQuery} className='mx-2 border-b border-blue-950 overflow-hidden bg '><Chat /></div>)}
                                 </div>
 
 
                             </div>
                             {/* right column */}
 
-                            <div className='relative border-blue-900 overflow-scroll w-[65%] h-[75vh]'>
+                            <div className=' relative border-blue-900 overflow-scroll w-[65%] h-[75vh]'>
                                 {query ?
                                     <div className='h-30 w-full bg-slate-300 '>
-                                        <Chat />
+                                        <div className='absolute w-full bg-slate-400 top-0 sticky'>
+                                            <Chat />
+                                        </div>
+
 
                                         {[1, 1, 1, 1, 1, 1, 1, 1, 1].map((item) => <div className='overflow-hidden '><MessageCard /></div>)}
-
+                                        <footer className=' sticky rounded flex items-center  bg-slate-200 h-10  border-blue-900 bottom-0   w-[100%]'>
+                                            <input className='mx-4 bg-slate-100 w-[100%] h-7 rounded pl-10 text-blue-950' />
+                                        </footer>
                                     </div>
                                     : <div className=' object-cover h-full w-full'><img className='object-cover w-full min-h-screen-sm' src="https://cdn.pixabay.com/photo/2016/08/11/23/48/mountains-1587287_1280.jpg" alt="" />
-                                     <div className='bootom-0 mx-20 my-20'>
-                                    <input className='w-[100%] h-10 rounded pl-10 text-blue-950' />
-                                </div>
+
                                     </div>}
-                                    <footer className='rounded flex items-center  bg-slate-200 h-[10%] absolute border-blue-900 bottom-2  mx-3 w-[95%]'>
-                                    <input className='mx-4 bg-slate-100 w-[100%] h-10 rounded pl-10 text-blue-950' />
-                               </footer>
+
                             </div>
-                            
+
                         </div>
                     </div>
 

@@ -35,21 +35,21 @@ const Home = () => {
 
     return (
         <div>
-            <div fluid className="h-screen bg-gray-200 ">
+            <div fluid className="h-screen bg-purple-100 ">
                 <div className="h-40 bg-blue-950 flex items-end justify-center shadow-2xl">
-                    <div className=" bg-gradient-to-b from-red-600 via-red-300 to-red-100 absolute  w-[80%] top-20 left-[10%] right-[10%] rounded shadow-2xl " >
-                        <div className='w-full relative  bg-slate-200 shadow-lg rounded-t-lg h-32 p-0 flex  items-center justify-between'>
+                    <div className=" bg-gradient-to-b from-red-600 via-red-300 to-red-100 absolute bottom-10 w-[94%] top-10 left-[3%] right-[3%] rounded shadow-2xl " >
+                        <div className='w-full relative  bg-slate-100 shadow-lg rounded-t-lg h-20 p-0 flex  items-center justify-between'>
                             <div className='flex  items-center w-[60%] '>
                                 {/* nav bar */}
-                                <img className=' hover:border-blue-900 border-2 cursor-pointer w-24 h-24 rounded-full my-5 mx-4' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
+                                <img className=' hover:border-purple-500  border-2 cursor-pointer w-20 h-20 rounded-full my-5 mx-4' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
                                 <p className='cursor-pointer text-blue-950 hover:text-red-700 '>user name</p>
                             </div>
                             <div className=' w-[40%] mr-5'>
                                 <ul className='left-0 text-decoration: none flex justify-between items-center'>
-                                    <li className=''><HiUserGroup className='text-2xl text-blue-950 hover:text-red-700 cursor-pointer' /></li>
-                                    <li className=''><SiInstatus className='text-xl text-blue-950  hover:text-red-700 cursor-pointer' /></li>
-                                    <li className=''><BsFillChatLeftDotsFill className='text-xl text-blue-950  hover:text-red-700 cursor-pointer' /></li>
-                                    <li className='' ><BsArrowDownSquareFill className='text-xl text-blue-950  hover:text-red-700 cursor-pointer' /></li>
+                                    <li className=''><HiUserGroup className='text-xl text-blue-950 hover:text-red-700 cursor-pointer' /></li>
+                                    <li className=''><SiInstatus className='text-lg text-blue-950  hover:text-red-700 cursor-pointer' /></li>
+                                    <li className=''><BsFillChatLeftDotsFill className='text-lg text-blue-950  hover:text-red-700 cursor-pointer' /></li>
+                                    <li className='' ><BsArrowDownSquareFill className='text-lg text-blue-950  hover:text-red-700 cursor-pointer' /></li>
 
                                 </ul>
                             </div>
@@ -57,12 +57,12 @@ const Home = () => {
                         {/* ------------------- */}
                         <div className='w-full flex'>
                             {/* left column */}
-                            <div className=' min-w-28 overflow-y-scroll w-[40%] h-[75vh] bg-gradient-to-b from-slate-300  to-slate-100 '>
+                            <div className=' min-w-28 overflow-y-scroll w-[40%] h-[82vh] bg-gradient-to-b from-slate-300  to-slate-100 '>
                                 <div className='sticky top-0 flex justify-between'>
                                     {/* search */}
-                                    < div className=' relative my[10%] w-[100%]  pt-3  top-0    bg-slate-400'>
+                                    < div className=' relative  w-[100%]  pt-1  top-0    bg-slate-200'>
 
-                                        <input className='w-[73%] h-10 rounded mt-3 mx-3 pl-10 text-blue-950'
+                                        <input className='w-[94%] h-8 rounded mt-3 mx-3 pl-10 text-blue-950'
 
                                             type="text"
                                             placeholder="search..."
@@ -72,14 +72,14 @@ const Home = () => {
                                             }}
                                             value={search}
                                         />
-                                        <ImSearch className='absolute  top-11 left-6 text-blue-950' />
-                                        <div className='right-1 absolute top-10'>
+                                        <ImSearch className='absolute  top-7 left-6 text-blue-950' />
+                                        <div className='right-3 absolute bottom-4'>
                                             <BiFilter className='hover:text-red-700 cursor-pointer text-2xl' />
                                         </div>
                                         <div className='hover:text-red-700 cursor-pointer' onClick={hadleUserList}>
-                                            <div className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mx-2 mt-3 border-b border-blue-950'>
-                                                <PiUserListFill className='text-2xl  hover:text-red-700 text-blue-950 ml-4' />
-                                                <p className='ml-2'>Chat List</p>
+                                            <div className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mt-1 border-b border-blue-950'>
+                                                <PiUserListFill className='text-xl mt-1 hover:text-red-700 text-blue-950 ml-4' />
+                                                <p className='ml-2 mt-1 text-sm'>Chat List</p>
 
                                             </div>
                                         </div>
@@ -105,10 +105,10 @@ const Home = () => {
                             </div>
                             {/* right column */}
 
-                            <div className=' relative border-blue-900 overflow-scroll w-[65%] h-[75vh]'>
+                            <div className=' relative border-blue-900 overflow-scroll w-[65%] h-[82vh] '>
                                 {query ?
-                                    <div className='h-30 w-full bg-slate-300 '>
-                                        <div className='absolute w-full bg-slate-400 top-0 sticky'>
+                                    <div className='h-30 w-full bg-slate-100 '>
+                                        <div className='absolute w-full bg-slate-200 top-0 sticky'>
                                             <Chat />
                                         </div>
 

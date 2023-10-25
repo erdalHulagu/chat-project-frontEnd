@@ -1,7 +1,7 @@
 import React from 'react'
 import { BiSolidLeftArrowSquare } from 'react-icons/bi'
 import { useNavigate } from 'react-router-dom'
-const Profil = () => {
+const Profile = () => {
     const navigate = useNavigate();
 
     const handleNavigate = () => {
@@ -27,4 +27,4 @@ const Profil = () => {
     )
 }
 
-export default Profil
+export default Profile

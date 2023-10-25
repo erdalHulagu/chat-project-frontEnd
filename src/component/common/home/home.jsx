@@ -11,7 +11,7 @@ import { RiEmojiStickerFill } from 'react-icons/ri'
 import { BsFillChatLeftDotsFill, BsArrowDownSquareFill } from 'react-icons/bs'
 import Chat from '../../user/chat/chat-card';
 import MessageCard from '../../user/chat/message-card';
-import Profil from '../../user/profil/profil';
+import Profil from '../../user/profile/profile';
 
 
 const Home = () => {

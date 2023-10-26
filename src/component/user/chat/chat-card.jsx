@@ -2,7 +2,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
 
-const Chat = () => {
+const ChatCard = () => {
     const navigate = useNavigate();
 
 const hadleMessageProfile = () => {
@@ -31,4 +31,4 @@ navigate('/Profile');
     )
 }
 
-export default Chat
+export default ChatCard

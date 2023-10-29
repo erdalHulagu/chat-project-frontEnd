@@ -2,9 +2,17 @@
 import { useFormik } from "formik";
 import React from "react";
 import { Button, Container, Form } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 
 const Register = () => {
+const navigater= useNavigate();
+
+const handleNavigater = (params) => {
+  navigater('/home');
+}
+
+
     const initialValues = {
         name: "",
         lastname: "",
@@ -128,7 +136,7 @@ const Register = () => {
                     />
                 </Form.Group>
                 
-                <Button variant="primary" type="submit">
+                <Button variant="secondary" type="submit" onClick={handleNavigater}>
                     Submit
                 </Button>
             </Form>

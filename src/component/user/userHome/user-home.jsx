@@ -37,7 +37,7 @@ const UserHome = () => {
 
     return (
         <div>
-            <div className='w-full relative  bg-slate-100 shadow-lg rounded-t-lg h-20 p-0 flex  items-center justify-between'>
+            <div className='w-full  bg-slate-100 shadow-lg rounded-t-lg h-[20%] p-0 flex  items-center justify-between'>
                 <div className='flex  items-center w-[60%] '>
                     {/* nav bar */}
                     <img onClick={handleProfile} className=' hover:border-purple-500  border-2 cursor-pointer w-20 h-20 rounded-full my-5 mx-4' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
@@ -56,10 +56,10 @@ const UserHome = () => {
             {/* ------------------- */}
             <div>
             {profil ? <Profil />
-                :<div className='w-full flex'>
+                :<div className='w-full h-[80%] flex'>
                     {/* left column */}
                     
-                        : <div className=' min-w-28 overflow-y-scroll w-[40%] h-[85vh] bg-gradient-to-b from-slate-300  to-slate-100 '>
+                         <div className=' min-w-28 overflow-y-scroll w-[40%] h-[85vh] bg-gradient-to-b from-slate-300  to-slate-100 '>
                             <div className='sticky top-0 flex justify-between'>
                                 {/* search */}
                                 < div className=' relative  w-[100%]  pt-1  top-0    bg-slate-200'>

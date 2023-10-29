@@ -1,6 +1,7 @@
 import React from 'react'
 import { BiSolidLeftArrowSquare } from 'react-icons/bi'
 import { IoIosHome } from 'react-icons/io';
+import { MdPhotoCamera } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom'
 const Profile = () => {
     const navigate = useNavigate();
@@ -13,12 +14,12 @@ const Profile = () => {
     return (
         <div fluid className="h-screen bg-purple-100 ">
             <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
-                <div className='h-30 w-30 flex left-3 mt-4'>
-                    <div className='my-3 mx-6 w-20 h-20'>
-                        <BiSolidLeftArrowSquare className='cursor-pointer text-2xl text-gray-400   hover:text-red-700 ' onClick={handleNavigate} />
+                <div className='h-30 w-30 flex w-[20%] left-3 mt-4'>
+                    <div className='my-3 ml-[30%] w-full h-full'>
+                        <BiSolidLeftArrowSquare className='cursor-pointer text-3xl text-gray-400   hover:text-red-700 ' onClick={handleNavigate} />
                     </div>
                 </div>
-                <div className='w-full h-40 mt-1  flex  justify-end right-0'>
+                <div className='w-[80%] h-40 mt-1  flex  justify-end right-0 '>
                     <div className=' flex mt-4 pt-2 h-10 text-center  w-24 rounded-lg text-gray-400 cursor-pointer hover:text-red-700 ' onClick={handleNavigate}>
                         <IoIosHome className='mt-1 mr-1 ' />
                         <p>Home</p>
@@ -36,9 +37,16 @@ const Profile = () => {
                         {/* left bar */}
                         <div className='w-[40%] h-full rounded-b-lg'>
                             <div className='w-full flex items-center border h-full '>
-                                <div className='bg-slate-200 w-full  h-full top-0 flex justify-center rounded-b-lg'>
+                                <div className='relative bg-slate-200 w-full  h-full top-0 flex justify-center rounded-b-lg'>
+
                                     <label htmlFor="imgInput">
-                                        <img className='rounded-full cursor-pointer w-48 h-48 mt-10 ' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
+                                        <div className=' w-full h-30 flex items-center justify-center'>
+                                            <img className='rounded-full cursor-pointer w-48 h-48 mt-10 ' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
+                                        </div>
+                                        <div className='top-10 absolute w-20 h-20  flex items-center justify-end ml-20'>
+                                            <MdPhotoCamera className='text-slate-300 text-3xl' />
+                                        </div>
+
                                     </label>
                                     <input type="file" id='imgInput' className='hidden' />
                                 </div>

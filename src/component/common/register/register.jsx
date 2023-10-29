@@ -1,16 +1,16 @@
 // import axios from "axios";
 import { useFormik } from "formik";
 import React from "react";
-import { Button, Container, Form } from "react-bootstrap";
+import {  Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 
 const Register = () => {
-const navigater= useNavigate();
+    const navigater = useNavigate();
 
-const handleNavigater = (params) => {
-  navigater('/home');
-}
+    const handleNavigater = (params) => {
+        navigater('/login');
+    }
 
 
     const initialValues = {
@@ -49,7 +49,7 @@ const handleNavigater = (params) => {
     });
 
     return (
-        <Container className="mt-5">
+        <Container className="mt-3 ">
             <Form noValidate onSubmit={formik.handleSubmit}>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                     <Form.Label>Name</Form.Label>
@@ -128,17 +128,16 @@ const handleNavigater = (params) => {
                         {formik.errors.phonenumbera}
                     </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                    <Form.Check
-                        type="checkbox"
-                        label="Check me out"
-                        {...formik.getFieldProps("remember")}
-                    />
-                </Form.Group>
-                
-                <Button variant="secondary" type="submit" onClick={handleNavigater}>
-                    Submit
-                </Button>
+
+                <div className="w-full h-14 flex items-center justify-end ">
+                    <div>
+                    <button className=" h-10  w-24 rounded-lg bg-slate-700 text-slate-100  hover:text-slate-950 hover:bg-gray-100   "  type="submit" onClick={handleNavigater}>
+                        Submit
+                    </button>
+                    </div>
+                    
+                </div>
+
             </Form>
         </Container>
     );

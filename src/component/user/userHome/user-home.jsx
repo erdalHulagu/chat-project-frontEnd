@@ -15,6 +15,8 @@ import { useNavigate } from 'react-router-dom'
 
 const UserHome = () => {
 
+    const navigate = useNavigate();
+
     const [query, setQuery] = useState(false)
     const [search, setSearch] = useState("")
     const [userList, setUserList] = useState(false)
@@ -32,7 +34,7 @@ const UserHome = () => {
     }
 
     const handleProfile = () => {
-        setProfil(true);
+        navigate("/profile");
 
     }
 
@@ -54,97 +56,83 @@ const UserHome = () => {
                     </ul>
                 </div>
             </div>
+            <div className='h-[88%] w-full flex  rounded-b-lg'>
+                {/* left column */}
 
-            {profil ? <Profil />
-                : <div className='h-[88%] w-full flex  rounded-b-lg'>
-                    {/* left column */}
+                <div className='rounded-b-lg min-w-28 overflow-y-scroll w-[40%] h-full bg-gradient-to-b from-slate-300  to-slate-100 '>
+                    <div className='sticky top-0 flex justify-between'>
+                        {/* search */}
+                        < div className=' relative  w-full  pt-1  top-0    bg-slate-200'>
 
-                    <div className='rounded-b-lg min-w-28 overflow-y-scroll w-[40%] h-full bg-gradient-to-b from-slate-300  to-slate-100 '>
-                        <div className='sticky top-0 flex justify-between'>
-                            {/* search */}
-                            < div className=' relative  w-full  pt-1  top-0    bg-slate-200'>
+                            <input className='w-[94%] h-8 rounded  ml-3  mt-3 pl-10 right-2 text-blue-950'
 
-                                <input className='w-[94%] h-8 rounded  ml-3  mt-3 pl-10 right-2 text-blue-950'
-
-                                    type="text"
-                                    placeholder="search..."
-                                    onChange={(e) => {
-                                        setSearch(e.target.value)
-                                        handleSearch(e.target.value)
-                                    }}
-                                    value={search}
-                                />
-                                <ImSearch className='absolute  top-7 left-6 text-blue-950' />
-                                <div className='right-3 mr-3 absolute bottom-4'>
-                                    <BiFilter className='hover:text-red-700 cursor-pointer text-2xl' />
-                                </div>
-                                <div className='hover:text-red-700 cursor-pointer' onClick={hadleUserList}>
-                                    <div className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mt-1 border-b border-blue-950'>
-                                        <PiUserListFill className='text-xl mt-1 hover:text-red-700 text-blue-950 ml-4' />
-                                        <p className='ml-2 mt-1 text-sm'>Chat List</p>
-
-                                    </div>
-                                </div>
-                                {/* <BiFilter className='mt-10 mr-3 text-2xl hover:text-red-700 cursor-pointer' /> */}
+                                type="text"
+                                placeholder="search..."
+                                onChange={(e) => {
+                                    setSearch(e.target.value)
+                                    handleSearch(e.target.value)
+                                }}
+                                value={search}
+                            />
+                            <ImSearch className='absolute  top-7 left-6 text-blue-950' />
+                            <div className='right-3 mr-3 absolute bottom-4'>
+                                <BiFilter className='hover:text-red-700 cursor-pointer text-2xl' />
                             </div>
-                            {/*                                     
-                                    <div className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mx-2 my-3 border-b border-blue-950'>
-                                        <PiUserListFill className='text-2xl  hover:text-red-700 text-blue-950 ml-4' />
-                                        <p className='ml-2'>Chat List</p>
-                                    </div> */}
-                        </div>
-                        {/* list of chat */}
-                        {/* <div className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mx-2 my-3 border-b border-blue-950'>
-                                    <PiUserListFill className='text-2xl  hover:text-red-700 text-blue-950 ml-4' />
-                                    <p className='ml-2'>Chat List</p>
-                                </div> */}
-                        <div >
-                            {/* Chat burata geklecek */}
-                            {(search || userList) && [...Array(20)].map((item) => <div onClick={handleQuery} className='mx-2 border-b border-blue-950 overflow-hidden bg '><ChatCard /></div>)}
-                        </div>
+                            <div className='hover:text-red-700 cursor-pointer' onClick={hadleUserList}>
+                                <div className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mt-1 border-b border-blue-950'>
+                                    <PiUserListFill className='text-xl mt-1 hover:text-red-700 text-blue-950 ml-4' />
+                                    <p className='ml-2 mt-1 text-sm'>Chat List</p>
 
-
-                    </div>
-                    {/* right column */}
-
-                    <div className=' overflow-scroll w-[60%] h-full relaltive flex flex-col rounded-b-lg'>
-
-                        {query ?
-                            <div className='h-30 w-full rounded-b-lg '>
-                                <div className='w-full  bg-slate-200 top-0 sticky'>
-                                    <ChatCard />
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div >
+                        {(search || userList) && [...Array(20)].map((item) => <div onClick={handleQuery} className='mx-2 border-b border-blue-950 overflow-hidden bg '><ChatCard /></div>)}
+                    </div>
 
 
-                                {[...Array(15)].map((item, id) => <div key={id} className='overflow-hidden w-full'><MessageCard /></div>)}
-                                <div className=' flex items-between justify-center fixed bottom-0 bg-slate-200 h-16 w-[60%] rounded-br-lg '  
-                                style={{position: `absolute`}}>
+                </div>
+                {/* right column */}
 
-                                    <div className=' flex items-center justify-center rounded-b-lg '>
-                                        <RiEmojiStickerFill className='hover:text-red-700 cursor-pointer text-2xl  mx-3' />
-                                        <PiPlusCircleFill className='hover:text-red-700 cursor-pointer text-2xl' />
-                                    </div>
-                                    <div className='  h-20 flex items-center justify-center w-full'>
-                                        <textarea type='text' className=' w-[94%] bg-slate-100  h-12 mb-3 rounded p-3 py-2 text-slate-950' />
-                                    </div>
-                                    <div className=' flex items-center justify-center rounded-b-lg '> 
+                <div className=' overflow-scroll w-[60%] h-full relaltive flex flex-col rounded-b-lg'>
+
+                    {query ?
+                        <div className='h-30 w-full rounded-b-lg '>
+                            <div className='w-full  bg-slate-200 top-0 sticky'>
+                                <ChatCard />
+                            </div>
+
+
+                            {[...Array(15)].map((item, id) => <div key={id} className='overflow-hidden w-full'><MessageCard /></div>)}
+                            <div className=' flex items-between justify-center fixed bottom-0 bg-slate-200 h-16 w-[60%] rounded-br-lg '
+                                style={{ position: `absolute` }}>
+
+                                <div className=' flex items-center justify-center rounded-b-lg '>
+                                    <RiEmojiStickerFill className='hover:text-red-700 cursor-pointer text-2xl  mx-3' />
+                                    <PiPlusCircleFill className='hover:text-red-700 cursor-pointer text-2xl' />
+                                </div>
+                                <div className='  h-20 flex items-center justify-center w-full'>
+                                    <textarea type='text' className=' w-[94%] bg-slate-100  h-12 mb-3 rounded p-3 py-2 text-slate-950' />
+                                </div>
+                                <div className=' flex items-center justify-center rounded-b-lg '>
                                     < FaMicrophoneAlt className='hover:text-red-700 cursor-pointer text-2xl  mr-4 ' />
 
-                                    </div>
-                                   
                                 </div>
 
                             </div>
-                            : <div className='  flex items-center justify-center  text-white object-cover h-full w-full text-center'
-                                style={{ backgroundImage: `url('https://cdn.pixabay.com/photo/2016/08/11/23/48/mountains-1587287_1280.jpg') `, opacity: `0.5 ` }}>
-                                <div className='relative flex items-center justify-center w-[16%]'>
-                                    <p className='absolute text-lg'>asiliasiakausbdklaujsbskjdbcskdjbcls</p>
-                                </div>
-                            </div>}
 
-                    </div>
+                        </div>
+                        : <div className='  flex items-center justify-center  text-white object-cover h-full w-full text-center'
+                            style={{ backgroundImage: `url('https://cdn.pixabay.com/photo/2016/08/11/23/48/mountains-1587287_1280.jpg') `, opacity: `0.5 ` }}>
+                            <div className='relative flex items-center justify-center w-[16%]'>
+                                <p className='absolute text-lg'>asiliasiakausbdklaujsbskjdbcskdjbcls</p>
+                            </div>
+                        </div>}
 
-                </div>}
+                </div>
+
+            </div>
 
         </>
     )

@@ -14,7 +14,7 @@ const Menu = () => {
    
 
     const handleLogin = () => {
-        navigate("login");
+        navigate("/login");
 
     }
 

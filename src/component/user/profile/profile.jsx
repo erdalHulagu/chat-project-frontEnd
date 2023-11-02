@@ -1,20 +1,33 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BiSolidLeftArrowSquare, BiSolidPencil } from 'react-icons/bi'
 import { IoIosHome, IoMdPhotos } from 'react-icons/io';
+import { ImSearch } from 'react-icons/im';
 import { RiUserSettingsFill } from 'react-icons/ri';
 import { FaUserFriends } from 'react-icons/fa';
 import { MdPhotoCamera, MdOutlineMonochromePhotos } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom'
+import FriendsCard from '../friends/friends-card';
 const Profile = () => {
     const navigate = useNavigate();
 
+    const [friendsCard, setFriendsCard] = useState(false);
+    const [searchFriends, setSearchFriends] = useState("");
+
     const handleNavigate = () => {
+    
         navigate(-1);
 
     }
+    const handleSearchFriends = () => {
+        
+    }
+    
     const handleSignOut = () => {
         navigate("/");
     }
+const handleFriendsCard = () => {
+  setFriendsCard(true);
+}
 
 
     return (
@@ -58,8 +71,8 @@ const Profile = () => {
                                     <div className='h-[30vh]  w-full  border rounded-bl-lg'>
                                         <div className='w-[94%] h[50%] flex   border-slate-400 border-b mx-[3%] '>
                                             <div className='w-full h[50%] flex flex-col  '>
-                                                <h5 className="ml-3  text-purple-800 text-lg font-bold w-[20vw] " > Your name </h5>
-                                                <input id='imgInput' className='mt-3  text-slate-800 bottom-0 w-[80%] bg-slate-200  focus:outline-none' type="text" alt='' />
+                                                <h5 className="ml-3  text-blue-800 text-lg font-bold w-[20vw] " > Your name </h5>
+                                                <input id='imgInput' className=' ml-3 mt-3  text-slate-800 bottom-0 w-[80%] bg-slate-200  focus:outline-none' type="text" alt='' />
 
                                             </div>
 
@@ -76,8 +89,8 @@ const Profile = () => {
 
                                         <div className='w-[94%] h[50%] flex   border-slate-400 border-b mx-[3%] '>
                                             <div className='w-full h[50%] flex flex-col  '>
-                                                <h5 className="ml-3  text-purple-800 text-lg font-bold w-[20vw]" > About </h5>
-                                                <input id='imgInput' className='mt-3  text-slate-800 bottom-0 w-[80%] bg-slate-200  focus:outline-none' type="text" alt='' />
+                                                <h5 className="ml-3  text-blue-800 text-lg font-bold w-[20vw]" > About </h5>
+                                                <input id='imgInput' className='mt-3 ml-3  text-slate-800 bottom-0 w-[80%] bg-slate-200  focus:outline-none' type="text" alt='' />
 
                                             </div>
 
@@ -94,19 +107,32 @@ const Profile = () => {
 
                         </div >
                         {/* right bar */}
-                        <div className='w-[60%] h-full '>
-                            <div className='w-full h-20  flex items-center justify-center shadow-slate-900 shadow-2xl bg-blue-950'>
+                        <div className='w-[60%] h-full overflow-scroll '>
+                            <div className='sticky top-0 w-full h-20  flex items-center justify-between shadow-slate-900 shadow-2xl bg-blue-950'>
                                 <div className='w-[50%] h-full flex items-center justify-start ' >
-                                    <FaUserFriends className='ml-3 text-gray-400 text-xl  hover:text-red-800 cursor-pointer' />
+                                   <FaUserFriends onClick={handleFriendsCard} className='ml-6 text-gray-400 text-2xl  hover:text-red-800 cursor-pointer' />
+                                
                                 </div>
-                                <div className='w-[50%] h-full flex items-center justify-end '>
-                                    <IoMdPhotos className='text-gray-400 text-xl  hover:text-red-800 cursor-pointer' />
-                                    <MdOutlineMonochromePhotos className='text-gray-400 text-xl mx-3 hover:text-red-800 cursor-pointercursor-pointer' />
-
+                                {friendsCard && <input  className='focus:outline-none text-sm relative  text-gray-400 pl-10 py-2 mr-7 rounded  cursor-pointercursor-pointer ' 
+                                type="text"
+                                placeholder="search..."
+                                onChange={(e) => {
+                                    setSearchFriends(e.target.value)
+                                    handleSearchFriends(e.target.value)
+                                }}
+                                value={searchFriends}
+                               />}
+                               <ImSearch className={`absolute mx-2 right-48 top-8  text-blue-900 ${!friendsCard && "hidden"} ` }/>
+                               <div className={` w-[50%] h-full flex items-center justify-end ${friendsCard && "hidden"} `}>
+                                    <IoMdPhotos className=' text-gray-400 text-2xl  hover:text-red-800 cursor-pointer' />
+                                    <MdOutlineMonochromePhotos className='text-gray-400 text-2xl mx-3 hover:text-red-800 cursor-pointercursor-pointer' />
+                                    
                                 </div>
 
                             </div>
+                            {friendsCard && [...Array(10)].map((friends)=><div className='w-full  flex ' ><FriendsCard/></div>)}
                         </div>
+                       
                     </div>
 
 

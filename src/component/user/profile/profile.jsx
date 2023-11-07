@@ -7,27 +7,32 @@ import { FaUserFriends } from 'react-icons/fa';
 import { MdPhotoCamera, MdOutlineMonochromePhotos } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom'
 import FriendsCard from '../friends/friends-card';
+import MyPhotos from '../my-photos/my-photos';
 const Profile = () => {
     const navigate = useNavigate();
 
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
+    const [myPhotos, setMyPhotos] = useState(false);
 
+    //--------------------------------------
     const handleNavigate = () => {
-    
         navigate(-1);
+    }
 
-    }
-    const handleSearchFriends = () => {
-        
-    }
-    
     const handleSignOut = () => {
         navigate("/");
     }
-const handleFriendsCard = () => {
-  setFriendsCard(true);
-}
+    //--------------------------------------
+    const handleSearchFriends = () => {
+    }
+    const handlePhotos = () => {
+        setMyPhotos(true)
+    }
+
+    const handleFriendsCard = () => {
+        setFriendsCard(true);
+    }
 
 
     return (
@@ -43,7 +48,7 @@ const handleFriendsCard = () => {
                         <IoIosHome className='mt-1 mr-1 ' />
                         <p>Home</p>
                     </div>
-                    <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950   hover:bg-gray-100   ' onClick={handleSignOut}  >Sign-out</button> */}
+                    <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950   hover:bg-gray-100   ' onClick={handleSignOut}  >Sign-out</button> 
                 </div>
                 <div className=" h-[86vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl " >
                     {/* top bar */}
@@ -62,7 +67,7 @@ const handleFriendsCard = () => {
 
                                     <label htmlFor="imgInput">
                                         <div className=' w-full h-[40vh] flex items-center justify-center'>
-                                            <img className='rounded-full cursor-pointer w-48 h-48 my-5 ' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
+                                            <img className='hover:opacity-70 rounded-full cursor-pointer w-48 h-48 my-5 ' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
                                             <MdPhotoCamera className='absolute cursor-pointer ml-32 text-purple-300 text-3xl' />
                                         </div>
 
@@ -107,32 +112,41 @@ const handleFriendsCard = () => {
 
                         </div >
                         {/* right bar */}
-                        <div className='w-[60%] h-full overflow-scroll '>
+                        <div className='w-[70%] h-full overflow-scroll '>
                             <div className='sticky top-0 w-full h-20  flex items-center justify-between shadow-slate-900 shadow-2xl bg-blue-950'>
-                                <div className='w-[50%] h-full flex items-center justify-start ' >
-                                   <FaUserFriends onClick={handleFriendsCard} className='ml-6 text-gray-400 text-2xl  hover:text-red-800 cursor-pointer' />
-                                
-                                </div>
-                                {friendsCard && <input  className='focus:outline-none text-sm relative  text-gray-400 pl-10 py-2 mr-7 rounded  cursor-pointercursor-pointer ' 
-                                type="text"
-                                placeholder="search..."
-                                onChange={(e) => {
-                                    setSearchFriends(e.target.value)
-                                    handleSearchFriends(e.target.value)
-                                }}
-                                value={searchFriends}
-                               />}
-                               <ImSearch className={`absolute mx-2 right-48 top-8  text-blue-900 ${!friendsCard && "hidden"} ` }/>
-                               <div className={` w-[50%] h-full flex items-center justify-end ${friendsCard && "hidden"} `}>
-                                    <IoMdPhotos className=' text-gray-400 text-2xl  hover:text-red-800 cursor-pointer' />
-                                    <MdOutlineMonochromePhotos className='text-gray-400 text-2xl mx-3 hover:text-red-800 cursor-pointercursor-pointer' />
-                                    
+                                <div className='w-[80%] h-full flex items-center justify-start' >
+
+                                    <FaUserFriends onClick={handleFriendsCard} className={`ml-5 text-gray-400 text-2xl  hover:text-red-800 cursor-pointer ${friendsCard && "hidden"}  `} />
+
+
+                                    {friendsCard &&
+                                        <input className='w-[80%] ml-5 focus:outline-none text-sm  text-gray-400 pl-8 py-2 rounded  cursor-pointercursor-pointer '
+                                            type="text"
+                                            placeholder="search..."
+                                            onChange={(e) => {
+                                                setSearchFriends(e.target.value)
+                                                handleSearchFriends(e.target.value)
+                                            }}
+                                            value={searchFriends}
+                                        />}
+                                    <ImSearch className={`absolute top-8 left-8 text-blue-900 ${!friendsCard && "hidden"} `} />
                                 </div>
 
+
+                                <div className={` w-[30%] h-full flex items-center justify-end `}>{/* {` w-[50%] h-full flex items-center justify-end ${friendsCard && "hidden"} `}*/}
+                                    <IoMdPhotos className=' text-gray-400 text-2xl  hover:text-red-800 cursor-pointer' onClick={handlePhotos} />
+                                    <MdOutlineMonochromePhotos className='text-gray-400 text-2xl mx-3 hover:text-red-800 cursor-pointer' />
+
+                                </div>
+
+                            </div >
+                            <div className='w-full h-full flex '>
+                            { myPhotos && [...Array(20)].map((photo)=> <div className='m-3 ' > <MyPhotos/> </div> )}
+                            {friendsCard && [...Array(10)].map((friends) => <div className='w-full m-3 flex ' ><FriendsCard /></div>)}
                             </div>
-                            {friendsCard && [...Array(10)].map((friends)=><div className='w-full  flex ' ><FriendsCard/></div>)}
+                            
                         </div>
-                       
+
                     </div>
 
 

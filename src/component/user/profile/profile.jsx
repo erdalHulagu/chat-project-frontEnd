@@ -2,12 +2,14 @@ import React, { useState } from 'react'
 import { BiSolidLeftArrowSquare, BiSolidPencil } from 'react-icons/bi'
 import { IoIosHome, IoMdPhotos } from 'react-icons/io';
 import { ImSearch } from 'react-icons/im';
-import { RiUserSettingsFill } from 'react-icons/ri';
+import { RiDownload2Line, RiUserSettingsFill } from 'react-icons/ri';
 import { FaUserFriends } from 'react-icons/fa';
 import { MdPhotoCamera, MdOutlineMonochromePhotos } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom'
 import FriendsCard from '../friends/friends-card';
 import MyPhotos from '../my-photos/my-photos';
+import { Col, Row } from 'react-bootstrap'
+
 const Profile = () => {
     const navigate = useNavigate();
 
@@ -28,10 +30,12 @@ const Profile = () => {
     }
     const handlePhotos = () => {
         setMyPhotos(true)
+        setFriendsCard(false);
     }
 
     const handleFriendsCard = () => {
         setFriendsCard(true);
+        setMyPhotos(false);
     }
 
 
@@ -113,7 +117,7 @@ const Profile = () => {
                         </div >
                         {/* right bar */}
                         <div className='w-[70%] h-full overflow-scroll '>
-                            <div className='sticky top-0 w-full h-20  flex items-center justify-between shadow-slate-900 shadow-2xl bg-blue-950'>
+                            <div className='sticky z-10 top-0 w-full h-20  flex items-center justify-between shadow-slate-900 shadow-2xl bg-blue-950'>
                                 <div className='w-[80%] h-full flex items-center justify-start' >
 
                                     <FaUserFriends onClick={handleFriendsCard} className={`ml-5 text-gray-400 text-2xl  hover:text-red-800 cursor-pointer ${friendsCard && "hidden"}  `} />
@@ -140,10 +144,14 @@ const Profile = () => {
                                 </div>
 
                             </div >
-                            <div className='w-full h-full flex '>
-                            { myPhotos && [...Array(20)].map((photo)=> <div className='m-3 ' > <MyPhotos/> </div> )}
-                            {friendsCard && [...Array(10)].map((friends) => <div className='w-full m-3 flex ' ><FriendsCard /></div>)}
-                            </div>
+                            <Row className='w-full h-full'>
+                            { myPhotos && !friendsCard && [...Array(20)].map((photo)=> <Col  ><MyPhotos/> </Col> )}
+                            {friendsCard && !myPhotos && [...Array(10)].map((friends) => <Col  > <FriendsCard /></Col >)}
+                            
+                            </Row>
+                               
+                           
+                            
                             
                         </div>
 

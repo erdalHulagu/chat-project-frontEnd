@@ -40,18 +40,18 @@ const UserHome = () => {
 
     return (
         < >
-            <div className='w-full  bg-slate-100 shadow-lg rounded-t-lg h-[12%] p-0 flex  items-center justify-between '>
-                <div className='flex  items-center w-[60%] '>
+            <div className='w-full  bg-slate-100 shadow-2xl shadow-slate-900 rounded-t-lg h-[12%] p-0 flex  items-center justify-between '>
+                <div className='flex  items-center w-[50%] '>
                     {/* nav bar */}
-                    <img onClick={handleProfile} className=' hover:border-purple-500  border-2 cursor-pointer w-20 h-20 rounded-full my-5 mx-4' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
+                    <img onClick={handleProfile} className=' hover:opacity-70 border-2 cursor-pointer w-20 h-20 rounded-full my-5 mx-4' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
                     <p className='cursor-pointer text-blue-950 hover:text-red-700 '>user name</p>
                 </div>
-                <div className=' w-[40%] mr-5'>
+                <div className=' w-[50%] mr-5'>
                     <ul className='left-0 text-decoration: none flex justify-between items-center'>
-                        <li className=''><HiUserGroup className='text-xl text-blue-950 hover:text-red-700 cursor-pointer' /></li>
-                        <li className=''><SiInstatus className='text-lg text-blue-950  hover:text-red-700 cursor-pointer' /></li>
-                        <li className=''><BsFillChatLeftDotsFill className='text-lg text-blue-950  hover:text-red-700 cursor-pointer' /></li>
-                        <li className='' ><BsArrowDownSquareFill className='text-lg text-blue-950  hover:text-red-700 cursor-pointer' /></li>
+                        <li className=''><HiUserGroup className='text-blue-950 w-14 h-14 p-3 mr-6 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
+                        <li className=''><SiInstatus className=' text-blue-950 w-14 h-14 p-3 mr-6 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
+                        <li className=''><BsFillChatLeftDotsFill className=' text-blue-950 w-14 h-14 p-3 mr-6 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
+                        <li className='' ><BsArrowDownSquareFill className=' text-blue-950 w-14 h-14 p-3 mr-6 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
 
                     </ul>
                 </div>
@@ -75,11 +75,9 @@ const UserHome = () => {
                                 value={search}
                             />
                             <ImSearch className='absolute  top-7 left-6 text-blue-950' />
-                            <div className='right-3 mr-3 absolute bottom-4'>
-                                <BiFilter className='hover:text-red-700 cursor-pointer text-2xl' />
-                            </div>
+                           
                             <div className='hover:text-red-700 cursor-pointer' onClick={hadleUserList}>
-                                <div className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mt-1 border-b border-blue-950'>
+                                <div className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mt-1   shadow-slate-950 shadow-2xl '>
                                     <PiUserListFill className='text-xl mt-1 hover:text-red-700 text-blue-950 ml-4' />
                                     <p className='ml-2 mt-1 text-sm'>Chat List</p>
 
@@ -88,7 +86,7 @@ const UserHome = () => {
                         </div>
                     </div>
                     <div >
-                        {(search || userList) && [...Array(20)].map((item) => <div onClick={handleQuery} className='mx-2 border-b border-blue-950 overflow-hidden bg '><ChatCard /></div>)}
+                        {(search || userList) && [...Array(20)].map((item) => <div onClick={handleQuery} className='mx-2  overflow-hidden bg '><ChatCard /></div>)}
                     </div>
 
 
@@ -105,18 +103,18 @@ const UserHome = () => {
 
 
                             {[...Array(15)].map((item, id) => <div key={id} className='overflow-hidden w-full'><MessageCard /></div>)}
-                            <div className=' flex items-between justify-center fixed bottom-0 bg-slate-200 h-16 w-[60%] rounded-br-lg '
+                            <div className='shadow-slate-900 shadow-2xl  flex items-between justify-center fixed bottom-0 bg-slate-200 h-16 w-[60%] rounded-br-lg '
                                 style={{ position: `absolute` }}>
 
                                 <div className=' flex items-center justify-center rounded-b-lg '>
-                                    <RiEmojiStickerFill className='hover:text-red-700 cursor-pointer text-2xl  mx-3' />
-                                    <PiPlusCircleFill className='hover:text-red-700 cursor-pointer text-2xl' />
+                                    <RiEmojiStickerFill className='ml-1 text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-400 hover:text-blue-950 cursor-pointer rounded-full' />
+                                    <PiPlusCircleFill className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-400 hover:text-blue-950 cursor-pointer rounded-full' />
                                 </div>
                                 <div className='  h-20 flex items-center justify-center w-full'>
                                     <textarea type='text' className=' w-[94%] bg-slate-100  h-12 mb-3 rounded p-3 py-2 text-slate-950' />
                                 </div>
                                 <div className=' flex items-center justify-center rounded-b-lg '>
-                                    < FaMicrophoneAlt className='hover:text-red-700 cursor-pointer text-2xl  mr-4 ' />
+                                    < FaMicrophoneAlt className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-400 hover:text-blue-950 cursor-pointer rounded-full  mr-1 ' />
 
                                 </div>
 

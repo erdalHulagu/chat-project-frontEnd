@@ -7,7 +7,7 @@ import { FaUserFriends } from 'react-icons/fa';
 import { MdPhotoCamera, MdOutlineMonochromePhotos } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom'
 import FriendsCard from '../friends/friends-card';
-import MyPhotos from '../my-photos/my-photos';
+import MyPhotos from '../my-photos/my-photos-card';
 import { Col, Row } from 'react-bootstrap'
 
 const Profile = () => {
@@ -43,24 +43,23 @@ const Profile = () => {
         <div className="h-screen bg-purple-100 ">
             <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
                 <div className='h-30 w-30 flex w-[20%] left-3 mt-4'>
-                    <div className='my-3 ml-[30%] w-full h-full'>
-                        <BiSolidLeftArrowSquare className='cursor-pointer text-3xl text-gray-400   hover:text-red-700 ' onClick={handleNavigate} />
+                    <div className='my-1 ml-[30%] w-full h-full'>
+                        <BiSolidLeftArrowSquare className=' text-gray-400 w-16 h-16 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handleNavigate} />
                     </div>
                 </div>
                 <div className='w-[80%] h-40 mt-1  flex  justify-end right-0 '>
                     <div className=' flex mt-4 pt-2 h-10 text-center  w-24 rounded-lg text-gray-400 cursor-pointer hover:text-red-700 ' onClick={handleNavigate}>
-                        <IoIosHome className='mt-1 mr-1 ' />
-                        <p>Home</p>
+                        <IoIosHome className='mt-1 mr-1 ' />Home
                     </div>
-                    <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950   hover:bg-gray-100   ' onClick={handleSignOut}  >Sign-out</button> 
+                    <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950   hover:bg-gray-100   ' onClick={handleSignOut}  >Sign-out</button>
                 </div>
                 <div className=" h-[86vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl " >
                     {/* top bar */}
-                    <div className='w-full text-slate-800 bg-slate-100 rounded-t-lg h-[12%] flex  items-center justify-end shadow-slate-950 shadow-2xl border-b'>
-                        <div className='w-[50%] flex  items-center justify-between right-0 '>
-                            <h4 className='cursor-pointer font-semibold hover:text-red-700'>Profile</h4>
-                            <RiUserSettingsFill className='text-slate-800 mr-[3%] text-2xl cursor-pointer hover:text-red-800' />
-                        </div>
+                    <div className='w-full text-slate-800 bg-slate-100 rounded-t-lg h-[12%] flex  items-center justify-between shadow-slate-950 shadow-2xl border-b'>
+                        
+                            <h4 className='ml-6 font-semibold '>Profile</h4>
+                            <RiUserSettingsFill className=' text-blue-950 w-14 h-14 p-3 mr-6 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
+                
 
                     </div>
                     <div className='w-full h-[88%] rounded-b-lg flex'>
@@ -120,7 +119,7 @@ const Profile = () => {
                             <div className='sticky z-10 top-0 w-full h-20  flex items-center justify-between shadow-slate-900 shadow-2xl bg-blue-950'>
                                 <div className='w-[80%] h-full flex items-center justify-start' >
 
-                                    <FaUserFriends onClick={handleFriendsCard} className={`ml-5 text-gray-400 text-2xl  hover:text-red-800 cursor-pointer ${friendsCard && "hidden"}  `} />
+                                    <FaUserFriends onClick={handleFriendsCard} className={`ml-3 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full ${friendsCard && "hidden"}  `} />
 
 
                                     {friendsCard &&
@@ -138,21 +137,21 @@ const Profile = () => {
 
 
                                 <div className={` w-[30%] h-full flex items-center justify-end `}>{/* {` w-[50%] h-full flex items-center justify-end ${friendsCard && "hidden"} `}*/}
-                                    <IoMdPhotos className=' text-gray-400 text-2xl  hover:text-red-800 cursor-pointer' onClick={handlePhotos} />
-                                    <MdOutlineMonochromePhotos className='text-gray-400 text-2xl mx-3 hover:text-red-800 cursor-pointer' />
+                                    <IoMdPhotos className=' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handlePhotos} />
+                                    <MdOutlineMonochromePhotos className=' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
 
                                 </div>
 
                             </div >
-                            <Row className='w-full h-full'>
-                            { myPhotos && !friendsCard && [...Array(20)].map((photo)=> <Col  ><MyPhotos/> </Col> )}
-                            {friendsCard && !myPhotos && [...Array(10)].map((friends) => <Col  > <FriendsCard /></Col >)}
-                            
+                            <Row >
+                                {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col  ><MyPhotos /> </Col>)}
+                                {friendsCard && !myPhotos && [...Array(50)].map((friends) => <Col sm={6} lg={3} md={4} xl={2}> <FriendsCard /></Col >)}
+
                             </Row>
-                               
-                           
-                            
-                            
+
+
+
+
                         </div>
 
                     </div>

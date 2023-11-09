@@ -1,22 +1,33 @@
 import React from "react";
+import { BiSolidTrash } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
 
-const FriendsCard = ({ name, surname,  img }) => {
+const FriendsCard = ({ name, surname, img }) => {
+   const navigate= useNavigate();
+
+   const handleNavigateProfile = () => {
+    navigate('/profile');
+     
+   }
+   
     return (
-        <div className="w-full h-50 p-2 mt-3 mx-3 rounded flex  justify-between  bg-gradient-to-b from-purple-300 via-purple-100 to-white hover:opacity-80 shadow-2xl shadow-slate-800">
-            
-                <img className="rounded-full h-24 w-24" src="https://media.istockphoto.com/id/160945163/tr/fotoğraf/jerusalem.jpg?s=612x612&w=0&k=20&c=VL3IB4BVu3_rdhP679HiP1SyJPbQWg1k3sHUaMZ_sfs=" alt="" />
-            
+        <div onClick={handleNavigateProfile} className="w-[92%] h-auto p-2  rounded m-2  bg-gradient-to-b from-purple-300 via-purple-100 to-white hover:border-2  border-purple-600 shadow-2xl shadow-slate-800 cursor-pointer">
+            <div className="w-full h-full border flex items-center justify-center mb-1">
+                <img className="rounded " src="https://media.istockphoto.com/id/160945163/tr/fotoğraf/jerusalem.jpg?s=612x612&w=0&k=20&c=VL3IB4BVu3_rdhP679HiP1SyJPbQWg1k3sHUaMZ_sfs=" alt="" />
+            </div>
 
-           
-                <div className=" w-full ml-3 ">
-                    <h5 className="text-slate-900 mx-1">name: {name}</h5>
-                    <h5 className="text-slate-900">surname: {surname} </h5>
-                </div>
-                <div className="w-full flex justify-end ">
-                    <button className="text-slate-100 w-20 hover:opacity-30 rounded bg-purple-900 mr-1 mb-1 ">delete</button>
-                </div>
 
-            
+
+
+            <div className=" w-full h-10 flex-col items-start justify-start">
+                <h5 className="text-slate-900 text-sm ">name: {name}</h5>
+                <h5 className="text-slate-900 text-sm ">surname: {surname} </h5>
+            </div>
+            <div className="w-full h-10 flex items-end justify-end">
+                <BiSolidTrash  className="hover:opacity-70 rounded-full w-8 h-8 p-2   hover:bg-gray-300 text-blue-950 hover:text-blue-950 cursor-pointer"/>
+            </div>
+
+
 
 
 

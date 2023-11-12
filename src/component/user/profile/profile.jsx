@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { BiSolidLeftArrowSquare, BiSolidPencil } from 'react-icons/bi'
 import { IoIosHome, IoMdPhotos } from 'react-icons/io';
 import { ImSearch } from 'react-icons/im';
-import { RiDownload2Line, RiUserSettingsFill } from 'react-icons/ri';
+import { RiUserSettingsFill } from 'react-icons/ri';
 import { FaUserFriends } from 'react-icons/fa';
 import { MdPhotoCamera, MdOutlineMonochromePhotos } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom'
@@ -27,6 +27,7 @@ const Profile = () => {
     }
     //--------------------------------------
     const handleSearchFriends = () => {
+        setFriendsCard(true);
     }
     const handlePhotos = () => {
         setMyPhotos(true)
@@ -37,14 +38,20 @@ const Profile = () => {
         setFriendsCard(true);
         setMyPhotos(false);
     }
+    const [isEnlarged, setIsEnlarged] = useState(false);
 
+    const handleToggleSize = () => {
+        setIsEnlarged(!isEnlarged);
+    };
+    
+    
 
     return (
         <div className="h-screen bg-purple-100 ">
             <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
                 <div className='h-30 w-30 flex w-[20%] left-3 mt-4'>
                     <div className='my-1 ml-[30%] w-full h-full'>
-                        <BiSolidLeftArrowSquare className=' text-gray-400 w-16 h-16 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handleNavigate} />
+                        <BiSolidLeftArrowSquare  className={`${isEnlarged ? 'hidden':' text-gray-400 w-16 h-16 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full'}`} onClick={handleNavigate}/>
                     </div>
                 </div>
                 <div className='w-[80%] h-40 mt-1  flex  justify-end right-0 '>
@@ -53,13 +60,15 @@ const Profile = () => {
                     </div>
                     <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950   hover:bg-gray-100   ' onClick={handleSignOut}  >Sign-out</button>
                 </div>
-                <div className=" h-[86vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl " >
+
+                <div className={`${isEnlarged ? 'max-h-[86vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl flex justify-center ': " h-[86vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl "}`} >
                     {/* top bar */}
-                    <div className='w-full text-slate-800 bg-slate-100 rounded-t-lg h-[12%] flex  items-center justify-between shadow-slate-950 shadow-2xl border-b'>
-                        
-                            <h4 className='ml-6 font-semibold '>Profile</h4>
-                            <RiUserSettingsFill className=' text-blue-950 w-14 h-14 p-3 mr-6 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
-                
+                    {isEnlarged ?<div className='rounded w-full h-auto max-h-[86vh] flex justify-center '><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </div> :<>
+                <div className='w-full text-slate-800 bg-slate-100 rounded-t-lg h-[12%] flex  items-center justify-between shadow-slate-950 shadow-2xl border-b'>
+
+                        <h4 className='ml-6 font-semibold '>Profile</h4>
+                        <RiUserSettingsFill className=' text-blue-950 w-14 h-14 p-3 mr-6 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
+
 
                     </div>
                     <div className='w-full h-[88%] rounded-b-lg flex'>
@@ -115,7 +124,7 @@ const Profile = () => {
 
                         </div >
                         {/* right bar */}
-                        <div className='w-[70%] h-full overflow-scroll '>
+                        <div className='w-[80%] h-full overflow-hidden overflow-y-scroll '>
                             <div className='sticky z-10 top-0 w-full h-20  flex items-center justify-between shadow-slate-900 shadow-2xl bg-blue-950'>
                                 <div className='w-[80%] h-full flex items-center justify-start' >
 
@@ -138,30 +147,23 @@ const Profile = () => {
 
                                 <div className={` w-[30%] h-full flex items-center justify-end `}>{/* {` w-[50%] h-full flex items-center justify-end ${friendsCard && "hidden"} `}*/}
                                     <IoMdPhotos className=' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handlePhotos} />
-                                    <MdOutlineMonochromePhotos className=' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
-
+                                    <div className=''>
+                                    <MdOutlineMonochromePhotos className='md:hidden sm:inline  text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
+                                    </div>
                                 </div>
 
                             </div >
+                            <div >
                             <Row >
-                                {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col  ><MyPhotos /> </Col>)}
-                                {friendsCard && !myPhotos && [...Array(50)].map((friends) => <Col sm={6} lg={3} md={4} xl={2}> <FriendsCard /></Col >)}
-
+                                {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col   md={12} lg={6} xxl={4}  ><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
+                                {friendsCard && !myPhotos && [...Array(50)].map((friends) => <Col  md={12} lg={6} xl={4}> <FriendsCard /></Col >)}
                             </Row>
-
-
-
-
+                            </div>
                         </div>
-
-                    </div>
-
-
-
-
-
-
+                    </div></>}
+                    
                 </div>
+                
             </div>
         </div>
         // ------

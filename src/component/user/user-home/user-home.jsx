@@ -9,7 +9,6 @@ import { RiEmojiStickerFill } from 'react-icons/ri'
 
 import { BsFillChatLeftDotsFill, BsArrowDownSquareFill } from 'react-icons/bs'
 import MessageCard from '../chat/message-card';
-import Profil from '../profile/profile';
 import ChatCard from '../chat/chat-card'
 import { useNavigate } from 'react-router-dom'
 

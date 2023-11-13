@@ -9,6 +9,7 @@ const FriendsCard = ({ name, surname, img }) => {
     navigate('/profile');
      
    }
+  
    
     return (
         <div onClick={handleNavigateProfile} className="w-[92%] h-auto p-2  rounded m-2  bg-gradient-to-b from-purple-300 via-purple-100 to-white hover:border-2  border-purple-600 shadow-2xl shadow-slate-800 cursor-pointer">

@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom'
 import FriendsCard from '../friends/friends-card';
 import MyPhotos from '../my-photos/my-photos-card';
 import { Col, Row } from 'react-bootstrap'
+import Photos from "../my-photos/myPhotos.json"
 
 const MyProfile = () => {
     const navigate = useNavigate();
@@ -160,7 +161,7 @@ const MyProfile = () => {
                             <div >
                             <Row >
                                 {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col   md={12} lg={6} xxl={4}  ><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                {friendsCard && !myPhotos && [...Array(50)].map((friends) => <Col  md={12} lg={6} xl={4}> <FriendsCard onClick={handleFriendProfile}/></Col >)}
+                                {friendsCard && !myPhotos && Photos.map((photos,id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard {...photos} onClick={handleFriendProfile}/></Col >)}
                             </Row>
                             </div>
                         </div>

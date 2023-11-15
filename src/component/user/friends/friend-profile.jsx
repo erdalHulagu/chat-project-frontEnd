@@ -61,7 +61,7 @@ const FriendProfile = () => {
                 <div className={`${isEnlarged ? 'max-h-[86vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl flex justify-center ' : " h-[86vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl "}`} >
                     {/* top bar */}
                     {isEnlarged ? <div className='rounded w-full h-auto max-h-[86vh] flex justify-center '><FriendPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </div> : <>
-                        <div className='w-full text-slate-800 bg-blue-950 border rounded-t-lg h-[12%] flex  items-center justify-center shadow-slate-950 shadow-2xl border-b'>
+                        <div className='w-full text-slate-800 bg-blue-950 border rounded-t-lg h-24 z-20 flex  items-center justify-center shadow-slate-950 shadow-2xl border-b'>
                             <div className='w-[10%] h-full items-center flex justify-center'>
                                 <BiSolidLeftArrowSquare onClick={handleNavigate} className='text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
                             </div>
@@ -76,27 +76,24 @@ const FriendProfile = () => {
                         </div>
                         <div className='w-full h-[88%] rounded-b-lg flex'>
                             {/* left bar */}
-                            <div className='w-[40%] h-full rounded-b-lg '>
+                            <div className='w-[35%] h-full rounded-b-lg '>
                                 <div className='w-full flex items-center border h-full marker:rounded-bl-lg'>
                                     <div className='relative bg-slate-200 w-full  h-full top-0 flex flex-col justify-center rounded-b-lg'>
 
+                                    <div className=' w-full flex items-center justify-between h-20 '>
+                                                    <BiSolidVideo className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
+                                                    <BiSolidVideoOff  className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
+                                                    <BiSolidMessageDetail  className=' text-blue-950 w-14 h-14 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
+                                                </div>
+
                                         <label htmlFor="imgInput">
-                                            <div className=' w-full h-[40vh] flex items-center justify-center'>
+                                            <div className=' w-full bg-slate-400 h-48 flex items-center justify-center'>
                                                 <img className='hover:opacity-70 rounded-full cursor-pointer w-48 h-48 my-5 ' src="https://cdn.pixabay.com/photo/2023/10/31/23/06/tiger-8356190_1280.jpg" alt="" />
                                                 <MdPhotoCamera className='absolute cursor-pointer ml-32 text-purple-300 text-3xl' />
                                             </div>
-                                            <div className='flex items-start justify-center w-full h-full'>
-                                                <div className='w-[40%] flex items-center justify-between'>
-                                                    <BiSolidVideo />
-                                                    <BiSolidVideoOff />
-                                                    <BiSolidMessageDetail />
-                                                </div>
-
-                                            </div>
-
                                         </label>
                                         <input type="file" id='imgInput' className='hidden' />
-                                        <div className='h-[30vh]  w-full  border rounded-bl-lg'>
+                                        <div className='h-[50vh]  w-full bg-slate-600  border rounded-bl-lg '>
                                             <div className='w-[94%] h[50%] flex   border-slate-400 border-b mx-[3%] '>
                                                 <div className='w-full h[50%] flex flex-col  '>
                                                     <h5 className="ml-3  text-blue-800 text-lg font-bold w-[20vw] " > Your name </h5>
@@ -105,7 +102,7 @@ const FriendProfile = () => {
                                                 </div>
 
                                                 <div className=' w-[50%] flex right-0 justify-end items-end'>
-                                                    <BiSolidPencil id='imgInput' className='text-2xl text-slate-600 hover:text-red-800 cursor-pointer' />
+                                                    <BiSolidPencil className='text-2xl text-slate-600 hover:text-red-800 cursor-pointer' />
                                                 </div>
 
                                             </div>
@@ -118,7 +115,7 @@ const FriendProfile = () => {
                                             <div className='w-[94%] h[50%] flex   border-slate-400 border-b mx-[3%] '>
                                                 <div className='w-full h[50%] flex flex-col  '>
                                                     <h5 className="ml-3  text-blue-800 text-lg font-bold w-[20vw]" > About </h5>
-                                                    <input id='imgInput' className='mt-3 ml-3  text-slate-800 bottom-0 w-[80%] bg-slate-200  focus:outline-none' type="text" alt='' />
+                                                    <input className='mt-3 ml-3  text-slate-800 bottom-0 w-[80%] bg-slate-200  focus:outline-none' type="text" alt='' />
 
                                                 </div>
 
@@ -135,7 +132,7 @@ const FriendProfile = () => {
 
                             </div >
                             {/* right bar */}
-                            <div className='w-[80%] h-full overflow-hidden overflow-y-scroll '>
+                            <div className='w-[65%] h-full overflow-hidden overflow-y-scroll '>
                                 <div className='sticky z-10 top-0 w-full h-20  flex items-center justify-between shadow-slate-900 shadow-2xl bg-blue-950'>
                                     <div className='w-[80%] h-full flex items-center justify-start' >
 
@@ -158,16 +155,14 @@ const FriendProfile = () => {
 
                                     <div className={` w-[30%] h-full flex items-center justify-end `}>{/* {` w-[50%] h-full flex items-center justify-end ${friendsCard && "hidden"} `}*/}
                                         <IoMdPhotos className=' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handleFriendPhotos} />
-                                        <div className=''>
-                                            <MdOutlineMonochromePhotos className='md:hidden sm:inline  text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
-                                        </div>
+                                        
                                     </div>
 
                                 </div >
                                 <div >
                                     <Row >
                                         {friendPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><FriendPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                        {friendsCard && !friendPhotos && [...Array(50)].map((friends) => <Col md={12} lg={6} xl={4}> <FriendsCard /></Col >)}
+                                        {friendsCard && !friendPhotos && [...Array(50)].map((friends) => <Col md={12} lg={6} xl={4}> <FriendsCard  /></Col >)}
                                     </Row>
                                 </div>
                             </div>

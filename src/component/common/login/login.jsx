@@ -61,7 +61,7 @@ const Login = () => {
             <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
                 <div className='h-30 w-30 flex items-start ml-10 w-full  mt-4'>
                     <div className='my-3 flex items-start  border-white justify-start w-full h-full'>
-                        <BiSolidLeftArrowSquare className='cursor-pointer text-3xl text-gray-400   hover:text-red-700 ' onClick={handleNavigate} />
+                        <BiSolidLeftArrowSquare className=' text-gray-400 w-16 h-16 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handleNavigate} />
                     </div>
                 </div>
                 

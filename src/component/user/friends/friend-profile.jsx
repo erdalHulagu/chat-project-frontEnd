@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import FriendsCard from '../friends/friends-card';
 import { Col, Row } from 'react-bootstrap'
 import FriendPhotos from './friend-photos-card';
+import Photos from "../my-photos/myPhotos.json"
 
 const FriendProfile = () => {
     const navigate = useNavigate();
@@ -15,6 +16,8 @@ const FriendProfile = () => {
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
     const [friendPhotos, setFriendPhotos] = useState(false);
+    const [camera, setCamera] = useState(false);
+
 
     //--------------------------------------
     const handleNavigate = () => {
@@ -43,15 +46,17 @@ const FriendProfile = () => {
         setIsEnlarged(!isEnlarged);
     };
 
+const handleCamera = () => {
+    setCamera(!camera);
+  
+}
 
 
     return (
         <div className="h-screen bg-purple-100 ">
-            <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
-                <div className='h-30 w-30 flex w-[20%] left-3 mt-4'>
-
-                </div>
-                <div className='w-[80%] h-40 mt-1  flex  justify-end right-0 '>
+            <div className="h-48 bg-blue-950  flex  justify-center shadow-black shadow-2xl ">
+                
+                <div className='w-full h-40 mt-1  flex  justify-end  '>
                     <div className=' flex mt-4 pt-2 h-10 text-center  w-24 rounded-lg text-gray-400 cursor-pointer hover:text-red-700 ' onClick={handleNavigate}>
                         <IoIosHome className='mt-1 mr-1 ' />Home
                     </div>
@@ -74,56 +79,41 @@ const FriendProfile = () => {
 
 
                         </div>
-                        <div className='w-full h-[88%] rounded-b-lg flex'>
+                        <div className='w-full h-[90%] rounded-b-lg flex'>
                             {/* left bar */}
                             <div className='w-[35%] h-full rounded-b-lg '>
                                 <div className='w-full flex items-center border h-full marker:rounded-bl-lg'>
-                                    <div className='relative bg-slate-200 w-full  h-full top-0 flex flex-col justify-center rounded-b-lg'>
+                                    <div className=' bg-slate-200 w-full  h-full rounded-b-lg flex flex-col items-center justify-center'>
 
-                                    <div className=' w-full flex items-center justify-between h-20 '>
-                                                    <BiSolidVideo className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
-                                                    <BiSolidVideoOff  className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
-                                                    <BiSolidMessageDetail  className=' text-blue-950 w-14 h-14 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
-                                                </div>
 
-                                        <label htmlFor="imgInput">
-                                            <div className=' w-full bg-slate-400 h-48 flex items-center justify-center'>
-                                                <img className='hover:opacity-70 rounded-full cursor-pointer w-48 h-48 my-5 ' src="https://cdn.pixabay.com/photo/2023/10/31/23/06/tiger-8356190_1280.jpg" alt="" />
-                                                <MdPhotoCamera className='absolute cursor-pointer ml-32 text-purple-300 text-3xl' />
+
+                                        <div className=' w-full h-[40%] flex items-center justify-center'>
+                                            <img className='hover:opacity-70 rounded-full cursor-pointer w-48 h-48  ' src="https://cdn.pixabay.com/photo/2023/10/31/23/06/tiger-8356190_1280.jpg" alt="" />
+
+                                        </div>
+                                        
+                                        <div className=' w-40 flex items-center justify-between h-[10%] mb-20 '>
+                                            
+                                            <BiSolidVideo className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
+                                           
+                                            <BiSolidMessageDetail className=' text-blue-950 w-14 h-14 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
+                                        </div>
+
+
+                                        <div className='h-[50%]  w-[96%]  rounded-bl-lg '>
+                                            <div className='border-y border-gray-300 flex flex-col  justify-between items-center'>
+                                                <h5 className='text-purple-900 mt-3  mx-2'>Full Name </h5>
+                                                <p >Erdal Hulagu</p>
                                             </div>
-                                        </label>
-                                        <input type="file" id='imgInput' className='hidden' />
-                                        <div className='h-[50vh]  w-full bg-slate-600  border rounded-bl-lg '>
-                                            <div className='w-[94%] h[50%] flex   border-slate-400 border-b mx-[3%] '>
-                                                <div className='w-full h[50%] flex flex-col  '>
-                                                    <h5 className="ml-3  text-blue-800 text-lg font-bold w-[20vw] " > Your name </h5>
-                                                    <input id='imgInput' className=' ml-3 mt-3  text-slate-800 bottom-0 w-[80%] bg-slate-200  focus:outline-none' type="text" alt='' />
-
-                                                </div>
-
-                                                <div className=' w-[50%] flex right-0 justify-end items-end'>
-                                                    <BiSolidPencil className='text-2xl text-slate-600 hover:text-red-800 cursor-pointer' />
-                                                </div>
-
+                                            <div className='border-y border-gray-300 flex flex-col  justify-center items-center'>
+                                                <h5 className='text-purple-900 mt-3  mx-2'>Phone Number  </h5>
+                                                <p className='mx-2' >23872340000000000000</p>
                                             </div>
-                                            <div className='w-[90%]  flex items-center mx-3'>
-                                                <p className=' my-12 flex flex-col items-center font-bold'>
-                                                    This is not your name. This name will be visible on your account contact
-                                                </p>
+                                            <div className='border-y border-gray-300 flex flex-col  justify-center items-center'>
+                                                <h5 className='text-purple-900 mt-3  mx-2'>Email Adress</h5>
+                                                <p >sdjhfalshdjfskhdfsdhflksjh</p>
                                             </div>
 
-                                            <div className='w-[94%] h[50%] flex   border-slate-400 border-b mx-[3%] '>
-                                                <div className='w-full h[50%] flex flex-col  '>
-                                                    <h5 className="ml-3  text-blue-800 text-lg font-bold w-[20vw]" > About </h5>
-                                                    <input className='mt-3 ml-3  text-slate-800 bottom-0 w-[80%] bg-slate-200  focus:outline-none' type="text" alt='' />
-
-                                                </div>
-
-                                                <div className=' w-[50%] flex right-0 justify-end items-end'>
-                                                    <BiSolidPencil className='text-2xl text-slate-600 hover:text-red-800 cursor-pointer' />
-                                                </div>
-
-                                            </div>
                                         </div>
                                     </div>
 
@@ -155,14 +145,14 @@ const FriendProfile = () => {
 
                                     <div className={` w-[30%] h-full flex items-center justify-end `}>{/* {` w-[50%] h-full flex items-center justify-end ${friendsCard && "hidden"} `}*/}
                                         <IoMdPhotos className=' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handleFriendPhotos} />
-                                        
+
                                     </div>
 
                                 </div >
                                 <div >
                                     <Row >
                                         {friendPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><FriendPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                        {friendsCard && !friendPhotos && [...Array(50)].map((friends) => <Col md={12} lg={6} xl={4}> <FriendsCard  /></Col >)}
+                                        {friendsCard && !friendPhotos && Photos.map((photos,id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard {...photos} /></Col >)}
                                     </Row>
                                 </div>
                             </div>

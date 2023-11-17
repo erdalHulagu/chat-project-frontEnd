@@ -2,7 +2,7 @@ import React from "react";
 import { BiSolidTrash } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 
-const FriendsCard = ({ name, surname, image}) => {
+const FriendsCard = ({ name, surname, image,onClick}) => {
     const navigate = useNavigate();
 
     const handleNavigateProfile = () => {
@@ -14,7 +14,7 @@ const FriendsCard = ({ name, surname, image}) => {
 
 
     return (
-        <div className="w-[94%] h-auto p-2 max-h-200 rounded m-3  bg-gradient-to-b from-purple-300 via-purple-100 to-white hover:border-2  border-purple-600 shadow-2xl shadow-slate-800 cursor-pointer">
+        <div onClick={onClick} className="w-[94%] h-auto p-2 max-h-200 rounded m-3  bg-gradient-to-b from-purple-300 via-purple-100 to-white hover:border-2  border-purple-600 shadow-2xl shadow-slate-800 cursor-pointer">
             <div className="w-full h-60  flex items-center justify-center mb-1">
                 <img onClick={handleNavigateProfile}  className="rounded m-0 w-full h-full " src={image} alt="" />
             </div>

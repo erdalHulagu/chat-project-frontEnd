@@ -46,10 +46,7 @@ const FriendProfile = () => {
         setIsEnlarged(!isEnlarged);
     };
 
-const handleCamera = () => {
-    setCamera(!camera);
-  
-}
+
 
 
     return (

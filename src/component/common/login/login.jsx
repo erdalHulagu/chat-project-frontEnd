@@ -5,6 +5,7 @@ import { Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { BiSolidLeftArrowSquare } from "react-icons/bi"
 import * as Yup from "yup";
+import axios from "axios";
 
 const Login = () => {
     const navigater = useNavigate();
@@ -40,9 +41,9 @@ const Login = () => {
 
     const onSubmit = async (values) => {
         try {
-            // const resp = await axios.post("https://carrental-v3-backend.herokuapp.com/login", values);
-            // console.log(resp.data);
-            // localStorage.setItem("token", resp.data.token)
+            const resp = await axios.post("https://carrental-v3-backend.herokuapp.com/login", values);
+            console.log(resp.data);
+            localStorage.setItem("token", resp.data.token)
 
         } catch (err) {
             console.log(err);

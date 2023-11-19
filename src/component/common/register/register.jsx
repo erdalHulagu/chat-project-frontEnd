@@ -1,4 +1,5 @@
 // import axios from "axios";
+import axios from "axios";
 import { useFormik } from "formik";
 import React from "react";
 import {  Container, Form } from "react-bootstrap";
@@ -22,7 +23,7 @@ const Register = () => {
         adress: "",
         remember: false,
     };
-
+console.log(name);
     const validationSchema = Yup.object({
         email: Yup.string()
             .email("Type in a valid email adress")
@@ -32,9 +33,9 @@ const Register = () => {
 
     const onSubmit = async (values) => {
         try {
-            // const resp = await axios.post("https://carrental-v3-backend.herokuapp.com/login", values);
-            // console.log(resp.data);
-            // localStorage.setItem("token", resp.data.token)
+            const resp = await axios.post("https://carrental-v3-backend.herokuapp.com/login", values);
+            console.log(resp.data);
+            localStorage.setItem("token", resp.data.token)
 
         } catch (err) {
             console.log(err);

@@ -1,0 +1,28 @@
+@mixin reset-list{
+    list-style: none;
+    padding:0;
+    margin:0;
+}
+
+@mixin flexbox($direction:row, $justify-content: flex-start, $align-items: flex-start, $gap:0){
+    display: flex;
+    justify-content: $justify-content;
+    flex-direction: $direction;
+    align-items: $align-items;
+    gap: $gap;
+}
+
+@mixin bg-image($url, $size: cover, $position: center center, $repeat: no-repeat){
+    background-image: url($url);
+    background-repeat: $repeat;
+    background-size: $size;
+    background-position: $position;
+}
+
+@mixin watermark($bgcolor, $opacity: 0.8){
+    content:"";
+    position: absolute;
+    top:0; left:0; right:0; bottom:0;
+    background-color: $bgcolor;
+    opacity: $opacity;
+}

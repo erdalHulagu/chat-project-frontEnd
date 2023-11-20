@@ -1,0 +1,25 @@
+$color1: rgb(123, 0, 145);
+$color2: rgb(203, 179, 0);
+$color3: rgb(116, 116, 116);
+$color4: rgb(237, 237, 237);
+$color5: rgba(123, 0, 145, 0.5);
+$color6: rgba(203, 179, 0, 0.5);
+
+
+/* BOOTSTRAP */
+$primary                    : $color1;
+$secondary                  : $color2;
+$font-family-sans-serif     : "Roboto";
+$navbar-light-color         : $color1;
+$navbar-light-hover-color   : $color2;
+$navbar-light-active-color  : $color2;
+$nav-link-font-weight       : 600;
+$border-radius              : 0;
+$form-feedback-valid-color  : $color1;
+$nav-tabs-link-active-color : $color2;
+
+/* SWEETALERT */
+$swal2-confirm-button-background-color  : $color1;
+$swal2-cancel-button-background-color   : $color2;
+$swal2-success                          : $color1;
+

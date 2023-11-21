@@ -58,21 +58,21 @@ const Login = () => {
     });
 
     return (
-        <div fluid className="h-screen bg-purple-100 ">
-            <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
-                <div className='h-30 w-30 flex items-start ml-10 w-full  mt-4'>
-                    <div className='my-3 flex items-start  border-white justify-start w-full h-full'>
-                        <BiSolidLeftArrowSquare className=' text-gray-400 w-16 h-16 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handleNavigate} />
-                    </div>
-                </div>
+        // <div fluid className="h-screen bg-purple-100 ">
+        //     <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
+        //         <div className='h-30 w-30 flex items-start ml-10 w-full  mt-4'>
+        //             <div className='my-3 flex items-start  border-white justify-start w-full h-full'>
+        //                 <BiSolidLeftArrowSquare className=' text-gray-400 w-16 h-16 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handleNavigate} />
+        //             </div>
+        //         </div>
                 
-                <div className=" flex  justify-center items-center h-[86vh] w-[94%]  absolute bottom-22  top-28 rounded  shadow-slate-700  shadow-2xl " >
+        //         <div className=" flex  justify-center items-center h-[86vh] w-[94%]  absolute bottom-22  top-28 rounded  shadow-slate-700  shadow-2xl " >
 
-                    <div className=' rounded w-full h-full flex  justify-center'>
-                        <img className='rounded object-cover absolute w-full h-full' src="https://media.istockphoto.com/id/1327187531/tr/vektör/global-network-connection-world-map-point-and-line-composition-concept-of-global-business.jpg?s=612x612&w=0&k=20&c=vfLYnJcaXytQn-7D4XYJQZcbXrvvUjHrujtJAl6JoeA=" alt="" />
-                        <h5 className='top-20 text-bold absolute text-gray-400'>- World wide connection -</h5>
-                    </div>
-                    <div className='overflow-hidden opacity-90 absolute rounded bg-slate-300 w-[80%] mt-20 h-[80%]  p-10 flex items-center justify-center  shadow-slate-400  shadow-2xl'>
+        //             <div className=' rounded w-full h-full flex  justify-center'>
+        //                 <img className='rounded object-cover absolute w-full h-full' src="https://media.istockphoto.com/id/1327187531/tr/vektör/global-network-connection-world-map-point-and-line-composition-concept-of-global-business.jpg?s=612x612&w=0&k=20&c=vfLYnJcaXytQn-7D4XYJQZcbXrvvUjHrujtJAl6JoeA=" alt="" />
+        //                 <h5 className='top-20 text-bold absolute text-gray-400'>- World wide connection -</h5>
+        //             </div>
+        //             <div className='overflow-hidden opacity-90 absolute rounded bg-slate-300 w-[80%] max-w-lg mt-20 h-[80%]  p-10 flex items-center justify-center  shadow-slate-400  shadow-2xl'>
                         <Container className="mt-3 ">
                             <Form noValidate onSubmit={formik.handleSubmit}>
 
@@ -115,15 +115,7 @@ const Login = () => {
                             </Form>
                         </Container>
 
-                    </div>
-
-
-
-
-                </div>
-            </div>
-        </div>
-
+      
 
     );
 };

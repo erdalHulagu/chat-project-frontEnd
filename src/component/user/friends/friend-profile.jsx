@@ -16,7 +16,6 @@ const FriendProfile = () => {
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
     const [friendPhotos, setFriendPhotos] = useState(false);
-    const [camera, setCamera] = useState(false);
 
 
     //--------------------------------------

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export const userSlice =createSlice({
-    user:"user",
+    name:"user",
     initialState: {
         fullName:"erdal hulagu",
         image:"https://cdn.pixabay.com/photo/2023/09/27/07/29/mantis-8278996_1280.jpg",
@@ -12,11 +12,9 @@ export const userSlice =createSlice({
     redusers:{
        
         setFullName:(state,action)=>{
-            state.name=action.payload
+            state.fullName=action.payload
         },
-        setSurname:(state,action)=>{
-            state.surname=action.payload
-        },
+        
         setImage:(state,action)=>{
             state.image=action.payload
         },

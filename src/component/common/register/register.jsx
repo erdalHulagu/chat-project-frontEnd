@@ -2,17 +2,13 @@
 import axios from "axios";
 import { useFormik } from "formik";
 import React from "react";
+import { useState } from "react";
 import {  Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 
-const Register = () => {
-    const navigater = useNavigate();
-
-    const handleNavigater = (params) => {
-        navigater('/login');
-    }
-
+const Register = ({handleSubmit}) => {
+    
 
     const initialValues = {
         name: "",
@@ -132,7 +128,7 @@ const Register = () => {
 
                 <div className="w-full h-14 flex items-center justify-end ">
                     <div>
-                    <button className=" h-10  w-24 rounded-lg bg-slate-700 text-slate-100  hover:text-slate-950 hover:bg-gray-100   "  type="submit" onClick={handleNavigater}>
+                    <button className=" h-10  w-24 rounded-lg bg-slate-700 text-slate-100  hover:text-slate-950 hover:bg-gray-100   "  type="submit" onClick={handleSubmit}>
                         Submit
                     </button>
                     </div>

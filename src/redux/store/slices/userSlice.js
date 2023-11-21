@@ -3,22 +3,18 @@ import { createSlice } from "@reduxjs/toolkit";
 export const userSlice =createSlice({
     user:"user",
     initialState: {
-        name:"erdal",
-        surname :"hulagu",
-        Image:"https://cdn.pixabay.com/photo/2023/09/27/07/29/mantis-8278996_1280.jpg",
+        fullName:"erdal hulagu",
+        image:"https://cdn.pixabay.com/photo/2023/09/27/07/29/mantis-8278996_1280.jpg",
         email:"erdal@gmail.com",
         phone:"123456789"
 
     },
     redusers:{
-        setUser:(state,action)=>{
-            state.user=action.payload
-            
-        },
-        setName:(state,action)=>{
+       
+        setFullName:(state,action)=>{
             state.name=action.payload
         },
-        surname:(state,action)=>{
+        setSurname:(state,action)=>{
             state.surname=action.payload
         },
         setImage:(state,action)=>{
@@ -31,4 +27,6 @@ export const userSlice =createSlice({
             state.phone=action.payload
         }
     }
-})
+});
+export const {setFullName, setImage, setEmail, setPhone} = userSlice.actions;
+export default userSlice.reducer;

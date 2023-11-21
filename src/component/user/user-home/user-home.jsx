@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { HiUserGroup } from 'react-icons/hi'
 import { SiInstatus } from 'react-icons/si'
 import { ImSearch } from 'react-icons/im'
-import { BiFilter } from 'react-icons/bi'
 import { PiUserListFill, PiPlusCircleFill } from 'react-icons/pi'
 import { FaMicrophoneAlt } from 'react-icons/fa'
 import { RiEmojiStickerFill } from 'react-icons/ri'
@@ -19,7 +18,6 @@ const UserHome = () => {
     const [query, setQuery] = useState(false)
     const [search, setSearch] = useState("")
     const [userList, setUserList] = useState(false)
-    const [profil, setProfil] = useState(false);
 
     const hadleUserList = () => {
         setUserList(true);

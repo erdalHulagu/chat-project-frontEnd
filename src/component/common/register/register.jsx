@@ -23,7 +23,7 @@ const Register = () => {
         adress: "",
         remember: false,
     };
-console.log(name);
+
     const validationSchema = Yup.object({
         email: Yup.string()
             .email("Type in a valid email adress")

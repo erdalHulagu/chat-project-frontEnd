@@ -10,13 +10,8 @@ import FriendsCard from '../friends/friends-card';
 import MyPhotos from '../my-photos/my-photos-card';
 import { Col, Row } from 'react-bootstrap'
 import friends from "../my-photos/friends.json"
-import { useDispatch } from 'react-redux';
-import { setProfile } from '../../../redux/store/slices/userSlice';
-import { useAppDispatch, useAppSelector } from '../../../redux/store/hooks/hooks';
 
 const MyProfile = () => {
-const friendId=useAppSelector((state)=>state.selectedFriendId)
-   const dispatch= useDispatch();
     const navigate = useNavigate();
 
     const [friendsCard, setFriendsCard] = useState(false);
@@ -50,13 +45,13 @@ const friendId=useAppSelector((state)=>state.selectedFriendId)
     const handleToggleSize = () => {
         setIsEnlarged(!isEnlarged);
     };
-
-    const handleFriendProfile = (friendId) => {
+    const handleFriendProfile = () => {
         navigate("/friendProfile");
-        dispatch(setProfile(friendId));
+       
        
 
     }
+    
 
    
     
@@ -170,7 +165,8 @@ const friendId=useAppSelector((state)=>state.selectedFriendId)
                                 <div >
                                     <Row >
                                         {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                        {friendsCard && !myPhotos && friends.map((friend, id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard {...friend} onClick={()=>handleFriendProfile(friend.id)} /></Col >)}
+                                        {friendsCard && !myPhotos && friends.map((friend, id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard {...friend}  onClick={handleFriendProfile}/></Col >)}
+                                        {/* {friendsCard && !myPhotos && friends.map((friend, id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard  {...friend}  /><FriendProfile friend={friend} onClick={()=>{handleFriendProfile(friend)}}/></Col >)} */}
                                     </Row>
                                 </div>
                             </div>
@@ -185,4 +181,4 @@ const friendId=useAppSelector((state)=>state.selectedFriendId)
     )
 }
 
-export default MyProfile
+export default MyProfile;

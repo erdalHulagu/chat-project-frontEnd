@@ -1,11 +1,7 @@
-import React from 'react'
+import axios from "axios";
+import { setting } from "../helpers/settings";
 
-const UserService = () => {
-  return (
-    <div>
-      UserService
-    </div>
-  )
-}
-
-export default UserService
+export const API_URL=setting.apiURL;
+export const getUser = (id) => {
+  return axios.get(`${API_URL}/${id}`);
+};

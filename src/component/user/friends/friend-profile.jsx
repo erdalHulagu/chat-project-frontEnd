@@ -7,14 +7,15 @@ import { useNavigate } from 'react-router-dom'
 import FriendsCard from '../friends/friends-card';
 import { Col, Row } from 'react-bootstrap'
 import FriendPhotos from './friend-photos-card';
-import friends from "../my-photos/friends.json"
-import { useSelector } from 'react-redux';
-import { useAppSelector } from '../../../redux/store/hooks/hooks';
+import friendFriends from "../my-photos/friends.json"
 
 const FriendProfile = () => {
-    const navigate = useNavigate();
-    const friend = useAppSelector(state=>state.user.friends);
+      
+      
+      
 
+    
+    const navigate = useNavigate();
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
     const [friendPhotos, setFriendPhotos] = useState(false);
@@ -47,8 +48,7 @@ const FriendProfile = () => {
         setIsEnlarged(!isEnlarged);
     };
     
-
-
+    
 
     return (
         <div className="h-screen bg-purple-100 ">
@@ -86,7 +86,7 @@ const FriendProfile = () => {
 
 
                                         <div className=' w-full h-[40%] flex items-center justify-center'>
-                                            <img className='hover:opacity-70 rounded-full cursor-pointer w-48 h-48  ' src={friend.image} alt="" />
+                                            <img className='hover:opacity-70 rounded-full cursor-pointer w-48 h-48  ' src="https://cdn.pixabay.com/photo/2023/10/17/02/14/lotus-8320293_1280.jpg" alt="" />
 
                                         </div>
                                         
@@ -101,19 +101,19 @@ const FriendProfile = () => {
                                         <div className='h-[50%]  w-[96%] flex flex-col items-start justify-start rounded-bl-lg '>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3'>Name </h5>
-                                                <p >{friend.name}</p>
+                                                <p >erman</p>
                                             </div>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3 '>Last name </h5>
-                                                <p >{friend.lastname}</p>
+                                                <p >garip</p>
                                             </div>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3'>Phone Number </h5>
-                                                <p className='mx-2' >{friend.phone}</p>
+                                                <p className='mx-2' >12345</p>
                                             </div>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3'>Email Adress</h5>
-                                                <p >{friend.email}</p>
+                                                <p >email</p>
                                             </div>
                                             
 
@@ -156,7 +156,7 @@ const FriendProfile = () => {
                                 <div >
                                     <Row >
                                         {friendPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><FriendPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                        {friendsCard && !friendPhotos && friends.map((photos,id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard {...photos} /></Col >)}
+                                        {friendsCard && !friendPhotos && friendFriends.map((friend,id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard {...friend} /></Col >)}
                                     </Row>
                                 </div>
                             </div>
@@ -170,5 +170,6 @@ const FriendProfile = () => {
 
     )
 }
+
 
 export default FriendProfile

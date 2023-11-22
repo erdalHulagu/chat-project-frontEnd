@@ -9,15 +9,20 @@ import { useNavigate } from 'react-router-dom'
 import FriendsCard from '../friends/friends-card';
 import MyPhotos from '../my-photos/my-photos-card';
 import { Col, Row } from 'react-bootstrap'
-import Photos from "../my-photos/myPhotos.json"
+import friends from "../my-photos/friends.json"
+import { useDispatch } from 'react-redux';
+import { setProfile } from '../../../redux/store/slices/userSlice';
+import { useAppDispatch, useAppSelector } from '../../../redux/store/hooks/hooks';
 
 const MyProfile = () => {
-
+const friendId=useAppSelector((state)=>state.selectedFriendId)
+   const dispatch= useDispatch();
     const navigate = useNavigate();
 
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
     const [myPhotos, setMyPhotos] = useState(false);
+
 
     //--------------------------------------
     const handleNavigate = () => {
@@ -46,12 +51,15 @@ const MyProfile = () => {
         setIsEnlarged(!isEnlarged);
     };
 
-    const handleFriendProfile = () => {
+    const handleFriendProfile = (friendId) => {
         navigate("/friendProfile");
+        dispatch(setProfile(friendId));
+       
 
     }
 
-
+   
+    
     return (
         <div className="h-screen bg-purple-100 ">
             <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
@@ -162,7 +170,7 @@ const MyProfile = () => {
                                 <div >
                                     <Row >
                                         {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                        {friendsCard && !myPhotos && Photos.map((photos, id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard {...photos} onClick={handleFriendProfile} /></Col >)}
+                                        {friendsCard && !myPhotos && friends.map((friend, id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard {...friend} onClick={()=>handleFriendProfile(friend.id)} /></Col >)}
                                     </Row>
                                 </div>
                             </div>

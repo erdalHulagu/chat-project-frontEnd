@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userSlice from "./slices/userSlice";
-import { profilesSlice } from "./slices/friendsProfileSlices";
+import { profileSlice } from "./slices/friendsProfileSlices";
+
 
 
 
@@ -8,6 +9,6 @@ import { profilesSlice } from "./slices/friendsProfileSlices";
 export const store=configureStore({
     reducer:{
        user: userSlice,
-       profiles:profilesSlice
+       profiles:profileSlice
     }
 })

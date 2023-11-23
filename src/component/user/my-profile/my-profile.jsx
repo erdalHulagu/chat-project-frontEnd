@@ -10,10 +10,12 @@ import FriendsCard from '../friends/friends-card';
 import MyPhotos from '../my-photos/my-photos-card';
 import { Col, Row } from 'react-bootstrap'
 import friends from "../my-photos/friends.json"
+import { useDispatch } from 'react-redux';
+import { setProfile } from '../../../redux/store/slices/friendsProfileSlices';
 
 const MyProfile = () => {
     const navigate = useNavigate();
-
+const dispatcher=useDispatch();
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
     const [myPhotos, setMyPhotos] = useState(false);
@@ -45,7 +47,8 @@ const MyProfile = () => {
     const handleToggleSize = () => {
         setIsEnlarged(!isEnlarged);
     };
-    const handleFriendProfile = () => {
+    const handleFriendProfile = (item) => {
+        dispatcher(setProfile(item))
         navigate("/friendProfile");
        
        
@@ -165,7 +168,7 @@ const MyProfile = () => {
                                 <div >
                                     <Row >
                                         {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                        {friendsCard && !myPhotos && friends.map((friend, id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard {...friend}  onClick={handleFriendProfile}/></Col >)}
+                                        {friendsCard && !myPhotos && friends.map((item, id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard  {...item}  onClick={handleFriendProfile(item)}/></Col >)}
                                         {/* {friendsCard && !myPhotos && friends.map((friend, id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard  {...friend}  /><FriendProfile friend={friend} onClick={()=>{handleFriendProfile(friend)}}/></Col >)} */}
                                     </Row>
                                 </div>

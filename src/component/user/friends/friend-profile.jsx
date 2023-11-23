@@ -8,10 +8,11 @@ import FriendsCard from '../friends/friends-card';
 import { Col, Row } from 'react-bootstrap'
 import FriendPhotos from './friend-photos-card';
 import friendFriends from "../my-photos/friends.json"
+import { useSelector } from 'react-redux';
 
 const FriendProfile = () => {
       
-      
+    const selector=  useSelector(state=>state.value)
       
 
     
@@ -86,7 +87,7 @@ const FriendProfile = () => {
 
 
                                         <div className=' w-full h-[40%] flex items-center justify-center'>
-                                            <img className='hover:opacity-70 rounded-full cursor-pointer w-48 h-48  ' src="https://cdn.pixabay.com/photo/2023/10/17/02/14/lotus-8320293_1280.jpg" alt="" />
+                                            <img className='hover:opacity-70 rounded-full cursor-pointer w-48 h-48  ' src={selector.image} alt="" />
 
                                         </div>
                                         
@@ -101,19 +102,19 @@ const FriendProfile = () => {
                                         <div className='h-[50%]  w-[96%] flex flex-col items-start justify-start rounded-bl-lg '>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3'>Name </h5>
-                                                <p >erman</p>
+                                                <p >{selector.name}</p>
                                             </div>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3 '>Last name </h5>
-                                                <p >garip</p>
+                                                <p >{selector.lastname}</p>
                                             </div>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3'>Phone Number </h5>
-                                                <p className='mx-2' >12345</p>
+                                                <p className='mx-2' >{selector.phone}</p>
                                             </div>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3'>Email Adress</h5>
-                                                <p >email</p>
+                                                <p >{selector.phone}</p>
                                             </div>
                                             
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BiSolidLeftArrowSquare, BiSolidPencil } from 'react-icons/bi'
 import { IoIosHome, IoMdPhotos } from 'react-icons/io';
 import { ImSearch } from 'react-icons/im';
@@ -9,13 +9,19 @@ import { useNavigate } from 'react-router-dom'
 import FriendsCard from '../friends/friends-card';
 import MyPhotos from '../my-photos/my-photos-card';
 import { Col, Row } from 'react-bootstrap'
-import friends from "../my-photos/friends.json"
-import { useDispatch } from 'react-redux';
-import { setProfile } from '../../../redux/store/slices/friendsProfileSlices';
+// import useAppSelector from '../../../redux/store/hooks/hooks';
+// import useAppDispatch from '../../../redux/store/hooks/hooks';
+// import { getUsers } from '../../../api/user.service';
+// import {setFriend, setSelectedProfile} from '../../../redux/store/slices/friendsProfileSlices'
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import { setFriend, setSelectedProfile } from '../../../redux/store/slices/friendsProfileSlices';
+
 
 const MyProfile = () => {
     const navigate = useNavigate();
 const dispatcher=useDispatch();
+const friends=useSelector((state)=>state.friend.friendprofile)
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
     const [myPhotos, setMyPhotos] = useState(false);
@@ -47,16 +53,27 @@ const dispatcher=useDispatch();
     const handleToggleSize = () => {
         setIsEnlarged(!isEnlarged);
     };
-    const handleFriendProfile = (item) => {
-        dispatcher(setProfile(item))
-        navigate("/friendProfile");
-       
-       
-
-    }
+    useEffect(() => {
+      try {
+        axios.get('../my-photos/friends.json').then(resp=>{
+                    dispatcher(setFriend(resp.data.friends));
+                });
+      } catch (error) {
+            console.log('Error fetching user data:', error);
+        
+      }
     
 
+}, [dispatcher])
    
+
+const handleFriendProfile = (friend) => {
+dispatcher(setSelectedProfile(friend));
+  
+}
+
+
+
     
     return (
         <div className="h-screen bg-purple-100 ">
@@ -168,7 +185,7 @@ const dispatcher=useDispatch();
                                 <div >
                                     <Row >
                                         {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                        {friendsCard && !myPhotos && friends.map((item, id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard  {...item}  onClick={handleFriendProfile(item)}/></Col >)}
+                                        {friendsCard && !myPhotos && friends.map((friend) => <Col key={friend.id} md={12} lg={6} xl={4}> <FriendsCard  {...friend}  onClick={handleFriendProfile(friend)}/></Col >)}
                                         {/* {friendsCard && !myPhotos && friends.map((friend, id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard  {...friend}  /><FriendProfile friend={friend} onClick={()=>{handleFriendProfile(friend)}}/></Col >)} */}
                                     </Row>
                                 </div>

@@ -9,10 +9,11 @@ import { Col, Row } from 'react-bootstrap'
 import FriendPhotos from './friend-photos-card';
 import friendFriends from "../my-photos/friends.json"
 import { useSelector } from 'react-redux';
+import { setSelectedProfile } from '../../../redux/store/slices/friendsProfileSlices';
 
 const FriendProfile = () => {
       
-    const selector=  useSelector(state=>state.value)
+    const selector=  useSelector((state)=>state.friendprofile)
       
 
     

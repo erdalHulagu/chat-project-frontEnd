@@ -6,9 +6,9 @@ import { profileSlice } from "./slices/friendsProfileSlices";
 
 
 
-export const store=configureStore({
+export const store = configureStore({
     reducer:{
        user: userSlice,
-       profiles:profileSlice
+       friendprofile:profileSlice
     }
 })

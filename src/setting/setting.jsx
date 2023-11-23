@@ -1,5 +1,5 @@
 export const setting = {
-    apiURL : "https://carrental-v3-backend.herokuapp.com",
+    apiURL : "../component/user/my-photos/friends.json",
     siteName: "Let's Rental Car",
     siteUrl : "letsrentalcar.com",
     email : "support@letsrentalcar.com",

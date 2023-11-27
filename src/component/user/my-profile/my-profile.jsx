@@ -9,20 +9,16 @@ import { useNavigate } from 'react-router-dom'
 import FriendsCard from '../friends/friends-card';
 import MyPhotos from '../my-photos/my-photos-card';
 import { Col, Row } from 'react-bootstrap'
-
-// import useAppSelector from '../../../redux/store/hooks/hooks';
-// import useAppDispatch from '../../../redux/store/hooks/hooks';
-// import { getUsers } from '../../../api/user.service';
-// import {setFriend, setSelectedProfile} from '../../../redux/store/slices/friendsProfileSlices'
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import { setFriend, setSelectedProfile } from '../../../redux/store/slices/friendsProfileSlices';
-
+import { setFriend, setSelectedProfile } from '../../../store/slices/friendsProfileSlices';
+import  { useAppDispatch ,useAppSelector} from "../../../store/hooks/hooks"
+import users from "../my-photos/friends.json"
 
 const MyProfile = () => {
-    const navigate = useNavigate();
-const dispatcher=useDispatch();
-const friends=useSelector((state)=>state.friend.user)
+const navigate = useNavigate();
+
+
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
     const [myPhotos, setMyPhotos] = useState(false);
@@ -54,24 +50,24 @@ const friends=useSelector((state)=>state.friend.user)
     const handleToggleSize = () => {
         setIsEnlarged(!isEnlarged);
     };
-    useEffect(() => {
-      try {
-        axios.get("https://carrental-v3-backend.herokuapp.com").then(resp=>{
-                    dispatcher(setFriend(resp.data.friends));
-                });
-      } catch (error) {
-            console.log('Error fetching user data:', error);
+//     useEffect(() => {
+//       try {
+//         axios.get("https://carrental-v3-backend.herokuapp.com").then(resp=>{
+//                     dispatcher(setFriend(resp.data.friends));
+//                 });
+//       } catch (error) {
+//             console.log('Error fetching user data:', error);
         
-      }
+//       }
     
 
-}, [dispatcher])
+// }, [dispatcher])
    
 
-const handleFriendProfile = (friend) => {
-dispatcher(setSelectedProfile(friend));
+// const handleFriendProfile = (friend) => {
+//      dispatch(setFriend(friend))
   
-}
+// }
 
 
 
@@ -186,8 +182,8 @@ dispatcher(setSelectedProfile(friend));
                                 <div >
                                     <Row >
                                         {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                        {friendsCard && !myPhotos && friends.map((friend) => <Col key={friend.id} md={12} lg={6} xl={4}> <FriendsCard  {...friend.users}  onClick={handleFriendProfile(friend)}/></Col >)}
-                                        {/* {friendsCard && !myPhotos && friends.map((friend, id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard  {...friend}  /><FriendProfile friend={friend} onClick={()=>{handleFriendProfile(friend)}}/></Col >)} */}
+                                        {friendsCard && !myPhotos && users.map((friend) => <Col key={friend} md={12} lg={6} xl={4}> <FriendsCard  {...friend}  /></Col >)}
+                                      
                                     </Row>
                                 </div>
                             </div>

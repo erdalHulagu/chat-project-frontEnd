@@ -7,16 +7,12 @@ import { useNavigate } from 'react-router-dom'
 import FriendsCard from '../friends/friends-card';
 import { Col, Row } from 'react-bootstrap'
 import FriendPhotos from './friend-photos-card';
-import friendFriends from "../my-photos/friends.json"
-import { useSelector } from 'react-redux';
-import { setSelectedProfile } from '../../../redux/store/slices/friendsProfileSlices';
-
+import users from '../my-photos/friends.json'
+import { useDispatch, useSelector } from 'react-redux';
+import { decrement, increment } from '../../../store/slices/rondomSlice';
 const FriendProfile = () => {
-      
-    const selector=  useSelector((state)=>state.friendprofile)
-      
-
-    
+    const count = useSelector((state) => state.counter.value)
+    const dispatch = useDispatch()
     const navigate = useNavigate();
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
@@ -62,6 +58,20 @@ const FriendProfile = () => {
                     </div>
                     <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950   hover:bg-gray-100   ' onClick={handleSignOut}  >Sign-out</button>
                 </div>
+                <h1>{count}</h1>
+                <button
+          aria-label="Increment value"
+          onClick={() => dispatch(increment())}
+        >
+          Increment
+        </button>
+        <span>{count}</span>
+        <button
+          aria-label="Decrement value"
+          onClick={() => dispatch(decrement())}
+        >
+          Decrement
+        </button>
 
                 <div className={`${isEnlarged ? 'max-h-[86vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl flex justify-center ' : " h-[86vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl "}`} >
                     {/* top bar */}
@@ -88,7 +98,7 @@ const FriendProfile = () => {
 
 
                                         <div className=' w-full h-[40%] flex items-center justify-center'>
-                                            <img className='hover:opacity-70 rounded-full cursor-pointer w-48 h-48  ' src={selector.image} alt="" />
+                                            <img className='hover:opacity-70 rounded-full cursor-pointer w-48 h-48  ' src="" alt="" />
 
                                         </div>
                                         
@@ -103,19 +113,19 @@ const FriendProfile = () => {
                                         <div className='h-[50%]  w-[96%] flex flex-col items-start justify-start rounded-bl-lg '>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3'>Name </h5>
-                                                <p >{selector.name}</p>
+                                                {/* <p >{name}</p> */}
                                             </div>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3 '>Last name </h5>
-                                                <p >{selector.lastname}</p>
+                                                {/* <p >{lastname}</p> */}
                                             </div>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3'>Phone Number </h5>
-                                                <p className='mx-2' >{selector.phone}</p>
+                                                {/* <p className='mx-2' >{phone}</p> */}
                                             </div>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3'>Email Adress</h5>
-                                                <p >{selector.phone}</p>
+                                                {/* <p >{phone}</p> */}
                                             </div>
                                             
 
@@ -158,7 +168,7 @@ const FriendProfile = () => {
                                 <div >
                                     <Row >
                                         {friendPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><FriendPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                        {friendsCard && !friendPhotos && friendFriends.map((friend,id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard {...friend} /></Col >)}
+                                        {friendsCard && !friendPhotos && users.map((friend,id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard {...friend} /></Col >)}
                                     </Row>
                                 </div>
                             </div>

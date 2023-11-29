@@ -9,7 +9,7 @@ import { Col, Row } from 'react-bootstrap'
 import FriendPhotos from './friend-photos-card';
 import users from '../my-photos/friends.json'
 import { useDispatch, useSelector } from 'react-redux';
-import { decrement, increment } from '../../../store/slices/rondomSlice';
+import { decrement, increment } from '../../../redux/store/slices/rondomSlice';
 const FriendProfile = () => {
     const count = useSelector((state) => state.counter.value)
     const dispatch = useDispatch()
@@ -58,20 +58,6 @@ const FriendProfile = () => {
                     </div>
                     <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950   hover:bg-gray-100   ' onClick={handleSignOut}  >Sign-out</button>
                 </div>
-                <h1>{count}</h1>
-                <button
-          aria-label="Increment value"
-          onClick={() => dispatch(increment())}
-        >
-          Increment
-        </button>
-        <span>{count}</span>
-        <button
-          aria-label="Decrement value"
-          onClick={() => dispatch(decrement())}
-        >
-          Decrement
-        </button>
 
                 <div className={`${isEnlarged ? 'max-h-[86vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl flex justify-center ' : " h-[86vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl "}`} >
                     {/* top bar */}
@@ -178,7 +164,7 @@ const FriendProfile = () => {
 
             </div>
         </div>
-        // ------
+    
 
     )
 }

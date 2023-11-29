@@ -3,22 +3,22 @@ import { BiSolidTrash } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 
 
-const FriendsCard = ({ name,lastname,image }) => {
-    // const{name,lastname,image,email}=MyPhotos
+const FriendsCard = ({ name,lastname,image,handleFriendProfile }) => {
+   
     const navigate = useNavigate();
 
-    const handleNavigateProfile = () => {
+    // const handleNavigateProfile = () => {
         
-        // Navigate to the '/profile' route
-        navigate('/friendProfile');
-    }
+    //     // Navigate to the '/profile' route
+    //     navigate('/friendProfile');
+    // }
    
    
-// const dispatcher=useAppDispatch(setProfile(name,lastname,email,image))
+
     return (
         <div className="w-[94%] h-auto p-2 max-h-200 rounded m-3  bg-gradient-to-b from-purple-300 via-purple-100 to-white hover:border-2  border-purple-600 shadow-2xl shadow-slate-800 cursor-pointer">
             <div className="w-full h-60  flex items-center justify-center mb-1">
-                <img onClick={handleNavigateProfile}  className="rounded m-0 w-full h-full " src={image} alt="" />
+                <img onClick={handleFriendProfile}  className="rounded m-0 w-full h-full " src={image} alt="" />
             </div>
 
 

@@ -1,12 +1,12 @@
 
-import { configureStore } from '@reduxjs/toolkit'
-import { profileSlice } from './slices/friendsProfileSlices'
-import { counterSlice } from './slices/rondomSlice'
+import { configureStore } from '@reduxjs/toolkit';
+import profileReducer from './slices/friendsProfileSlices'
 
 export const store = configureStore({
   reducer: {
-    counter: counterSlice,
-    friendprofile:profileSlice
-    
+    profile: profileReducer,
+    // other reducers...
   },
-})
+});
+
+export default store;

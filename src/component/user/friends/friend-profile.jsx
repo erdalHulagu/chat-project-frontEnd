@@ -9,9 +9,8 @@ import { Col, Row } from 'react-bootstrap'
 import FriendPhotos from './friend-photos-card';
 import users from '../my-photos/friends.json'
 import { useDispatch, useSelector } from 'react-redux';
-import { decrement, increment } from '../../../redux/store/slices/rondomSlice';
 const FriendProfile = () => {
-    const count = useSelector((state) => state.counter.value)
+    const profile= useSelector((state) => state.profile.friendList)
     const dispatch = useDispatch()
     const navigate = useNavigate();
     const [friendsCard, setFriendsCard] = useState(false);
@@ -59,7 +58,7 @@ const FriendProfile = () => {
                     <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950   hover:bg-gray-100   ' onClick={handleSignOut}  >Sign-out</button>
                 </div>
 
-                <div className={`${isEnlarged ? 'max-h-[86vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl flex justify-center ' : " h-[86vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl "}`} >
+                <div className={`${isEnlarged ? 'max-h-[80vh]  w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl flex justify-center ' : " h-[80%] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl "}`} >
                     {/* top bar */}
                     {isEnlarged ? <div className='rounded w-full h-auto max-h-[86vh] flex justify-center '><FriendPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </div> : <>
                         <div className='w-full text-slate-800 bg-blue-950 border rounded-t-lg h-24 z-20 flex  items-center justify-center shadow-slate-950 shadow-2xl border-b'>
@@ -83,8 +82,8 @@ const FriendProfile = () => {
 
 
 
-                                        <div className=' w-full h-[40%] flex items-center justify-center'>
-                                            <img className='hover:opacity-70 rounded-full cursor-pointer w-48 h-48  ' src="" alt="" />
+                                        <div className=' w-full h-[40%] flex items-center justify-center mt-1'>
+                                            <img className='rounded-full w-40 h-40  ' src={profile.image} alt="" />
 
                                         </div>
                                         
@@ -99,11 +98,11 @@ const FriendProfile = () => {
                                         <div className='h-[50%]  w-[96%] flex flex-col items-start justify-start rounded-bl-lg '>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3'>Name </h5>
-                                                {/* <p >{name}</p> */}
+                                                <p >{profile.name}</p>
                                             </div>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3 '>Last name </h5>
-                                                {/* <p >{lastname}</p> */}
+                                                <p >{profile.lastname}</p>
                                             </div>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3'>Phone Number </h5>
@@ -111,7 +110,7 @@ const FriendProfile = () => {
                                             </div>
                                             <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
                                                 <h5 className='text-purple-900 mt-3'>Email Adress</h5>
-                                                {/* <p >{phone}</p> */}
+                                                <p >{profile.email}</p>
                                             </div>
                                             
 

@@ -14,17 +14,18 @@
       "email": "katie@gmail.com"
     },
     {
-      "id": 2,
-      "image": "https://cdn.pixabay.com/photo/2016/04/06/21/27/three-1312869_1280.png",
-      "name": "Ayla",
-      "lastname": "Hulagu",
-      "email": "ayla@gmail.com"
-    },
-    {
       "id": 3,
       "image": "https://cdn.pixabay.com/photo/2016/04/12/19/01/three-1325106_1280.png",
       "name": "Adem",
       "lastname": "Hulagu",
       "email": "adem@gmail.com"
+    },
+    {
+      "id": 2,
+      "image": "https://cdn.pixabay.com/photo/2016/04/06/21/27/three-1312869_1280.png",
+      "name": "Ayla",
+      "lastname": "Hulagu",
+      "email": "ayla@gmail.com"
     }
+   
   ]

@@ -9,15 +9,15 @@ import { useNavigate } from 'react-router-dom'
 import FriendsCard from '../friends/friends-card';
 import MyPhotos from '../my-photos/my-photos-card';
 import { Col, Row } from 'react-bootstrap'
-import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import { setFriend, setSelectedProfile } from '../../../store/slices/friendsProfileSlices';
-import  { useAppDispatch ,useAppSelector} from "../../../store/hooks/hooks"
-import users from "../my-photos/friends.json"
+import friends from "../my-photos/friends.json"
+import { useDispatch } from 'react-redux';
+import { setFriendProfile } from '../../../redux/store/slices/friendsProfileSlices';
 
 const MyProfile = () => {
 const navigate = useNavigate();
-
+const dispatch = useDispatch();
+// const [friendProfile, setFriendProfile] = useState(false);/
 
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
@@ -64,10 +64,14 @@ const navigate = useNavigate();
 // }, [dispatcher])
    
 
-// const handleFriendProfile = (friend) => {
-//      dispatch(setFriend(friend))
+const handleFriendProfile = (friend,id) => {
+    // if (friend.id===id) {
+        
+    // }
+     dispatch(setFriendProfile(friend))
+     navigate('/friendProfile')
   
-// }
+}
 
 
 
@@ -182,7 +186,7 @@ const navigate = useNavigate();
                                 <div >
                                     <Row >
                                         {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                        {friendsCard && !myPhotos && users.map((friend) => <Col key={friend} md={12} lg={6} xl={4}> <FriendsCard  {...friend}  /></Col >)}
+                                        {friendsCard && !myPhotos && friends.map((friend) => <Col key={friend.id} md={12} lg={6} xl={4}> <FriendsCard   {...friend}  handleFriendProfile={handleFriendProfile(friend)} /></Col >)}
                                       
                                     </Row>
                                 </div>

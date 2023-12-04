@@ -15,9 +15,9 @@ import { useDispatch } from 'react-redux';
 import { setFriendProfile } from '../../../redux/store/slices/friendsProfileSlices';
 
 const MyProfile = () => {
-const navigate = useNavigate();
-const dispatch = useDispatch();
-// const [friendProfile, setFriendProfile] = useState(false);/
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    // const [friendProfile, setFriendProfile] = useState(false);/
 
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
@@ -50,38 +50,38 @@ const dispatch = useDispatch();
     const handleToggleSize = () => {
         setIsEnlarged(!isEnlarged);
     };
-//     useEffect(() => {
-//       try {
-//         axios.get("https://carrental-v3-backend.herokuapp.com").then(resp=>{
-//                     dispatcher(setFriend(resp.data.friends));
-//                 });
-//       } catch (error) {
-//             console.log('Error fetching user data:', error);
-        
-//       }
-    
+    //     useEffect(() => {
+    //       try {
+    //         axios.get("https://carrental-v3-backend.herokuapp.com").then(resp=>{
+    //                     dispatcher(setFriend(resp.data.friends));
+    //                 });
+    //       } catch (error) {
+    //             console.log('Error fetching user data:', error);
 
-// }, [dispatcher])
-   
-
-const handleFriendProfile = (friend,id) => {
-    // if (friend.id===id) {
-        
-    // }
-     dispatch(setFriendProfile(friend))
-     navigate('/friendProfile')
-  
-}
+    //       }
 
 
+    // }, [dispatcher])
 
-    
+
+    const handleFriendProfile = (friend) => {
+        // if (friend.id===id) {
+
+        // }
+        dispatch(setFriendProfile(friend))
+        navigate('/friendProfile')
+
+    }
+
+
+
+
     return (
         <div className="h-screen bg-purple-100 ">
             <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
                 <div className='h-30 w-30 flex w-[20%] left-3 mt-4'>
-                    <div className='my-1 ml-[30%] w-full h-full'>
-                        <BiSolidLeftArrowSquare className={`${isEnlarged ? 'hidden' : ' text-gray-400 w-16 h-16 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full'}`} onClick={handleNavigate} />
+                    <div className=' w-full ml-[9%] h-full'>
+                        <BiSolidLeftArrowSquare className={`${isEnlarged ? 'hidden' : ' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full'}`} onClick={handleNavigate} />
                     </div>
                 </div>
                 <div className='w-[80%] h-40 mt-1  flex  justify-end right-0 '>
@@ -97,7 +97,7 @@ const handleFriendProfile = (friend,id) => {
                         <div className='w-full text-slate-800 bg-slate-100 rounded-t-lg h-[12%] flex  items-center justify-between shadow-slate-950 shadow-2xl border-b'>
 
                             <h4 className='ml-6 font-semibold '>Profile</h4>
-                            <RiUserSettingsFill className=' text-blue-950 w-14 h-14 p-3 mr-6 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
+                            <RiUserSettingsFill className=' text-blue-950 w-14 h-14 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
 
 
                         </div>
@@ -109,13 +109,13 @@ const handleFriendProfile = (friend,id) => {
 
                                         <label htmlFor="imgInput">
                                             <div className=' w-full h-[40vh] flex items-center justify-center'>
-                                                <img className='hover:opacity-70 rounded-full cursor-pointer w-48 h-48 my-5 ' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
-                                                <MdPhotoCamera className='absolute cursor-pointer ml-32 text-purple-300 text-3xl' />
+                                                <img className='rounded-full cursor-pointer w-36 h-36 my-5 ' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
+                                                <MdPhotoCamera className='absolute ml-20 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
                                             </div>
 
                                         </label>
                                         <input type="file" id='imgInput' className='hidden' />
-                                        <div className='h-[30vh]  w-full  border rounded-bl-lg'>
+                                        <div className='h-[50vh]  w-full  border rounded-bl-lg'>
                                             <div className='w-[94%] h[50%] flex   border-slate-400 border-b mx-[3%] '>
                                                 <div className='w-full h[50%] flex flex-col  '>
                                                     <h5 className="ml-3  text-blue-800 text-lg font-bold w-[20vw] " > Your name </h5>
@@ -175,19 +175,17 @@ const handleFriendProfile = (friend,id) => {
                                     </div>
 
 
-                                    <div className={` w-[30%] h-full flex items-center justify-end `}>{/* {` w-[50%] h-full flex items-center justify-end ${friendsCard && "hidden"} `}*/}
+                                    <div className={` w-[30]% h-full flex items-center justify-end `}>{/* {` w-[50%] h-full flex items-center justify-end ${friendsCard && "hidden"} `}*/}
                                         <IoMdPhotos className=' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handlePhotos} />
-                                        <div className=''>
-                                            <MdOutlineMonochromePhotos className='md:hidden sm:inline  text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
-                                        </div>
+                                        <MdOutlineMonochromePhotos className='md:hidden sm:inline  text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
                                     </div>
 
                                 </div >
                                 <div >
                                     <Row >
                                         {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                        {friendsCard && !myPhotos && friends.map((friend) => <Col key={friend.id} md={12} lg={6} xl={4}> <FriendsCard   {...friend}  handleFriendProfile={handleFriendProfile(friend)} /></Col >)}
-                                      
+                                        {friendsCard && !myPhotos && friends.map((friend) => <Col key={friend.id} md={12} lg={6} xl={4}> <FriendsCard   {...friend} handleFriendProfile={handleFriendProfile(friend)} /></Col >)}
+
                                     </Row>
                                 </div>
                             </div>

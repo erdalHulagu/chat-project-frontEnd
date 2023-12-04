@@ -24,7 +24,7 @@ const Home = () => {
 
 
     return (
-        <div>
+        
             <div fluid className="h-screen bg-purple-100 ">
 
                 <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
@@ -50,16 +50,10 @@ const Home = () => {
 
                         <UserHome/>
 
-                
-
-
-
-
-
                     </div>
                 </div>
             </div>
-        </div>
+        
     )
 }
 

@@ -77,10 +77,12 @@ const MyProfile = () => {
 
 
     return (
-        <div className="h-screen bg-purple-100 ">
-            <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
-                <div className='h-30 w-30 flex w-[20%] left-3 mt-4'>
-                    <div className=' w-full ml-[9%] h-full'>
+        <div fluid className="h-screen bg-purple-100 ">
+
+                <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
+                    <div className='h-30 w-30 flex left-3 mt-4 '>
+
+                       <div className=' w-full ml-[9%] h-full'>
                         <BiSolidLeftArrowSquare className={`${isEnlarged ? 'hidden' : ' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full'}`} onClick={handleNavigate} />
                     </div>
                 </div>
@@ -108,41 +110,41 @@ const MyProfile = () => {
                                     <div className='relative bg-slate-200 w-full  h-full top-0 flex flex-col justify-center rounded-b-lg'>
 
                                         <label htmlFor="imgInput">
-                                            <div className=' w-full h-[40vh] flex items-center justify-center'>
+                                            <div className=' w-full h-full flex items-center justify-center'>
                                                 <img className='rounded-full cursor-pointer w-36 h-36 my-5 ' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
                                                 <MdPhotoCamera className='absolute ml-20 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
                                             </div>
 
                                         </label>
                                         <input type="file" id='imgInput' className='hidden' />
-                                        <div className='h-[50vh]  w-full  border rounded-bl-lg'>
-                                            <div className='w-[94%] h[50%] flex   border-slate-400 border-b mx-[3%] '>
-                                                <div className='w-full h[50%] flex flex-col  '>
-                                                    <h5 className="ml-3  text-blue-800 text-lg font-bold w-[20vw] " > Your name </h5>
-                                                    <input id='imgInput' className=' ml-3 mt-3  text-slate-800 bottom-0 w-[80%] bg-slate-200  focus:outline-none' type="text" alt='' />
+                                        <div className='w-full  h-full rounded-bl-lg'>
+                                            <div className='w-[94%] flex   border-slate-400 border-b mx-[3%] '>
+                                                <div className='w-full flex flex-col  '>
+                                                    <h5 className="ml-3  text-blue-900 text-lg font-bold w-[20vw] " > Your name </h5>
+                                                    <input id='imgInput' className=' ml-3  text-slate-800 bottom-0 w-[80%] bg-slate-200  focus:outline-none' type="text" alt='' />
 
                                                 </div>
 
                                                 <div className=' w-[50%] flex right-0 justify-end items-end'>
-                                                    <BiSolidPencil id='imgInput' className='text-2xl text-slate-600 hover:text-red-800 cursor-pointer' />
+                                                    <BiSolidPencil id='imgInput' className='text-lg text-slate-600 hover:text-red-800 cursor-pointer' />
                                                 </div>
 
                                             </div>
                                             <div className='w-[90%]  flex items-center mx-3'>
-                                                <p className=' my-12 flex flex-col items-center font-bold'>
+                                                <p className=' my-8 flex flex-col items-center font-bold'>
                                                     This is not your name. This name will be visible on your account contact
                                                 </p>
                                             </div>
 
                                             <div className='w-[94%] h[50%] flex   border-slate-400 border-b mx-[3%] '>
                                                 <div className='w-full h[50%] flex flex-col  '>
-                                                    <h5 className="ml-3  text-blue-800 text-lg font-bold w-[20vw]" > About </h5>
-                                                    <input id='imgInput' className='mt-3 ml-3  text-slate-800 bottom-0 w-[80%] bg-slate-200  focus:outline-none' type="text" alt='' />
+                                                    <h5 className="ml-3  text-blue-900 text-lg font-bold w-[20vw]" > About </h5>
+                                                    <input id='imgInput' className='ml-3  text-slate-800 bottom-0 w-[80%] bg-slate-200  focus:outline-none' type="text" alt='' />
 
                                                 </div>
 
                                                 <div className=' w-[50%] flex right-0 justify-end items-end'>
-                                                    <BiSolidPencil className='text-2xl text-slate-600 hover:text-red-800 cursor-pointer' />
+                                                    <BiSolidPencil className='text-lg text-slate-600 hover:text-red-800 cursor-pointer' />
                                                 </div>
 
                                             </div>

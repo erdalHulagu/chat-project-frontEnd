@@ -76,39 +76,44 @@ const FriendProfile = () => {
                         </div>
                         <div className='w-full h-[90%] rounded-b-lg flex'>
                             {/* left bar */}
-                            <div className='w-[40%] h-full rounded-b-lg '>
-                                <div className='w-full flex items-center border h-full marker:rounded-bl-lg'>
-                                    <div className='relative bg-slate-200 w-full  h-full rounded-b-lg flex flex-col  justify-center'>
+                            <div className='w-[40%] mb-6 marker:rounded-bl-lg '>
+                                <div className='w-full flex items-center h-full'>
+                                    <div className=' bg-slate-200 w-full  h-full rounded-bl-lg flex flex-col  justify-center'>
 
 
 
-                                        <div className=' w-full h-[40%] flex items-center justify-center mt-1'>
-                                            <img className='rounded-full w-40 h-40  ' src={profile.image} alt="" />
+                                        <div className=' w-full flex items-center justify-center '>
+                                            <div className='rounded-full  '>
+                                            <img className='rounded-full  w-36 h-36 ' src={profile.image} alt="" />
+                                            </div>
+                                            
 
                                         </div>
                                         
-                                        <div className=' w-40 flex items-center justify-between h-[10%] mb-20 '>
-                                            
+                                        <div className=' w-full h-[10%] flex items-center justify-center border-b border-gray-300 '>
+                                            <div className='flex items-center justify-between w-36'>
                                             <BiSolidVideo className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-500 hover:text-slate-200 cursor-pointer rounded-full' />
                                            
-                                            <BiSolidMessageDetail className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-500 hover:text-slate-200 cursor-pointer rounded-full' />
-                                        </div>
+                                           <BiSolidMessageDetail className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-500 hover:text-slate-200 cursor-pointer rounded-full' />
+                                       
+                                            </div>
+                                           </div>
 
 
-                                        <div className='h-[50%]  w-[96%] flex flex-col items-start justify-start rounded-bl-lg '>
-                                            <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
+                                        <div className='h-70 w-[96%] flex flex-col items-start justify-start rounded-bl-lg '>
+                                            <div className='border-b border-gray-300 flex flex-col w-[94%] h-15 ml-[5%]'>
                                                 <h5 className='text-purple-900 mt-3'>Name </h5>
                                                 <p >{profile.name}</p>
                                             </div>
-                                            <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
+                                            <div className='border-b border-gray-300 flex flex-col w-[94%] h-15 ml-[5%]'>
                                                 <h5 className='text-purple-900 mt-3 '>Last name </h5>
                                                 <p >{profile.lastname}</p>
                                             </div>
-                                            <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
+                                            <div className='border-b border-gray-300 flex flex-col w-[94%] h-15 ml-[5%]'>
                                                 <h5 className='text-purple-900 mt-3'>Phone Number </h5>
-                                                {/* <p className='mx-2' >{phone}</p> */}
+                                                <p className='mx-2' >123456789</p>
                                             </div>
-                                            <div className='border-y border-gray-300 flex flex-col w-[94%] ml-3'>
+                                            <div className=' border-gray-300 flex flex-col w-[94%] h-15 ml-[5%]'>
                                                 <h5 className='text-purple-900 mt-3'>Email Adress</h5>
                                                 <p >{profile.email}</p>
                                             </div>
@@ -122,7 +127,7 @@ const FriendProfile = () => {
 
                             </div >
                             {/* right bar */}
-                            <div className='w-[65%] h-full overflow-hidden overflow-y-scroll '>
+                            <div className='w-[80%] mb-6 overflow-hidden overflow-y-scroll '>
                                 <div className='sticky z-10 top-0 w-full h-20  flex items-center justify-between shadow-slate-900 shadow-2xl bg-blue-950'>
                                     <div className='w-[80%] h-full flex items-center justify-start' >
 
@@ -143,15 +148,16 @@ const FriendProfile = () => {
                                     </div>
 
 
-                                    <div className={` w-[50%] h-full flex items-center justify-end `}>{/* {` w-[50%] h-full flex items-center justify-end ${friendsCard && "hidden"} `}*/}
+                                    <div className={` w-[30]% h-full flex items-center justify-end `}>{/* {` w-[50%] h-full flex items-center justify-end ${friendsCard && "hidden"} `}*/}
                                         <IoMdPhotos className=' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handleFriendPhotos} />
+                                       
                                         <p className=' text-gray-400 mt-3 mr-3'>Photos</p>
 
                                     </div>
 
                                 </div >
                                 <div >
-                                    <Row >
+                                <Row >
                                         {friendPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><FriendPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
                                         {friendsCard && !friendPhotos && users.map((friend,id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard {...friend} /></Col >)}
                                     </Row>

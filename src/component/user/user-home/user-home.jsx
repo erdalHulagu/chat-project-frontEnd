@@ -37,18 +37,18 @@ const UserHome = () => {
 
     return (
         < >
-            <div className='w-full  bg-slate-100 shadow-2xl shadow-slate-900 rounded-t-lg h-[12%] p-0 flex  items-center justify-between '>
+            <div className='w-full  bg-slate-100 shadow-2xl shadow-slate-900 rounded-t-lg h-24 p-0 flex  items-center justify-between border-b z-10  '>
                 <div className='flex  items-center w-[50%] '>
                     {/* nav bar */}
                     <img onClick={handleProfile} className=' hover:opacity-70 border-2 cursor-pointer w-20 h-20 rounded-full my-5 mx-4' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
                     <p className='cursor-pointer text-blue-950 hover:text-red-700 '>user name</p>
                 </div>
-                <div className=' w-[50%] mr-5'>
+                <div className=' w-[60%] '>
                     <ul className='left-0 text-decoration: none flex justify-between items-center'>
-                        <li className=''><HiUserGroup className='text-blue-950 w-14 h-14 p-3 mr-6 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
-                        <li className=''><SiInstatus className=' text-blue-950 w-14 h-14 p-3 mr-6 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
-                        <li className=''><BsFillChatLeftDotsFill className=' text-blue-950 w-14 h-14 p-3 mr-6 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
-                        <li className='' ><BsArrowDownSquareFill className=' text-blue-950 w-14 h-14 p-3 mr-6 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
+                        <li className=''><HiUserGroup className='text-blue-950 w-14 h-14 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
+                        <li className=''><SiInstatus className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
+                        <li className=''><BsFillChatLeftDotsFill className=' text-blue-950  w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
+                        <li className='' ><BsArrowDownSquareFill className=' text-blue-950 w-14 h-14 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full mr-1' /></li>
 
                     </ul>
                 </div>

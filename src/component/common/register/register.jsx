@@ -46,9 +46,9 @@ const Register = ({handleSubmit}) => {
     });
 
     return (
-        <Container className="mt-3 ">
+        <Container className="mt-4 ">
             <Form noValidate onSubmit={formik.handleSubmit}>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Group className="mb-2" controlId="formBasicEmail">
                     <Form.Label>Name</Form.Label>
                     <Form.Control
                         type="text"
@@ -61,7 +61,7 @@ const Register = ({handleSubmit}) => {
                         {formik.errors.name}
                     </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Group className="mb-2" controlId="formBasicEmail">
                     <Form.Label>Last Name</Form.Label>
                     <Form.Control
                         type="text"
@@ -73,7 +73,7 @@ const Register = ({handleSubmit}) => {
                     <Form.Control.Feedback type="invalid">
                         {formik.errors.lastname}
                     </Form.Control.Feedback>
-                </Form.Group><Form.Group className="mb-3" controlId="formBasicEmail">
+                </Form.Group><Form.Group className="mb-2" controlId="formBasicEmail">
                     <Form.Label>Email address</Form.Label>
                     <Form.Control
                         type="email"
@@ -86,7 +86,7 @@ const Register = ({handleSubmit}) => {
                         {formik.errors.email}
                     </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicPassword">
+                <Form.Group className="mb-2" controlId="formBasicPassword">
                     <Form.Label>Password</Form.Label>
                     <Form.Control
                         type="password"
@@ -99,7 +99,7 @@ const Register = ({handleSubmit}) => {
                         {formik.errors.password}
                     </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Group className="mb-2" controlId="formBasicEmail">
                     <Form.Label>Address</Form.Label>
                     <Form.Control
                         type="email"
@@ -112,7 +112,7 @@ const Register = ({handleSubmit}) => {
                         {formik.errors.adress}
                     </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Group className="mb-2" controlId="formBasicEmail">
                     <Form.Label>Phone Number</Form.Label>
                     <Form.Control
                         type="text"
@@ -128,7 +128,7 @@ const Register = ({handleSubmit}) => {
 
                 <div className="w-full h-14 flex items-center justify-end ">
                     <div>
-                    <button className=" h-10  w-24 rounded-lg bg-slate-700 text-slate-100  hover:text-slate-950 hover:bg-gray-100   "  type="submit" onClick={handleSubmit}>
+                    <button className=" mb-3 h-10  w-24 rounded-lg bg-slate-700 text-slate-100  hover:text-slate-950 hover:bg-gray-100   "  type="submit" onClick={handleSubmit}>
                         Submit
                     </button>
                     </div>

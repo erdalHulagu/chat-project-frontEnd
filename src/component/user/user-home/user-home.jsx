@@ -34,6 +34,10 @@ const UserHome = () => {
         navigate("/profile");
 
     }
+    const handleNavigateStatus = () => {
+        navigate("/status");
+    }
+    
 
     return (
         < >
@@ -46,7 +50,7 @@ const UserHome = () => {
                 <div className=' w-[60%] '>
                     <ul className='left-0 text-decoration: none flex justify-between items-center'>
                         <li className=''><HiUserGroup className='text-blue-950 w-14 h-14 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
-                        <li className=''><SiInstatus className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
+                        <li className=''><SiInstatus className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' onClick={handleNavigateStatus} /></li>
                         <li className=''><BsFillChatLeftDotsFill className=' text-blue-950  w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
                         <li className='' ><BsArrowDownSquareFill className=' text-blue-950 w-14 h-14 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full mr-1' /></li>
 

@@ -40,19 +40,19 @@ const UserHome = () => {
     
 
     return (
-        < >
+        < div className='h-[98%] w-full'>
             <div className='w-full  bg-slate-100 shadow-2xl shadow-slate-900 rounded-t-lg h-24 p-0 flex  items-center justify-between border-b z-10  '>
                 <div className='flex  items-center w-[50%] '>
                     {/* nav bar */}
                     <img onClick={handleProfile} className=' hover:opacity-70 border-2 cursor-pointer w-20 h-20 rounded-full my-5 mx-4' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
-                    <p className='cursor-pointer text-blue-950 hover:text-red-700 '>user name</p>
+                    <p className='cursor-pointer text-blue-950 hover:text-red-700 text-xs'>user name</p>
                 </div>
                 <div className=' w-[60%] '>
                     <ul className='left-0 text-decoration: none flex justify-between items-center'>
-                        <li className=''><HiUserGroup className='text-blue-950 w-14 h-14 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
-                        <li className=''><SiInstatus className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' onClick={handleNavigateStatus} /></li>
-                        <li className=''><BsFillChatLeftDotsFill className=' text-blue-950  w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' /></li>
-                        <li className='' ><BsArrowDownSquareFill className=' text-blue-950 w-14 h-14 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full mr-1' /></li>
+                        <li className=''><HiUserGroup className='text-blue-950 w-12 h-12 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full' /></li>
+                        <li className=''><SiInstatus className=' text-blue-950 w-12 h-12 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full' onClick={handleNavigateStatus} /></li>
+                        <li className=''><BsFillChatLeftDotsFill className=' text-blue-950  w-12 h-12 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full' /></li>
+                        <li className='' ><BsArrowDownSquareFill className=' text-blue-950 w-12 h-12 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full mr-1' /></li>
 
                     </ul>
                 </div>
@@ -94,7 +94,7 @@ const UserHome = () => {
                 </div>
                 {/* right column */}
 
-                <div className='overflow-hidden overflow-y-scroll w-[60%] h-full relaltive flex flex-col rounded-b-lg'>
+                <div className='overflow-hidden overflow-y-scroll w-[60%] h-full relaltive flex flex-col rounded-br-lg'>
 
                     {query ?
                         <div className='h-30 w-full rounded-b-lg '>
@@ -104,18 +104,18 @@ const UserHome = () => {
 
 
                             {[...Array(15)].map((item, id) => <div key={id} className='w-full h-auto'><MessageCard /></div>)}
-                            <div className='shadow-slate-900 shadow-2xl  flex items-between justify-center fixed bottom-0 bg-slate-200 h-16 w-[60%] rounded-br-lg '
+                            <div className=' flex items-between justify-center fixed bottom-0 bg-slate-200 h-12 w-[60%] rounded-br-lg '
                                 style={{ position: `absolute` }}>
 
                                 <div className=' flex items-center justify-center rounded-b-lg '>
-                                    <RiEmojiStickerFill className='ml-1 text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-400 hover:text-blue-950 cursor-pointer rounded-full' />
-                                    <PiPlusCircleFill className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-400 hover:text-blue-950 cursor-pointer rounded-full' />
+                                    <RiEmojiStickerFill className='hover:text-red-800 ml-1 text-blue-950 w-12 h-12 p-3 hover:opacity-80 hover:bg-gray-300  cursor-pointer rounded-full' />
+                                    <PiPlusCircleFill className=' text-blue-950 w-12 h-12 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full' />
                                 </div>
-                                <div className='  h-20 flex items-center justify-center w-full'>
-                                    <textarea type='text' className=' w-[94%] bg-slate-100  h-12 mb-3 rounded p-3 py-2 text-slate-950' />
+                                <div className=' max-h-20 flex items-center justify-center w-full'>
+                                    <textarea type='text' className='max-h-20  w-full bg-slate-100   rounded p-3 py-2 text-slate-950' />
                                 </div>
                                 <div className=' flex items-center justify-center rounded-b-lg '>
-                                    < FaMicrophoneAlt className=' text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-400 hover:text-blue-950 cursor-pointer rounded-full  mr-1 ' />
+                                    < FaMicrophoneAlt className=' text-blue-950 w-12 h-12 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full  mr-1 ' />
 
                                 </div>
 
@@ -133,7 +133,7 @@ const UserHome = () => {
 
             </div>
 
-        </>
+        </div>
     )
 }
 

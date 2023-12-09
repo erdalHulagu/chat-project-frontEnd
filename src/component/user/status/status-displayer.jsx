@@ -42,10 +42,10 @@ const StatusDisplayer = () => {
                 <img className=' h-[34vh]  sm:h-[70%] md:h-[94%]  mx-1 shadow-slate-800 shadow-xl rounded ' src={stories?.[currentStoryIndex].image} alt="" />
             </div>
             <div className='w-full h-[10%] bg-blue-950 bottom-0 absolute rounded-b flex items-center justify-center'>
-                <BiSolidWinkSmile className='ml-1 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-red-700 cursor-pointer rounded-full' />
-                <BiSolidSticker className=' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-red-700 cursor-pointer rounded-full' />
+                <BiSolidWinkSmile className='ml-1 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
+                <BiSolidSticker className=' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
                 <input className=' ml-1 h-10 w-[70%] md:w-[85%] bg-gray-300 rounded px-3' type="text" placeholder='type comment' />
-                <BiSolidPaperPlane className='mx-1 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-red-700 cursor-pointer rounded-full' />
+                <BiSolidPaperPlane className='mx-1 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
             </div>
         </div>
 

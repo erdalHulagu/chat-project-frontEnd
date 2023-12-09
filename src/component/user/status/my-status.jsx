@@ -39,7 +39,7 @@ const handleFriendStatus = () => {
             </div>
 
           </div>
-          <div className='h-[86%] w-full  rounded-bl-lg  overflow-y-scroll scrollbar-thin '>
+          <div className='h-[86%] w-full  rounded-bl-lg  overflow-y-scroll  '>
             <div className='p-2 h-14 w-auto sticky top-0 bg-slate-100 border-b'>
               <p className='p-2  text-gray-600'>RECENT</p>
             </div>
@@ -50,7 +50,7 @@ const handleFriendStatus = () => {
         </div>
         {/* Right Bar */}
         <div className='h-full w-[60%] lg:w-[75%]'>
-          <AiFillCloseCircle onClick={handleNavigete} className='absolute m-1  text-blue-900 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-red-950 cursor-pointer rounded-full right-0' />
+          <AiFillCloseCircle onClick={handleNavigete} className='absolute m-1  text-blue-950 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full right-0' />
           <div className='w-full h-full flex items-center justify-center'>
 
             <div>

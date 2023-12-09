@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { BiSolidLeftArrowSquare, BiSolidPencil } from 'react-icons/bi'
 import { IoIosHome, IoMdPhotos } from 'react-icons/io';
 import { ImSearch } from 'react-icons/im';
 import { RiUserSettingsFill } from 'react-icons/ri';
 import { FaUserFriends } from 'react-icons/fa';
 import { MdPhotoCamera, MdOutlineMonochromePhotos } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom'
 import FriendsCard from '../friends/friends-card';
 import MyPhotos from '../my-photos/my-photos-card';
 import { Col, Row } from 'react-bootstrap'
@@ -13,11 +12,11 @@ import axios from 'axios';
 import friends from "../my-photos/friends.json"
 import { useDispatch } from 'react-redux';
 import { setFriendProfile } from '../../../redux/store/slices/friendsProfileSlices';
+import { useNavigate } from 'react-router-dom';
 
 const MyProfile = () => {
-    const navigate = useNavigate();
+    const navigate= useNavigate();
     const dispatch = useDispatch();
-    // const [friendProfile, setFriendProfile] = useState(false);/
 
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");

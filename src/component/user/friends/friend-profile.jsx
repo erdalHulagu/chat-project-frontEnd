@@ -66,7 +66,7 @@ const FriendProfile = () => {
                                 <BiSolidLeftArrowSquare onClick={handleNavigate} className='text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
                             </div>
                             <div className='w-full text-center'>
-                                <h4 className=' ml-6 font-semibold text-slate-100 mr-[12%] '>Friend Profile</h4>
+                                <h4 className=' ml-6 font-semibold text-slate-100 mr-[12%] '>{profile.name}'s Profile</h4>
 
                             </div>
 
@@ -127,12 +127,12 @@ const FriendProfile = () => {
 
                             </div >
                             {/* right bar */}
-                            <div className='w-[80%] mb-6 overflow-hidden overflow-y-scroll '>
-                                <div className='sticky z-10 top-0 w-full h-20  flex items-center justify-between shadow-slate-900 shadow-2xl bg-blue-950'>
+                            <div className='w-[80%] h-[96%]  overflow-y-scroll '>
+                                <div className='sticky z-10 top-0 w-full h-20 right-0 flex items-center justify-between shadow-slate-900 shadow-2xl bg-blue-950'>
                                     <div className='w-[80%] h-full flex items-center justify-start' >
 
                                         <FaUserFriends onClick={handleFriendsCard} className={`ml-3 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full ${friendsCard && "hidden"}  `} />
-                                        <p className=' text-gray-400 mt-3 mr-3'>Friends</p>
+                                        {/* <p className=' text-gray-400 mt-3 mr-3'>Friends</p> */}
 
                                         {friendsCard &&
                                             <input className='w-[80%] ml-5 focus:outline-none text-sm  text-gray-400 pl-8 py-2 rounded  cursor-pointercursor-pointer '
@@ -150,16 +150,14 @@ const FriendProfile = () => {
 
                                     <div className={` w-[30]% h-full flex items-center justify-end `}>{/* {` w-[50%] h-full flex items-center justify-end ${friendsCard && "hidden"} `}*/}
                                         <IoMdPhotos className=' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handleFriendPhotos} />
-                                       
-                                        <p className=' text-gray-400 mt-3 mr-3'>Photos</p>
-
+                                        
                                     </div>
 
                                 </div >
                                 <div >
                                 <Row >
-                                        {friendPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><FriendPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                        {friendsCard && !friendPhotos && users.map((friend,id) => <Col key={id} md={12} lg={6} xl={4}> <FriendsCard {...friend} /></Col >)}
+                                        {friendPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={6} lg={4} xxl={3}  ><FriendPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
+                                        {friendsCard && !friendPhotos && users.map((friend,id) => <Col key={id} md={6} lg={4} xl={3}> <FriendsCard {...friend} /></Col >)}
                                     </Row>
                                 </div>
                             </div>

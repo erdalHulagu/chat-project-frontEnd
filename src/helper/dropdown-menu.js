@@ -28,7 +28,7 @@ const Dropdown = () => {
                 <a
                 key={index}
                 href="#"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-300"
+                className="block  p-4 py-2 text-sm text-gray-700 hover:bg-slate-300"
               >
                 {item}
               </a>

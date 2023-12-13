@@ -3,7 +3,7 @@ import { IoIosArrowDropdownCircle } from 'react-icons/io';
 
 const Dropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const items = ['Item 1', 'Item 2', 'Item 3'];
+  const items = ['create group', 'Item 2', 'Item 3'];
 
   const handleDropDownMenu = () => {
     setIsOpen(!isOpen)

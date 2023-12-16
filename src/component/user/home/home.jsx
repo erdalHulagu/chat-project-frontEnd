@@ -4,7 +4,7 @@ import { IoIosHome } from 'react-icons/io'
 import { BiSolidUser } from 'react-icons/bi'
 import { useNavigate } from 'react-router-dom';
 import MyStatus from '../status/my-status';
-import CreateGroup from '../group/group-chat/create-group';
+import Group from '../group/group-chat/group';
 
 
 
@@ -49,9 +49,9 @@ const Home = () => {
 
 
                     <div className=" h-[84vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded  shadow-slate-900  shadow-xl " >
-{/* <MyStatus/> */}
+                        {/* <MyStatus/> */}
                         {/* <UserHome/> */}
-                        <CreateGroup/>
+                        <Group/>
 
                     </div>
                 </div>

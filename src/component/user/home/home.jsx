@@ -4,7 +4,7 @@ import { IoIosHome } from 'react-icons/io'
 import { BiSolidUser } from 'react-icons/bi'
 import { useNavigate } from 'react-router-dom';
 import MyStatus from '../status/my-status';
-import CreateGroup from '../group/create-group';
+import CreateGroup from '../group/group-chat/create-group';
 
 
 

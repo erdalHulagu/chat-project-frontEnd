@@ -15,7 +15,7 @@ const CreateGroupCard = () => {
         setIsVisible(!isVisible);
     }
     const handleInputVisible = () => {
-        setIsActive(true)
+        setIsActive(!isActive)
     }
     const handleCreateGroupChat = () => {
         setCreateGroupChat(true);

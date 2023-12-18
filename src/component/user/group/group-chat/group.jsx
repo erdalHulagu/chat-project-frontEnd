@@ -1,35 +1,41 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import DropdownMenu from '../dropdown-menu';
+import GroupDropdownMenu from '../group-dropdown-menu';
 import { BiSolidLeftArrowSquare } from 'react-icons/bi';
 import CreateGroupCard from './create-group/create-group-card';
-import { GrGroup } from "react-icons/gr";
 import { HiUserGroup } from 'react-icons/hi';
 import CreateComminityGroup from './comminity-group/create-comminity-group';
-
+import AddExsistingComminity from './comminity-group/create-existing-group/add-existing-comminity';
 
 
 
 const Group = () => {
     const navigate = useNavigate();
-    const [groupChat, setGroupChat] = useState(false);
-    const [comminityGroupChat, setComminityGroupChat] = useState(false);
-
+    const [createGroup, setCreateGroup] = useState(false);
+    const [createCominityGroup, setCreateCominityGroup] = useState(false);
+    const [addExistingComminity, setAddExistingComminity] = useState(false)
 
 
 
     const handleNavigate = () => {
         navigate(-1)
     }
-    const handleGroupChat = () => {
+    const handleCreateGroup = () => {
 
-        setGroupChat(true);
-        setComminityGroupChat(false);
+        setCreateGroup(true);
+        setCreateCominityGroup(false);
+        setAddExistingComminity(false)
     }
 
-    const handleCominityGroupChat = () => {
-        setComminityGroupChat(true);
-        setGroupChat(false);
+    const handleCreateCominityGroup = () => {
+        setCreateCominityGroup(true);
+        setCreateGroup(false);
+        setAddExistingComminity(false)
+    }
+    const handleAddExistingComminity = () => {
+        setAddExistingComminity(true)
+        setCreateCominityGroup(false);
+        setCreateGroup(false);
     }
 
 
@@ -46,14 +52,15 @@ const Group = () => {
                         <BiSolidLeftArrowSquare className='  text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
                         <p className='text-gray-400 mt-3'>Groups</p>
                     </div>
-                    <DropdownMenu
-                        handleGroupChat={handleGroupChat}
-                        handleCominityGroupChat={handleCominityGroupChat}
+                    <GroupDropdownMenu
+                        handleCreateGroup={handleCreateGroup}
+                        handleCreateCominityGroup={handleCreateCominityGroup}
+                        handleAddExistingComminity={handleAddExistingComminity}
                     />
                 </div>
 
                 {/* left bottom bar */}
-                {!(groupChat || comminityGroupChat)&&
+                {!(createGroup || createCominityGroup || addExistingComminity) &&
                     <div className='w-full h-[86%] rounded-bl flex items-center justify-center bg-slate-100'>
                         <div className='p-3 rounded bg-slate-200 h-[95%] w-[90%] flex flex-col items-center justify-center mx-[5%] my-[5%]'>
                             <div className='h-[50%] w-[90%]'>
@@ -66,10 +73,12 @@ const Group = () => {
                             </div>
                         </div>
                     </div>}
-                    <>
-                        {groupChat && < CreateGroupCard />}
-                        {comminityGroupChat && <CreateComminityGroup />}
-                    </>
+                <>
+                    {createGroup && < CreateGroupCard />}
+                    {createCominityGroup && <CreateComminityGroup />}
+                    {addExistingComminity && <AddExsistingComminity />}
+                     
+                </>
 
 
 

@@ -83,7 +83,7 @@ const FriendProfile = () => {
 
 
                                         <div className=' w-full flex items-center justify-center '>
-                                            <div className='rounded-full  '>
+                                            <div className='rounded-full shadow-2xl shadow-slate-800 '>
                                             <img className='rounded-full  w-36 h-36 ' src={profile.image} alt="" />
                                             </div>
                                             

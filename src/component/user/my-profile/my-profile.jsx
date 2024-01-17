@@ -112,8 +112,8 @@ const MyProfile = () => {
                                     <div className='relative bg-slate-200 w-full  h-full top-0 flex flex-col justify-center rounded-b-lg'>
 
                                         <label htmlFor="imgInput">
-                                            <div className=' w-full h-full flex items-center justify-center'>
-                                                <img className='rounded-full cursor-pointer w-36 h-36 my-5 ' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
+                                            <div className=' w-full h-full flex items-center justify-center '>
+                                                <img className='shadow-2xl shadow-slate-800 rounded-full cursor-pointer w-36 h-36 my-5 ' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
                                                 <MdPhotoCamera className='absolute ml-20 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
                                             </div>
 

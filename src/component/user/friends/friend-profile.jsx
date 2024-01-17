@@ -101,21 +101,21 @@ const FriendProfile = () => {
 
 
                                         <div className='h-70 w-[96%] flex flex-col items-start justify-start rounded-bl-lg '>
-                                            <div className='border-b border-gray-300 flex flex-col w-[94%] h-15 ml-[5%]'>
-                                                <h5 className='text-purple-900 mt-3'>Name </h5>
-                                                <p >{profile.name}</p>
+                                            <div className='border-b border-gray-300 flex flex-col w-[90%] h-16 ml-[10%]'>
+                                                <span className='text-red-900 '>Name </span>
+                                                <span >{profile.name}</span>
                                             </div>
-                                            <div className='border-b border-gray-300 flex flex-col w-[94%] h-15 ml-[5%]'>
-                                                <h5 className='text-purple-900 mt-3 '>Last name </h5>
-                                                <p >{profile.lastname}</p>
+                                            <div className='border-b border-gray-300 flex flex-col w-[90%] h-16 ml-[10%]'>
+                                                <span className='text-red-900 '>Last name </span>
+                                                <span >{profile.lastname}</span>
                                             </div>
-                                            <div className='border-b border-gray-300 flex flex-col w-[94%] h-15 ml-[5%]'>
-                                                <h5 className='text-purple-900 mt-3'>Phone Number </h5>
-                                                <p className='mx-2' >123456789</p>
+                                            <div className='border-b border-gray-300 flex flex-col w-[90%] h-16 ml-[10%]'>
+                                                <span className='text-red-900 '>Phone Number </span>
+                                                <span className='mx-2' >123456789</span>
                                             </div>
-                                            <div className=' border-gray-300 flex flex-col w-[94%] h-15 ml-[5%]'>
-                                                <h5 className='text-purple-900 mt-3'>Email Adress</h5>
-                                                <p >{profile.email}</p>
+                                            <div className=' border-gray-300 flex flex-col w-[90%] h-16 ml-[10%]'>
+                                                <span className='text-red-900 '>Email Adress</span>
+                                                <span >{profile.email}</span>
                                             </div>
                                             
 
@@ -132,7 +132,7 @@ const FriendProfile = () => {
                                     <div className='w-[80%] h-full flex items-center justify-start' >
 
                                         <FaUserFriends onClick={handleFriendsCard} className={`ml-3 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full ${friendsCard && "hidden"}  `} />
-                                        {/* <p className=' text-gray-400 mt-3 mr-3'>Friends</p> */}
+                                        <p className='sm:hidden md:inline text-gray-400 mt-3 mr-3'>Friends</p>
 
                                         {friendsCard &&
                                             <input className='w-[80%] ml-5 focus:outline-none text-sm  text-gray-400 pl-8 py-2 rounded  cursor-pointercursor-pointer '
@@ -150,7 +150,7 @@ const FriendProfile = () => {
 
                                     <div className={` w-[30]% h-full flex items-center justify-end `}>{/* {` w-[50%] h-full flex items-center justify-end ${friendsCard && "hidden"} `}*/}
                                         <IoMdPhotos className=' text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handleFriendPhotos} />
-                                        
+                                        <p className='sm:hidden md:inline  text-gray-400 mt-3 mr-3'>Photos</p>
                                     </div>
 
                                 </div >

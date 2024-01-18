@@ -77,28 +77,17 @@ const Group = () => {
                     {createGroup && < CreateGroupCard />}
                     {createCominityGroup && <CreateComminityGroup />}
                     {addExistingComminity && <AddExsistingComminity />}
-                     
+
                 </>
 
 
 
             </div>
             {/* Right Bar */}
-            <div className='h-[86%] w-[60%]  rounded-bl-lg  '>
-
-
-                <div className='h-full w-[60%] lg:w-[75%]'><div className='w-full h-full flex items-center justify-center'>
-
-                    <div>
-                        <div className=' w-full  flex items-center justify-center '>
-                        </div>
-                        <p>Click on contact to view up date</p>
-                    </div>
-
+            <div className='h-[86%] w-[60%] lg:w-[75%]  rounded-bl-lg  '>
+                <div className=' h-full w-full flex justify-center items-center'>
+                    <p className='font-bold'>Click on contact to view up date</p>
                 </div>
-                </div>
-
-
             </div>
         </div>
     )

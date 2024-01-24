@@ -39,9 +39,6 @@ const Group = () => {
     }
 
 
-
-
-
     return (
         <div className='h-full w-full flex '>
             {/* left top bar */}
@@ -83,7 +80,7 @@ const Group = () => {
 
 
             </div>
-            {/* Right Bar */}
+            {/* Right Bottom Bar */}
             <div className='h-[86%] w-[60%] lg:w-[75%]  rounded-bl-lg  '>
                 <div className=' h-full w-full flex justify-center items-center'>
                     <p className='font-bold'>Click on contact to view up date</p>

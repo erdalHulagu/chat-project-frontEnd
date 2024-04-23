@@ -127,7 +127,8 @@ const FriendProfile = () => {
 
                             </div >
                             {/* right bar */}
-                            <div className='w-[80%] h-[96%]  overflow-y-scroll '>
+                            <div className='w-[80%] h-[96%] overflow-hidden '>
+                                <div className='w-full h-full hover:overflow-clip hover:overflow-y-auto'>
                                 <div className='sticky z-10 top-0 w-full h-20 right-0 flex items-center justify-between shadow-slate-900 shadow-2xl bg-blue-950'>
                                     <div className='w-[80%] h-full flex items-center justify-start' >
 
@@ -160,6 +161,8 @@ const FriendProfile = () => {
                                         {friendsCard && !friendPhotos && users.map((friend,id) => <Col key={id} md={6} lg={4} xl={3}> <FriendsCard {...friend} /></Col >)}
                                     </Row>
                                 </div>
+                                </div>
+
                             </div>
                         </div></>}
 

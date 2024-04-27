@@ -16,7 +16,7 @@ const CreateComminityGroup = () => {
         setIsVisible(!isVisible);
     }
     const handleInputVisible = () => {
-        setIsActive(true)
+        setIsActive(!isActive)
     }
     const handleCreateGroupChat = () => {
         setCreateGroupChat(true);
@@ -41,7 +41,7 @@ const CreateComminityGroup = () => {
                 <div className='w-[94%] flex   border-slate-400 border-b mx-[3%] '>
                     <div className='w-full flex flex-col  '>
 
-                        <div className='flex  w-full'>
+                        <div className='flex  w-full h-12'>
                             {isActive ? (<input id='imgInput' className=' ml-3  text-slate-800 bottom-0 w-[90%] bg-slate-200  focus:outline-none ' type="text" alt='' autoFocus />) : <h5 className="ml-3 text-sm text-slate-500 w-[90%]" > Type in group name (optional) </h5>}
                             <div className='w-[10] flex justify-end'>
                                 <BiSolidPencil onClick={handleInputVisible} id='imgInput' className={'rounded-full hover:opacity-50 hover:bg-white p-2 w-10 h-10 text-lg text-slate-500 hover:text-red-800 cursor-pointer '} />
@@ -53,19 +53,19 @@ const CreateComminityGroup = () => {
 
 
                 </div>
-                <div className='w-[94%] h-[90%] bg-slate-400 flex mt-20 mx-[3%]  '>
+                <div className='w-[94%] h-[90%] bg-slate-300 flex mt-20 mx-[3%]  '>
                     <div className='w-full h-full flex flex-col '>
-                        <p className=" text-gray-200 ml-3 text-sm" > Group Description </p>
+                        <p className=" text-gray-600 ml-3 text-sm mt-3" > Group Description </p>
                         {isVisible &&
-                            <p onClick={handleToggleVisibility} id="textarea" className=" text-gray-300  pl-2 text-sm" > ! click on and write something...  You can add rules for your group member to see</p>
+                            <p onClick={handleToggleVisibility} id="textarea" className=" text-gray-600  pl-2 text-sm" > ! click on and write something...  You can add rules for your group member to see</p>
                         }
-                        {!isVisible && <textarea id="textarea" className='w-full h-[30%] resize-none overflow-hidden pl-2  pb-28  bg-slate-400 mb-2 text-gray-300 bottom-0 focus:outline-none' type="text" alt='' />}
+                        {!isVisible && <textarea id="textarea" className='w-full h-[30%] resize-none overflow-hidden pl-2  pb-28 bg-slate-300 text-gray-600 mb-2 bottom-0 focus:outline-none' type="text" alt='' />}
 
                     </div>
 
                     <div className='flex justify-end '>
 
-                        <TfiCommentsSmiley className='mt-3 text-gray-200 w-10 h-10 p-2 hover:opacity-30 hover:bg-slate-100 rounded-full hover:text-red-800 cursor-pointer' />
+                        <TfiCommentsSmiley className='mt-2 mr-2 text-gray-600 w-10 h-10 p-2 hover:opacity-60 hover:bg-slate-100 rounded-full hover:text-red-800 cursor-pointer' />
                     </div>
 
                 </div>

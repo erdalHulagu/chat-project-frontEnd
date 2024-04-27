@@ -5,7 +5,7 @@ import { BiSolidLeftArrowSquare } from 'react-icons/bi';
 import CreateGroupCard from './create-group/create-group-card';
 import { HiUserGroup } from 'react-icons/hi';
 import CreateComminityGroup from './comminity-group/create-comminity-group';
-import AddExsistingComminity from './comminity-group/create-existing-group/add-existing-comminity';
+import AddExsistingComminity from './create-existing-group/add-existing-comminity';
 
 
 
@@ -40,7 +40,7 @@ const Group = () => {
 
 
     return (
-        <div className='h-full w-full flex '>
+        <div className='h-full w-full flex overflow-hidden'>
             {/* left top bar */}
             <div className='w-[40%] lg:w-[25%] sm: rounded-l-lg  bg-slate-200 '>
                 <div className=' flex justify-between rounded-tl-lg h-[14%] border-b w-[full]  bg-blue-950 border-slate-100 border'>

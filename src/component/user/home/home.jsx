@@ -5,7 +5,7 @@ import { BiSolidUser } from 'react-icons/bi'
 import { useNavigate } from 'react-router-dom';
 import MyStatus from '../status/my-status';
 import Group from '../group/group-chat/group';
-import AddExsistingGroup from '../group/group-chat/comminity-group/create-existing-group/add-existing-comminity';
+import AddExsistingGroup from '../group/group-chat/create-existing-group/add-existing-comminity';
 
 
 

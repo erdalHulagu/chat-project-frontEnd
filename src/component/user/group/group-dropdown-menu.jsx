@@ -38,7 +38,7 @@ const DropdownMenu = ({ handleCreateGroup, handleCreateCominityGroup,handleAddEx
         <div className=' relative flex w-[50] h-full justify-end cursor-pointer'>
 
             <IoIosArrowDropdownCircle
-                onClick={handleHover1}
+                onMouseOver={handleHover1}
                 onMouseLeave={handleLeave1} className='m-1  text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
             {dropdown1 &&
                 <div

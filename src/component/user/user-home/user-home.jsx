@@ -37,7 +37,7 @@ const UserHome = () => {
     const handleNavigateStatus = () => {
         navigate("/status");
     }
-    
+
 
     return (
         < div className='h-[98%] w-full'>
@@ -60,8 +60,8 @@ const UserHome = () => {
             <div className='h-[88%] w-full flex  rounded-b-lg'>
                 {/* left column */}
 
-                <div className='rounded-b-lg min-w-28 overflow-hidden overflow-y-scroll w-[40%] h-full bg-gradient-to-b from-slate-300  to-slate-100 '>
-                    <div className='sticky top-0 flex justify-between'>
+                <div className='rounded-b-lg min-w-28  w-[40%] h-full bg-gradient-to-b from-slate-100  to-slate-50 border-r'>
+                    <div className='sticky top-0 flex justify-between h-28  shadow-slate-600  shadow-md '>
                         {/* search */}
                         < div className=' relative  w-full  pt-1  top-0    bg-slate-200'>
 
@@ -76,34 +76,37 @@ const UserHome = () => {
                                 value={search}
                             />
                             <ImSearch className='absolute  top-7 left-6 text-blue-950' />
-                           
-                            
-                                <div onClick={hadleUserList} className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mt-1  border-b shadow-slate-950  shadow-2xl '>
-                                    <PiUserListFill className='text-xl mt-1 text-blue-950 ml-4  hover:text-red-700 ' />
-                                    <p className='ml-2 mt-1 text-sm'>Chat List</p>
 
-                                </div>
-                            
+
+                            <div onClick={hadleUserList} className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mt-1  '>
+                                <PiUserListFill className='text-xl mt-1 text-blue-950 ml-4  hover:text-red-700 ' />
+                                <p className='ml-2 mt-1 text-sm'>Chat List</p>
+                            </div>
+
                         </div>
                     </div>
-                    <div >
-                        {(search || userList) && [...Array(20)].map((item) => <div onClick={handleQuery} className='mx-2  overflow-hidden bg '><ChatCard /></div>)}
+                    <div className='h-[90%] overflow-clip hover:overflow-y-scroll' >
+                        {(search || userList) && [...Array(20)].map((item) => <div onClick={handleQuery} className=' '><ChatCard /></div>)}
                     </div>
 
 
                 </div>
                 {/* right column */}
 
-                <div className='overflow-hidden overflow-y-scroll w-[60%] h-full relaltive flex flex-col rounded-br-lg'>
+                <div className=' w-[60%] h-full relaltive flex flex-col rounded-br-lg'>
 
                     {query ?
-                        <div className='h-30 w-full rounded-b-lg '>
+                        <div className='h-30 w-full rounded-b-lg  overflow-hidden'>
                             <div className='w-full  bg-slate-200 top-0 sticky'>
                                 <ChatCard />
                             </div>
-
-
-                            {[...Array(15)].map((item, id) => <div key={id} className='w-full h-auto'><MessageCard /></div>)}
+                            <div className='w-full h-[84%] overflow-y-scroll overflow-clip px-[5%]'>
+                                <div className=' flex flex-col justify-center  py-20 space-y-10 '>
+                                {[...Array(15)].map((item, id) =><MessageCard key={id} isRegUserMessage={id % 2 === 0} content={"message"} />)}  {/*1:18:20 VD=2*/}
+                                </div>
+                          
+                            </div>
+                          
                             <div className=' flex items-between justify-center fixed bottom-0 bg-slate-200 h-12 w-[60%] rounded-br-lg '
                                 style={{ position: `absolute` }}>
 
@@ -112,7 +115,7 @@ const UserHome = () => {
                                     <PiPlusCircleFill className=' text-blue-950 w-12 h-12 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full' />
                                 </div>
                                 <div className=' max-h-20 flex items-center justify-center w-full'>
-                                    <textarea type='text' className='max-h-20  w-full bg-slate-100   rounded p-3 py-2 text-slate-950' />
+                                    <input type='text' className='max-h-20  w-full bg-slate-100   rounded p-3 py-2 text-slate-950' />
                                 </div>
                                 <div className=' flex items-center justify-center rounded-b-lg '>
                                     < FaMicrophoneAlt className=' text-blue-950 w-12 h-12 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full  mr-1 ' />
@@ -123,7 +126,7 @@ const UserHome = () => {
 
                         </div>
                         : <div className='  flex items-center justify-center  text-white object-cover h-full w-full text-center opacity-20'
-                            style={{ backgroundImage: `url('https://cdn.pixabay.com/photo/2016/08/11/23/48/mountains-1587287_1280.jpg') `}}>
+                            style={{ backgroundImage: `url('https://cdn.pixabay.com/photo/2016/08/11/23/48/mountains-1587287_1280.jpg') ` }}>
                             <div className='relative flex items-center justify-center w-[16%]'>
                                 <p className='absolute text-lg'>asiliasiakausbdklaujsbskjdbcskdjbcls</p>
                             </div>

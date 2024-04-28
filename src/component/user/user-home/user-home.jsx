@@ -85,7 +85,7 @@ const UserHome = () => {
 
                         </div>
                     </div>
-                    <div className='h-[90%] overflow-clip hover:overflow-y-scroll' >
+                    <div className='max-h-[90%] h-[84%] overflow-clip hover:overflow-y-scroll' >
                         {(search || userList) && [...Array(20)].map((item) => <div onClick={handleQuery} className=' '><ChatCard /></div>)}
                     </div>
 

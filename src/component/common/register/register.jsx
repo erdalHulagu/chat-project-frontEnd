@@ -6,10 +6,10 @@ import { useState } from "react";
 import {  Container, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
+import { register } from "../../../api/service/user-service";
 
 const Register = ({handleSubmit}) => {
-    
-
+    const [loading, setLoading] = useState(false);
     const initialValues = {
         name: "",
         lastname: "",
@@ -28,14 +28,19 @@ const Register = ({handleSubmit}) => {
     });
 
     const onSubmit = async (values) => {
+        setLoading(true);
         try {
-            const resp = await axios.post("https://carrental-v3-backend.herokuapp.com/login", values);
+            const resp=await register(values);
+            toast("You're registered", "success");
+            formik.resetForm();
             console.log(resp.data);
-            localStorage.setItem("token", resp.data.token)
 
         } catch (err) {
+            toast(err.response.data.messsage,"error")
             console.log(err);
             // alert(err.response.data.message);
+        }finally{
+            setLoading(false);
         }
     };
 
@@ -122,14 +127,14 @@ const Register = ({handleSubmit}) => {
                         isValid={formik.touched.phonenumber && !formik.errors.phonenumber}
                     />
                     <Form.Control.Feedback type="invalid">
-                        {formik.errors.phonenumbera}
+                        {formik.errors.phonenumber}
                     </Form.Control.Feedback>
                 </Form.Group>
 
                 <div className="w-full h-14 flex items-center justify-end ">
                     <div>
                     <button className=" mb-3 h-10  w-24 rounded-lg bg-slate-700 text-slate-100  hover:text-slate-950 hover:bg-gray-100   "  type="submit" onClick={handleSubmit}>
-                        Submit
+                    {loading && <Spinner animation="border" size="sm" />}Register
                     </button>
                     </div>
                     

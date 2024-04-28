@@ -23,13 +23,9 @@ const Login = () => {
 
 
     const initialValues = {
-        name: "",
-        lastname: "",
         email: "",
         password: "",
-        phonenumber: "",
-        adress: "",
-        remember: false,
+      
     };
 
     const validationSchema = Yup.object({
@@ -106,7 +102,7 @@ const Login = () => {
                                 <div className="w-full h-14 flex items-center justify-end ">
                                     <div>
                                         <button className=" h-10  w-24 rounded-lg bg-slate-700 text-slate-100  hover:text-slate-950 hover:bg-gray-100   " type="submit" onClick={handleNavigater}>
-                                            Submit
+                                        {loading && <Spinner animation="border" size="sm" />} Login
                                         </button>
                                     </div>
 

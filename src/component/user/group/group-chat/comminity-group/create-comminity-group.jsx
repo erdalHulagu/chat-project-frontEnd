@@ -59,7 +59,7 @@ const CreateComminityGroup = () => {
                         {isVisible &&
                             <p onClick={handleToggleVisibility} id="textarea" className=" text-gray-600  pl-2 text-sm" > ! click on and write something...  You can add rules for your group member to see</p>
                         }
-                        {!isVisible && <textarea id="textarea" className='w-full h-[30%] resize-none overflow-hidden pl-2  pb-28 bg-slate-300 text-gray-600 mb-2 bottom-0 focus:outline-none' type="text" alt='' />}
+                        {!isVisible && <textarea id="textarea" className='w-full h-[30%] resize-none overflow-clip hover:overflow-y-auto pl-2  pb-28 bg-slate-300 text-gray-600 mb-2 bottom-0 focus:outline-none' type="text" alt='' />}
 
                     </div>
 

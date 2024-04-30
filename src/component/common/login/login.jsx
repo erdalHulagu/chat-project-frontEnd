@@ -1,14 +1,16 @@
 // import axios from "axios";
 import { useFormik } from "formik";
-import React from "react";
-import { Container, Form } from "react-bootstrap";
+import React, { useState } from "react";
+import { Container, Form, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { BiSolidLeftArrowSquare } from "react-icons/bi"
 import * as Yup from "yup";
 import axios from "axios";
+import { login } from "../../../service/user-service";
 
 const Login = () => {
     const navigater = useNavigate();
+    const [loading, setLoading] = useState(false)
 
     const handleNavigater = () => {
         navigater('/home');
@@ -36,14 +38,18 @@ const Login = () => {
     });
 
     const onSubmit = async (values) => {
+        setLoading(true);
         try {
-            const resp = await axios.post("https://carrental-v3-backend.herokuapp.com/login", values);
+            const resp = login(values);
             console.log(resp.data);
+            formik.resetForm();
             localStorage.setItem("token", resp.data.token)
 
         } catch (err) {
             console.log(err);
             // alert(err.response.data.message);
+        }finally{
+            setLoading(false);
         }
     };
 
@@ -54,21 +60,7 @@ const Login = () => {
     });
 
     return (
-        // <div fluid className="h-screen bg-purple-100 ">
-        //     <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
-        //         <div className='h-30 w-30 flex items-start ml-10 w-full  mt-4'>
-        //             <div className='my-3 flex items-start  border-white justify-start w-full h-full'>
-        //                 <BiSolidLeftArrowSquare className=' text-gray-400 w-16 h-16 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' onClick={handleNavigate} />
-        //             </div>
-        //         </div>
-                
-        //         <div className=" flex  justify-center items-center h-[86vh] w-[94%]  absolute bottom-22  top-28 rounded  shadow-slate-700  shadow-2xl " >
-
-        //             <div className=' rounded w-full h-full flex  justify-center'>
-        //                 <img className='rounded object-cover absolute w-full h-full' src="https://media.istockphoto.com/id/1327187531/tr/vektör/global-network-connection-world-map-point-and-line-composition-concept-of-global-business.jpg?s=612x612&w=0&k=20&c=vfLYnJcaXytQn-7D4XYJQZcbXrvvUjHrujtJAl6JoeA=" alt="" />
-        //                 <h5 className='top-20 text-bold absolute text-gray-400'>- World wide connection -</h5>
-        //             </div>
-        //             <div className='overflow-hidden opacity-90 absolute rounded bg-slate-300 w-[80%] max-w-lg mt-20 h-[80%]  p-10 flex items-center justify-center  shadow-slate-400  shadow-2xl'>
+        
                         <Container className="mt-3 ">
                             <Form noValidate onSubmit={formik.handleSubmit}>
 
@@ -101,8 +93,13 @@ const Login = () => {
 
                                 <div className="w-full h-14 flex items-center justify-end ">
                                     <div>
-                                        <button className=" h-10  w-24 rounded-lg bg-slate-700 text-slate-100  hover:text-slate-950 hover:bg-gray-100   " type="submit" onClick={handleNavigater}>
-                                        {loading && <Spinner animation="border" size="sm" />} Login
+                                        <button className=" h-10  w-24 rounded-lg bg-slate-700 text-slate-100  hover:text-slate-950 hover:bg-gray-100   " 
+                                        type="submit"
+                                        //  onClick={handleNavigater}
+                                        disabled={!(formik.dirty && formik.isValid) || loading}
+                                        >
+                                            {loading && <Spinner animation="border" size="sm" />}
+                                        Login
                                         </button>
                                     </div>
 

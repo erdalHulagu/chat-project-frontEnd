@@ -1,15 +1,14 @@
 import { encryptedLocalStorage } from "./encrypt-storage";
 
-const authHeader =()=>{
-    const token = encryptedLocalStorage.getItem('token');
+const authHeader = () => {
+  const token = encryptedLocalStorage.getItem("token");
 
-    let header={};
+  let header = {};
+  if (token) {
+    header = { Authorization: `Bearer ${token}` };
+  }
 
-    if (token) {
-        header={Authorization:`Bearer ${token}`};
-        
-    }
-    return header;
+  return header;
+};
 
-}
 export default authHeader;

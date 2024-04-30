@@ -1,5 +1,5 @@
 export const setting = {
-    apiURL : "localhost:8081",
+    apiURL : "http://localhost:8081",
     siteName: "",
     siteUrl : "",
     email : "",

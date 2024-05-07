@@ -1,24 +1,26 @@
 import { createSlice } from "@reduxjs/toolkit";
-import LOGIN from"./action-type"
+
 
 const initialState={
-    LOGIN,
+    isUserLogin:false,
     user:{},
+    erdal:"erdal"
 }
 export const authSlice= createSlice({
 name:"auth",
 initialState,
 reducers:{
     loginSucces:(state,action)=>{
-        state.LOGIN=true;
+        state.isUserLogin=true;
         state.user=action.payload;
+        state.erdal=action.payload;
     },
     loginFailed:(state,action)=>{
-        state.LOGIN=false;
+        state.isUserLogin=false;
         state.user={};
     },
     logout:(state,action)=>{
-        state.LOGIN=false;
+        state.isUserLogin=false;
         state.user={};
 
     }

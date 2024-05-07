@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import Register from '../register/register'
 import Login from '../login/login';
 import { BiSolidLeftArrowSquare } from 'react-icons/bi';
-
 const Menu = () => {
     const [register, setRegister] = useState(false);
     const [login, setLogin] = useState(false);
@@ -31,7 +30,7 @@ const Menu = () => {
 
                         
                          <div className='h-16 w-48  flex items-center '>
-                                <img className='ml-[3%] hover:opacity-30 rounded-full cursor-pointer w-14 h-14 absolute ' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
+                                <img className='ml-[3%] hover:opacity-30 rounded-full cursor-pointer w-14 h-14 absolute ' src={require(`../../../assets/img/logo.png`)} alt="" />
 
                             </div>
                     

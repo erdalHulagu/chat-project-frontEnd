@@ -10,13 +10,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
 import { loginFailed, loginSucces } from "../../../redux/store/slices/auth/auth-slice";
 import { toast } from "../../../helper/swal";
+import { useAppDispatch } from "../../../redux/hooks/hooks";
 
 const Login = () => {
     
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate();
-    const dispach = useSelector();
-    const selector = useDispatch();
+  const dispatch= useAppDispatch();
 
     const initialValues = {
         email: "",
@@ -34,21 +34,22 @@ const Login = () => {
     const onSubmit = async (values) => {
         setLoading(true);
         try {
-            const respAuth = login(values);
+            const respAuth =await login(values);
             console.log(respAuth.data);
             formik.resetForm();
             encryptedLocalStorage.setItem("token", respAuth.data.token)
 
             const respUser=await getUser();
-            dispach(loginSucces(respUser.date));
-            navigate("/")
+            dispatch(loginSucces(respUser.date));
+            navigate("/home")
 
         } catch (err) {
-            dispach(loginFailed());
-            toast(err.response.data.message, "error")
+            dispatch(loginFailed());
+            toast("error");
             
         } finally {
             setLoading(false);
+            
         }
     };
 

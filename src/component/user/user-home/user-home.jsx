@@ -10,14 +10,18 @@ import { BsFillChatLeftDotsFill, BsArrowDownSquareFill } from 'react-icons/bs'
 import MessageCard from '../chat/message-card';
 import ChatCard from '../chat/chat-card'
 import { useNavigate } from 'react-router-dom'
+import { useAppSelector } from '../../../redux/hooks/hooks'
+import { useSelector } from 'react-redux'
 
 const UserHome = () => {
 
+const {user}=useAppSelector((state)=>state.auth);
     const navigate = useNavigate();
 
     const [query, setQuery] = useState(false)
     const [search, setSearch] = useState("")
     const [userList, setUserList] = useState(false)
+    
 
     const hadleUserList = () => {
         setUserList(true);
@@ -42,11 +46,17 @@ const UserHome = () => {
     return (
         < div className='h-[98%] w-full'>
             <div className='w-full  bg-slate-100 shadow-2xl shadow-slate-900 rounded-t-lg h-24 p-0 flex  items-center justify-between border-b z-10  '>
+
                 <div className='flex  items-center w-[50%] '>
                     {/* nav bar */}
+                    
+                    <>
                     <img onClick={handleProfile} className=' hover:opacity-70 border-2 cursor-pointer w-20 h-20 rounded-full my-5 mx-4' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
-                    <p className='cursor-pointer text-blue-950 hover:text-red-700 text-xs'>user name</p>
-                </div>
+                    <p onClick={handleProfile} className='cursor-pointer text-gray-950 hover:text-red-700 text-xs font-extrabold'>{user.address} {user.lastName}</p>
+                    </>
+
+                    </div>
+
                 <div className=' w-[60%] '>
                     <ul className='left-0 text-decoration: none flex justify-between items-center'>
                         <li className=''><HiUserGroup className='text-blue-950 w-12 h-12 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full' /></li>
@@ -56,6 +66,7 @@ const UserHome = () => {
 
                     </ul>
                 </div>
+                
             </div>
             <div className='h-[88%] w-full flex  rounded-b-lg'>
                 {/* left column */}
@@ -102,11 +113,11 @@ const UserHome = () => {
                             </div>
                             <div className='w-full h-[84%] overflow-y-scroll overflow-clip px-[5%]'>
                                 <div className=' flex flex-col justify-center  py-20 space-y-10 '>
-                                {[...Array(15)].map((item, id) =><MessageCard key={id} isRegUserMessage={id % 2 === 0} content={"message"} />)}  {/*1:18:20 VD=2*/}
+                                    {[...Array(15)].map((item, id) => <MessageCard key={id} isRegUserMessage={id % 2 === 0} content={"message"} />)}  {/*1:18:20 VD=2*/}
                                 </div>
-                          
+
                             </div>
-                          
+
                             <div className=' flex items-between justify-center fixed bottom-0 bg-slate-200 h-12 w-[60%] rounded-br-lg '
                                 style={{ position: `absolute` }}>
 
@@ -137,6 +148,7 @@ const UserHome = () => {
             </div>
 
         </div>
+
     )
 }
 

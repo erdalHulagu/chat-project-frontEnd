@@ -8,9 +8,9 @@ import * as Yup from "yup";
 import { getUser, login } from "../../../service/user-service";
 import { useDispatch, useSelector } from "react-redux";
 import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
-import { loginFailed, loginSucces } from "../../../redux/store/slices/auth/auth-slice";
 import { toast } from "../../../helper/swal";
 import { useAppDispatch } from "../../../redux/hooks/hooks";
+import { loginFailed, loginSuccess } from "../../../redux/store/slices/auth-slice";
 
 const Login = () => {
     
@@ -40,7 +40,7 @@ const Login = () => {
             encryptedLocalStorage.setItem("token", respAuth.data.token)
 
             const respUser=await getUser();
-            dispatch(loginSucces(respUser.date));
+            dispatch(loginSuccess(respUser.date));
             navigate("/home")
 
         } catch (err) {

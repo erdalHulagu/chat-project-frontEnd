@@ -2,7 +2,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import profileReducer from './slices/friendsProfileSlices'
 import createdGroupReducer from './slices/created-group-slice';
-import authReducer from './slices/auth/auth-slice'
+import authReducer from './slices/auth-slice'
 export const store = configureStore({
   reducer: {
     profile: profileReducer,
@@ -10,7 +10,7 @@ export const store = configureStore({
     auth:authReducer,
     
     // other reducers...
-  },
+  }
 });
 
 export default store;

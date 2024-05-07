@@ -9,9 +9,9 @@ return axios.post(`${BASE_API_URL}/register`,user);
 };
 
 export const login=(credential)=>{
-    return axios.post(`${BASE_API_URL}/login`,credential);
+    return axios.post(`${BASE_API_URL}/login`,  credential);
 }
 
 export const getUser=()=>{
-    return axios.get(`${BASE_API_URL}/users/profile`,{headers:authHeader()});
+    return axios.get(`${BASE_API_URL}/users/profile`,{headers:  authHeader() });
 }

@@ -10,13 +10,26 @@ import { BsFillChatLeftDotsFill, BsArrowDownSquareFill } from 'react-icons/bs'
 import MessageCard from '../chat/message-card';
 import ChatCard from '../chat/chat-card'
 import { useNavigate } from 'react-router-dom'
-import { useAppSelector } from '../../../redux/hooks/hooks'
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks/hooks'
 import { useSelector } from 'react-redux'
+import { logout } from '../../../redux/store/slices/auth-slice'
+import { encryptedLocalStorage } from '../../../helper/auth-token/encrypt-storage'
+import { question } from '../../../helper/swal'
 
 const UserHome = () => {
-
-const {user}=useAppSelector((state)=>state.auth);
+    const { isUserLogin, user } = useAppSelector((state) => state.auth);
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
+  
+    const handleLogout = () => {
+      question("Logout", "Are you sure to logout?").then((result) => {
+        if (result.isConfirmed) {
+          dispatch(logout());
+          encryptedLocalStorage.removeItem("token");
+          navigate("/");/*  */
+        }
+      });
+    };
 
     const [query, setQuery] = useState(false)
     const [search, setSearch] = useState("")
@@ -52,7 +65,7 @@ const {user}=useAppSelector((state)=>state.auth);
                     
                     <>
                     <img onClick={handleProfile} className=' hover:opacity-70 border-2 cursor-pointer w-20 h-20 rounded-full my-5 mx-4' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
-                    <p onClick={handleProfile} className='cursor-pointer text-gray-950 hover:text-red-700 text-xs font-extrabold'>{user.address} {user.lastName}</p>
+                    <p onClick={handleProfile} className='cursor-pointer text-gray-950 hover:text-red-700 text-xs font-extrabold'>{user.firstName} {user.lastName}</p>
                     </>
 
                     </div>

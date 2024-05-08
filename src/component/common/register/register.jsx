@@ -10,6 +10,7 @@ import { register } from "../../../service/user-service";
 import { toast } from "../../../helper/swal";
 
 const Register = () => {
+   const navigate= useNavigate();
     const [loading, setLoading] = useState(false);
     const initialValues = {
         firstName: "",
@@ -35,6 +36,7 @@ const Register = () => {
            toast("You're registered", "success");
             formik.resetForm();
             console.log(resp.data);
+            navigate('/login')
 
         } catch (err) {
             toast(err.response.data.messsage,"error")

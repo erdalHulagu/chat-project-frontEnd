@@ -13,10 +13,11 @@ import friends from "../my-photos/friends.json"
 import { useDispatch } from 'react-redux';
 import { setFriendProfile } from '../../../redux/store/slices/friendsProfileSlices';
 import { useNavigate } from 'react-router-dom';
-
+import {useAppSelector} from'../../../redux/store/hooks';
 const MyProfile = () => {
     const navigate= useNavigate();
     const dispatch = useDispatch();
+    const{isUserLogin,user}=useAppSelector((state)=>state.auth);
 
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
@@ -100,13 +101,14 @@ const MyProfile = () => {
                     {isEnlarged ? <div className='rounded w-full h-auto max-h-[86vh] flex justify-center '><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </div> : <>
                         <div className='w-full text-slate-800 bg-slate-100 rounded-t-lg h-[12%] flex  items-center justify-between shadow-slate-950 shadow-2xl border-b'>
 
-                            <h4 className='ml-6 font-semibold '>Profile</h4>
+                            <h4 className='ml-6 font-semibold '>{user.firstName} {user.lastName}'s Profile</h4>
                             <RiUserSettingsFill className=' text-blue-950 w-14 h-14 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full' />
 
 
                         </div>
                         <div className='w-full h-[88%] rounded-b-lg flex'>
                             {/* left bar */}
+                            {isUserLogin &&
                             <div className='w-[40%] h-full rounded-b-lg '>
                                 <div className='w-full flex items-center border h-full marker:rounded-bl-lg'>
                                     <div className='relative bg-slate-200 w-full  h-full top-0 flex flex-col justify-center rounded-b-lg'>
@@ -122,7 +124,7 @@ const MyProfile = () => {
                                         <div className='w-full  h-full rounded-bl-lg'>
                                             <div className='w-[94%] flex   border-slate-400 border-b mx-[3%] '>
                                                 <div className='w-full flex flex-col  '>
-                                                    <h5 className="ml-3  text-blue-900 text-lg font-bold w-[20vw] " > Your name </h5>
+                                                    <h5 className="ml-3  text-blue-900 text-lg font-bold w-[20vw] " >{user.firstName} {user.lastName}</h5>
                                                     <input id='imgInput' className=' ml-3  text-slate-800 bottom-0 w-[80%] bg-slate-200  focus:outline-none' type="text" alt='' />
 
                                                 </div>
@@ -157,6 +159,7 @@ const MyProfile = () => {
                                 </div>
 
                             </div >
+}
                             {/* right bar */}
                             <div className='w-[80%] h-full overflow-hidden overflow-y-scroll '>
                                 <div className='sticky z-10 top-0 w-full h-20  flex items-center justify-between shadow-slate-900 shadow-2xl bg-blue-950'>

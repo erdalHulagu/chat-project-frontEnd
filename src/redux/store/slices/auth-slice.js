@@ -4,7 +4,6 @@ import { createSlice } from "@reduxjs/toolkit";
 // const initialState={
 //     isUserLogin:false,
 //     user:{},
-//     erdal:"erdal"
 // }
 
 export const authSlice = createSlice({
@@ -18,6 +17,7 @@ export const authSlice = createSlice({
         state.isUserLogin = true;
         state.user = action.payload;
       },
+  
       loginFailed: (state) => {
         state.isUserLogin = false;
         state.user = {};

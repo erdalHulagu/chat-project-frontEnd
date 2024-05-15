@@ -15,3 +15,11 @@ export const login=(credential)=>{
 export const getUser=()=>{
     return axios.get(`${BASE_API_URL}/users/profile`,{headers:  authHeader() });
 }
+export const updateUser = (user) => {
+    return axios.put(`${BASE_API_URL}/users/auth`, user, { headers: authHeader() });
+  };
+export const updatePassword = (credential) => {
+    return axios.patch(`${BASE_API_URL}/users/auth/password`, credential, {
+      headers: authHeader(),
+    });
+  };

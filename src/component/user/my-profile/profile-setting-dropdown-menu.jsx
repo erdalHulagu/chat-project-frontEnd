@@ -127,15 +127,15 @@ const ProfileSettingDropdownMenu = ({ menuItems = [] }) => {
     return (
         <div className='relative flex w-[50] h-full justify-end cursor-pointer'>
             <RiUserSettingsFill
-                onMouseEnter={handleMouseEnter}
+                onClick={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
-                className='text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 z-10 cursor-pointer rounded-full'
+                className='text-blue-950 w-14 h-14 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-blue-950 cursor-pointer rounded-full'
             />
             {isOpen && (
                 <div
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
-                    className='shadow-xl shadow-slate-900 border border-2xl border-slate-600 py-1 rounded absolute bg-slate-200 mt-14 flex-col items-center justify-center w-30 h-30'
+                    className='shadow-xl shadow-slate-900 border border-2xl border-slate-600 py-1 rounded absolute bg-slate-200 mt-14 flex-col items-center justify-center w-30 h-62'
                 >
                     {menuItems.map((item, index) => (
                         <DropdownItem key={index} label={item.label} onClick={item.onClick} />

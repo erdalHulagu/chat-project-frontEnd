@@ -15,6 +15,7 @@ import { setFriendProfile } from '../../../redux/store/slices/friendsProfileSlic
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../../redux/store/hooks';
 import ProfileSettingDropdownMenu from './profile-setting-dropdown-menu';
+import menuItems from './menu-items'
 const MyProfile = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -93,8 +94,8 @@ const MyProfile = () => {
 
 
                             <h4 className='ml-6 font-semibold '>{user.firstName} {user.lastName}'s Profile</h4>
-                            <div>
-                                <ProfileSettingDropdownMenu />
+                            <div className='z-20 h-62 w-40'>
+                            <ProfileSettingDropdownMenu menuItems={menuItems} />
                             </div>
 
 

@@ -1,20 +1,20 @@
-const handleCreateGroup = () => {
+
+const upDateProfile = () => {
     console.log('Create Group');
 };
 
-const handleCreateCommunityGroup = () => {
-    console.log('Create Community Group');
+const handleHomePage = () => {
+    console.log('update');
 };
 
-const handleAddExistingCommunity = () => {
+const handleLogOut = () => {
     console.log('Add Existing Community');
 };
 
 const menuItems = [
-    { label: 'All Groups' },
-    { label: 'Create New Community', onClick: handleCreateCommunityGroup },
-    { label: 'Add Existing Community', onClick: handleAddExistingCommunity },
-    { label: 'Create New Group', onClick: handleCreateGroup },
+    { label: 'Up Date Profile',onClick: upDateProfile },
+    { label: 'Home Page', onClick: handleHomePage },
+    { label: 'Log Out', onClick: handleLogOut},
 ];
 
 export default menuItems;

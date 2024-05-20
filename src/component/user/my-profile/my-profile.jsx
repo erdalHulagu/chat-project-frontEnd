@@ -2,20 +2,18 @@ import React, { useState } from 'react'
 import { BiSolidLeftArrowSquare, BiSolidPencil } from 'react-icons/bi'
 import { IoIosHome, IoMdPhotos } from 'react-icons/io';
 import { ImSearch } from 'react-icons/im';
-import { RiUserSettingsFill } from 'react-icons/ri';
 import { FaUserFriends } from 'react-icons/fa';
 import { MdPhotoCamera, MdOutlineMonochromePhotos } from 'react-icons/md';
 import FriendsCard from '../friends/friends-card';
 import MyPhotos from '../my-photos/my-photos-card';
-import { Col, Row } from 'react-bootstrap'
-import axios from 'axios';
+import {  Col, Row } from 'react-bootstrap'
 import friends from "../my-photos/friends.json"
 import { useDispatch } from 'react-redux';
 import { setFriendProfile } from '../../../redux/store/slices/friendsProfileSlices';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../../redux/store/hooks';
 import ProfileSettingDropdownMenu from './profile-setting-dropdown-menu';
-import menuItems from './menu-items'
+import { RiUserSettingsFill } from 'react-icons/ri';
 const MyProfile = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -95,7 +93,9 @@ const MyProfile = () => {
 
                             <h4 className='ml-6 font-semibold '>{user.firstName} {user.lastName}'s Profile</h4>
                             <div className='z-20 h-62 w-40'>
-                            <ProfileSettingDropdownMenu menuItems={menuItems} />
+                            
+                                <ProfileSettingDropdownMenu />
+                               
                             </div>
 
 

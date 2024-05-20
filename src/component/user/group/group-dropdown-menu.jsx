@@ -44,31 +44,31 @@ const DropdownMenu = ({ handleCreateGroup, handleCreateCominityGroup,handleAddEx
                 <div
                     onMouseEnter={handleHover1}
                     onMouseLeave={handleLeave1}
-                    className="shadow-xl shadow-slate-900 border border-2xl border-slate-600 py-1 rounded absolute  bg-slate-200 -bottom-2 left-6 flex-col items-center justify-center w-40 h-30">
+                    className="shadow-xl shadow-slate-900 border border-2xl border-slate-600 py-1 rounded absolute  bg-slate-200 -bottom-2 left-6 flex-col items-center justify-center w-40 h-84">
 
-                    <div className='text-gray-600 hover:text-slate-100 hover:shadow-md hover:shadow-slate-700 flex items-center  w-full h-[32%] px-2 hover:bg-gray-400 '>
+                    <div className='text-gray-600 hover:text-slate-100 hover:shadow-md hover:shadow-slate-700 flex items-center  w-full h-14 px-2 hover:bg-gray-400 '>
                         All Groups
                     </div>
                     <div
                         onMouseEnter={handleHover2}
                         onMouseLeave={handleLeave2}
-                        className=' text-gray-600 hover:text-slate-100  hover:shadow-md hover:shadow-slate-700 flex items-center  w-full h-[32%] px-2 hover:bg-gray-400 '>
+                        className=' text-gray-600 hover:text-slate-100  hover:shadow-md hover:shadow-slate-700 flex items-center  w-full h-14 px-2 hover:bg-gray-400 '>
                         Create Comminity
                     </div>
                     {dropdown2 &&
                         <div
                             onMouseEnter={handleHover2}
                             onMouseLeave={handleLeave2}
-                            className='shadow-xl shadow-slate-900 py-1 rounded absolute  bg-slate-200 -bottom-1 left-36 flex-col items-center justify-center w-48 h-30'>
+                            className='shadow-xl shadow-slate-900 py-1 rounded absolute  bg-slate-200 -bottom-1 left-36 flex-col items-center justify-center w-48 h-14'>
 
                             <div
                                 onClick={handleCreateCominityGroup}
-                                className=' text-gray-600 hover:text-slate-100  hover:shadow-md hover:shadow-slate-700 flex items-center  w-full h-[32%] px-2 hover:bg-gray-400 '>
+                                className=' text-gray-600 hover:text-slate-100  hover:shadow-md hover:shadow-slate-700 flex items-center  w-full h-14 px-2 hover:bg-gray-400 '>
                                 Create New Comminity
                             </div>
                             <div
                             onClick={handleAddExistingComminity} 
-                            className=' text-gray-600 hover:text-slate-100 hover:shadow-md hover:shadow-slate-700 flex items-center  border-b w-full h-[32%] px-2 hover:bg-gray-400 '>
+                            className=' text-gray-600 hover:text-slate-100 hover:shadow-md hover:shadow-slate-700 flex items-center  border-b w-full h-14 px-2 hover:bg-gray-400 '>
                                 Add Existing Comminity
                             </div>
                         </div>
@@ -76,16 +76,16 @@ const DropdownMenu = ({ handleCreateGroup, handleCreateCominityGroup,handleAddEx
                     <div
                         onMouseEnter={handleHover3}
                         onMouseLeave={handleLeave3}>
-                        <div className=' text-gray-600 hover:text-slate-100 hover:shadow-md hover:shadow-slate-700 w-full h-[32%] px-2 hover:bg-gray-400  '>
+                        <div className=' text-gray-600 hover:text-slate-100 hover:shadow-md hover:shadow-slate-700 w-full h-14 px-2 hover:bg-gray-400  '>
                             Add Groups
                         </div>
                         {dropdown3 &&
                             <div
                                 onMouseEnter={handleHover3}
                                 onMouseLeave={handleLeave3}
-                                className='shadow-xl shadow-slate-900 py-1 rounded absolute  bg-slate-200 -bottom-2 left-36 flex-col items-center justify-center w-40 h-30'>
+                                className='shadow-xl shadow-slate-900 py-1 rounded absolute  bg-slate-200 -bottom-2 left-36 flex-col items-center justify-center w-40 h-14'>
 
-                                <div onClick={handleCreateGroup} className='text-gray-600 hover:text-slate-100 hover:shadow-md hover:shadow-slate-700 flex items-center  w-full h-[32%] px-2 hover:bg-gray-400 '>
+                                <div onClick={handleCreateGroup} className='text-gray-600 hover:text-slate-100 hover:shadow-md hover:shadow-slate-700 flex items-center  w-full h-14 px-2 hover:bg-gray-400 '>
                                     Create New Group
                                 </div>
 

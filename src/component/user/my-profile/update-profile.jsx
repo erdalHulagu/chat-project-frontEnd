@@ -3,16 +3,10 @@ import { useFormik } from "formik";
 import React, { useState } from "react";
 import { Container, Form, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { BiSolidLeftArrowSquare } from "react-icons/bi"
 import * as Yup from "yup";
 import { getUser, login, updateUser } from "../../../service/user-service";
-import { useDispatch, useSelector } from "react-redux";
-import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
 import { toast } from "../../../helper/swal";
-import { useAppDispatch } from "../../../redux/store/hooks";
-import { loginFailed, loginSuccess } from "../../../redux/store/slices/auth-slice";
-
-const UpdateUserProfile = () => {
+const UpdateProfile = () => {
     
     const navigate= useNavigate();
     const [loading, setLoading] = useState(false);
@@ -37,7 +31,7 @@ const UpdateUserProfile = () => {
         setLoading(true);
         try {
             const resp=await updateUser(values);
-           toast("You're registered", "success");
+           toast("Profile updated succesfully", "success");
             formik.resetForm();
             console.log(resp.data);
             navigate('/login')
@@ -144,7 +138,7 @@ const UpdateUserProfile = () => {
                     disabled={!(formik.dirty && formik.isValid) || loading}
                 >
                     {loading && <Spinner animation="border" size="sm" />}
-                Register
+                Submit
                     </button>
                     </div>
                     
@@ -158,4 +152,4 @@ const UpdateUserProfile = () => {
     );
 };
 
-export default UpdateUserProfile;
+export default UpdateProfile;

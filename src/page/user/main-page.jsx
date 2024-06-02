@@ -1,5 +1,5 @@
 import React from 'react'
-import Main from '../../component/user/main/main'
+import Main from '../../component/common/main/main'
 
 const HomePages = () => {
   return (

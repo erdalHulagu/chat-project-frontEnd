@@ -1,21 +1,19 @@
 import React, { useState } from 'react'
-import UserHome from '../user-home/user-home';
+import UserHome from '../../user/user-home/user-home';
 import { BiSolidUser } from 'react-icons/bi'
 import { useNavigate } from 'react-router-dom';
-import MyStatus from '../status/my-status';
-import Group from '../group/group-chat/group';
-import AddExsistingGroup from '../group/group-chat/create-existing-group/add-existing-comminity';
+import MyStatus from '../../user/status/my-status';
+import Group from '../../user/group/group-chat/group';
+import AddExsistingGroup from '../../user/group/group-chat/create-existing-group/add-existing-comminity';
 import { IoIosHome } from 'react-icons/io';
 import CustomRouters from '../../../router/custom-routers';
+import Menu from '../menu/menu';
 
 
 
 const Main = () => {
 
     const navigater = useNavigate();
-    const [register, setRegister] = useState(false);
-    const [login, setLogin] = useState(false);
-    const [submit, setSubmit] = useState(false);
 
 
     const hadleHome = () => {
@@ -29,20 +27,10 @@ const Main = () => {
     }
 
 
-    const handleRegister = () => {
-        setRegister(true);
-        setLogin(false);
-    }
 
-    const handleLogin = () => {
-        setLogin(true);
-    }
+   
 
-    const handleSubmit = () => {
-        setSubmit(true);
-    }
-  
-    
+
 
     return (
 
@@ -54,16 +42,11 @@ const Main = () => {
                         <img className=' rounded-full cursor-pointer w-20 h-20 absolute ' src={require(`../../../assets/img/logo.png`)} alt="" />
                     </div>
                 </div>
-                <div className='w-full h-40 mt-1  flex  justify-end right-0'>
-{
-    login||register ?
 
+                <Menu />
                 <div className='w-full h-40 mt-1  flex  justify-end right-0'>
-                        <button className='mt-4 h-10  w-24 hover:opacity-30 rounded-lg text-gray-400  hover:text-slate-950 hover:bg-gray-100  ' onClick={handleLogin}>Login</button>
-                        <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950 hover:bg-gray-100' onClick={handleRegister}  >Register</button>
-                    </div>
-                    
-                   :<>
+
+
                     <div className=' flex mt-4 pt-2 h-10 text-center  w-24 rounded-lg text-gray-400 cursor-pointer hover:text-red-700 ' onClick={hadleHome}>
                         <IoIosHome className='mt-1 mr-1 ' />
                         <p>- Home</p>
@@ -73,8 +56,8 @@ const Main = () => {
                         <p>- Profile</p>
                     </div>
                     <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950 hover:bg-gray-100   ' onClick={handleSignOut}  >Sign-out</button>
-                    </>    
-}
+
+
                 </div>
 
 

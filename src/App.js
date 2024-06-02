@@ -4,7 +4,7 @@ import ProfileSettingDropdownMenu from "./component/user/my-profile/profile-sett
 import CustomRouters from "./router/custom-routers";
 import { IoIosHome } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
-import Main from "./component/user/main/main";
+import Main from "./component/common/main/main";
 
 
 

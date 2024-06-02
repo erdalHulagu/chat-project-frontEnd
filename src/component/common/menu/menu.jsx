@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Register from '../register/register'
 import Login from '../login/login';
 import { BiSolidLeftArrowSquare } from 'react-icons/bi';
-const Menu = () => {
+const Menu= () => {
     const [register, setRegister] = useState(false);
     const [login, setLogin] = useState(false);
     const [submit, setSubmit] = useState(false);

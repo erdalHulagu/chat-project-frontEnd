@@ -1,5 +1,5 @@
 import React from 'react'
-import Menu from '../../component/common/menu/main'
+import Menu from '../../component/common/menu/menu'
 
 const MenuPage = () => {
   return (

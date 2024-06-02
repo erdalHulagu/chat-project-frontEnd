@@ -14,7 +14,9 @@ import Menu from '../menu/menu';
 const Main = () => {
 
     const navigater = useNavigate();
-
+    const [showMenu, setshowMenu] = useState(false)
+    const [register, setRegister] = useState(false)
+    const [login, setLogin] = useState(false)
 
     const hadleHome = () => {
         navigater('/home');
@@ -25,10 +27,22 @@ const Main = () => {
     const handleSignOut = () => {
         navigater('/');
     }
+    const handleRegister = () => {
+        setRegister(true);
+        setLogin(false);
+    }
+
+    const handleLogin = () => {
+        setLogin(true);
+        setRegister(false);
+
+    }
+    const handleMenu = () => {
+        setshowMenu(true);
+    }
 
 
 
-   
 
 
 
@@ -42,25 +56,39 @@ const Main = () => {
                         <img className=' rounded-full cursor-pointer w-20 h-20 absolute ' src={require(`../../../assets/img/logo.png`)} alt="" />
                     </div>
                 </div>
-
-                <Menu />
-                <div className='w-full h-40 mt-1  flex  justify-end right-0'>
+                
 
 
-                    <div className=' flex mt-4 pt-2 h-10 text-center  w-24 rounded-lg text-gray-400 cursor-pointer hover:text-red-700 ' onClick={hadleHome}>
-                        <IoIosHome className='mt-1 mr-1 ' />
-                        <p>- Home</p>
+
+
+                    <div className='w-full h-40 mt-1  flex  justify-end right-0'>
+                    {(register || login) ?
+                    <>
+                        <Menu login={login} register={register} />
+                        
+                         <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950 hover:bg-gray-100   ' onClick={handleLogin}  >Login</button>
+                        <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950 hover:bg-gray-100   ' onClick={handleRegister}  >Register</button>
+                      
+                        </>
+                        : 
+                       <>
+                        <div className=' flex mt-4 pt-2 h-10 text-center  w-24 rounded-lg text-gray-400 cursor-pointer hover:text-red-700 ' onClick={hadleHome}>
+                            <IoIosHome className='mt-1 mr-1 ' />
+                            <p>- Home</p>
+                        </div>
+                        <div className=' flex mt-4 pt-2 h-10 text-center  w-24 rounded-lg text-gray-400 cursor-pointer hover:text-red-700 ' onClick={handleProfile}>
+                            <BiSolidUser className='mt-1 mr-1 ' />
+                            <p>- Profile</p>
+                        </div>
+
+                        <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950 hover:bg-gray-100   ' onClick={handleSignOut}  >Sign-out</button>
+
+                       </>
+                      
+}
                     </div>
-                    <div className=' flex mt-4 pt-2 h-10 text-center  w-24 rounded-lg text-gray-400 cursor-pointer hover:text-red-700 ' onClick={handleProfile}>
-                        <BiSolidUser className='mt-1 mr-1 ' />
-                        <p>- Profile</p>
-                    </div>
-                    <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950 hover:bg-gray-100   ' onClick={handleSignOut}  >Sign-out</button>
 
-
-                </div>
-
-
+                
                 <div className=" h-[84vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded  shadow-slate-900  shadow-xl " >
                     {/* <MyStatus/> */}
                     {/* <UserHome/>  */}

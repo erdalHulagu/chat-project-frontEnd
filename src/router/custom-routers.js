@@ -15,10 +15,10 @@ const CustomRouters = () => {
   return (
     <>
       <Routes>
-        <Route path="/" element={<MenuPage />} />
+        {/* <Route path="/" element={<MenuPage />} /> */}
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/home" element={<MainPages />} />
+        <Route path="/" element={<MainPages />} />
         <Route path='/profile' element={<MyProfilePage />} />
         <Route path='/updateProfile' element={<UpdateProfilePage/>}/>
         <Route path='/friendProfile' element={<FriendProfilePage />} />

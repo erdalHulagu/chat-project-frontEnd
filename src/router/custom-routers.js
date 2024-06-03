@@ -15,7 +15,6 @@ const CustomRouters = () => {
   return (
     <>
       <Routes>
-     
         <Route path="/" element={<MenuPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />

@@ -57,7 +57,7 @@ const UserHome = () => {
 
 
     return (
-        < div className='h-[98%] w-full'>
+        < div className='h-[98%] w-full '>
             <div className='w-full  bg-slate-100 shadow-2xl shadow-slate-900 rounded-t-lg h-24 p-0 flex  items-center justify-between border-b z-10  '>
 
                 <div className='flex  items-center w-[50%] '>

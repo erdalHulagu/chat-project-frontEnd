@@ -63,7 +63,8 @@ const Login = () => {
 
     return (
 
-        <Container className="mt-3 ">
+        <div className=" h-full w-full flex items-center justify-center rounded bg-slate-300">
+            <div className=' opacity-80 w-full rounded  max-w-xl h-full flex items-center justify-center'>
             <Form noValidate onSubmit={formik.handleSubmit}>
 
                 <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -107,7 +108,8 @@ const Login = () => {
                 </div>
 
             </Form>
-        </Container>
+        </div>
+        </div>
 
 
 

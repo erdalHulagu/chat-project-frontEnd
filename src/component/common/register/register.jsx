@@ -54,8 +54,9 @@ const Register = () => {
     });
 
     return (
-        <Container className="mt-4 ">
-            <Form noValidate onSubmit={formik.handleSubmit}>
+        <div className=" h-full w-full flex items-center justify-center rounded bg-slate-300">
+            <div className=' opacity-80 w-full rounded  max-w-xl h-full flex items-center justify-center'>
+            <Form  noValidate onSubmit={formik.handleSubmit}>
                 <Form.Group className="mb-2" controlId="formBasicEmail">
                     <Form.Label>Name</Form.Label>
                     <Form.Control
@@ -147,7 +148,8 @@ const Register = () => {
                 </div>
 
             </Form>
-        </Container>
+            </div>
+        </div>
     );
 };
 

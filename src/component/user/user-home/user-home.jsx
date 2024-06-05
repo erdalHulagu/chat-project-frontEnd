@@ -18,18 +18,18 @@ import { useAppDispatch, useAppSelector } from '../../../redux/store/hooks'
 
 const UserHome = () => {
     const { isUserLogin, user } = useAppSelector((state) => state.auth);
-    const dispatch = useAppDispatch();
+    // const dispatch = useAppDispatch();
     const navigate = useNavigate();
   
-    const handleLogout = () => {
-      question("Logout", "Are you sure to logout?").then((result) => {
-        if (result.isConfirmed) {
-          dispatch(logout());
-          encryptedLocalStorage.removeItem("token");
-          navigate("/");/*  */
-        }
-      });
-    };
+    // const handleLogout = () => {
+    //   question("Logout", "Are you sure to logout?").then((result) => {
+    //     if (result.isConfirmed) {
+    //       dispatch(logout());
+    //       encryptedLocalStorage.removeItem("token");
+    //       navigate("/");/*  */
+    //     }
+    //   });
+    // };
 
     const [query, setQuery] = useState(false)
     const [search, setSearch] = useState("")
@@ -57,7 +57,7 @@ const UserHome = () => {
 
 
     return (
-        < div className='h-[98%] w-full '>
+        < div className='h-[98%] w-full z-10 '>
             <div className='w-full  bg-slate-100 shadow-2xl shadow-slate-900 rounded-t-lg h-24 p-0 flex  items-center justify-between border-b z-10  '>
 
                 <div className='flex  items-center w-[50%] '>
@@ -117,7 +117,7 @@ const UserHome = () => {
                 </div>
                 {/* right column */}
 
-                <div className=' w-[60%] h-full relaltive flex flex-col rounded-br-lg'>
+                <div className=' w-[60%] h-full relaltive flex flex-col rounded-br-lg '>
 
                     {query ?
                         <div className='h-30 w-full rounded-b-lg  overflow-hidden'>

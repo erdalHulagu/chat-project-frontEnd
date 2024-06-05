@@ -54,9 +54,9 @@ const Register = () => {
     });
 
     return (
-        <div className=" h-full w-full flex items-center justify-center rounded bg-slate-300">
-            <div className=' opacity-80 w-full rounded  max-w-xl h-full flex items-center justify-center'>
-            <Form  noValidate onSubmit={formik.handleSubmit}>
+        <div className=" h-[90%] w-full flex items-center justify-center rounded ">
+            <div className='opacity-80 w-full rounded  max-w-xl  flex items-center justify-center '>
+            <Form className="w-[70%]  text-white"  noValidate onSubmit={formik.handleSubmit}>
                 <Form.Group className="mb-2" controlId="formBasicEmail">
                     <Form.Label>Name</Form.Label>
                     <Form.Control
@@ -137,7 +137,7 @@ const Register = () => {
 
                 <div className="w-full h-14 flex items-center justify-end ">
                     <div>
-                    <button className=" mb-3 h-10  w-24 rounded-lg bg-slate-700 text-slate-100  hover:text-slate-950 hover:bg-gray-100   "  type="submit" 
+                    <button className=" mb-3 h-10  w-24 rounded-lg bg-gray-100 text-slate-900  hover:text-gray-100 hover:bg-slate-700   "  type="submit" 
                     disabled={!(formik.dirty && formik.isValid) || loading}
                 >
                     {loading && <Spinner animation="border" size="sm" />}

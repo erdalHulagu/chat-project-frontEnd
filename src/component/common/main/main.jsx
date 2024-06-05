@@ -23,7 +23,7 @@ const Main = () => {
     const [home, sethome] = useState(false)
 
     const hadleHome = () => {
-        navigate('/');
+        navigate('/userHome');
     }
     const handleProfile = () => {
         navigate('/profile');

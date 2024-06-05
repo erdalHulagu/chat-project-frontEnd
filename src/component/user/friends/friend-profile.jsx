@@ -48,17 +48,17 @@ const FriendProfile = () => {
     
 
     return (
-        <div className="h-screen bg-purple-100 ">
-            <div className="h-48 bg-blue-950  flex  justify-center shadow-black shadow-2xl ">
+        <div fluid className="h-full w-full flex items-center justify-center">
+            {/* <div className="h-48 bg-blue-950  flex  justify-center shadow-black shadow-2xl ">
                 
                 <div className='w-full h-40 mt-1  flex  justify-end  '>
                     <div className=' flex mt-4 pt-2 h-10 text-center  w-24 rounded-lg text-gray-400 cursor-pointer hover:text-red-700 ' onClick={handleNavigate}>
                         <IoIosHome className='mt-1 mr-1 ' />Home
                     </div>
                     <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950   hover:bg-gray-100   ' onClick={handleSignOut}  >Sign-out</button>
-                </div>
-
-                <div className={`${isEnlarged ? 'max-h-[86vh]  w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl flex justify-center ' : " h-[86%] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl "}`} >
+                </div> */}
+                <div className='h-full w-full absolute  bg-gradient-to-b from-purple-300  via-purple-50 to-white  rounded'>
+                <div className={`${isEnlarged ? 'h-full  w-full  absolute bottom-22  rounded-lg shadow-slate-700 shadow-2xl flex justify-center ' : " h-full w-full  absolute bottom-22  rounded-lg shadow-slate-700 shadow-2xl "}`} >
                     {/* top bar */}
                     {isEnlarged ? <div className='rounded w-full h-auto max-h-[86vh] flex justify-center '><FriendPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </div> : <>
                         <div className='w-full text-slate-800 bg-blue-950 border rounded-t-lg h-24 z-20 flex  items-center justify-center shadow-slate-950 shadow-2xl border-b'>
@@ -76,7 +76,7 @@ const FriendProfile = () => {
                         </div>
                         <div className='w-full h-[90%] rounded-b-lg flex'>
                             {/* left bar */}
-                            <div className='w-[40%] mb-6 marker:rounded-bl-lg '>
+                            <div className='w-[40%]  marker:rounded-bl-lg '>
                                 <div className='w-full flex items-center h-full'>
                                     <div className=' bg-slate-200 w-full  h-full rounded-bl-lg flex flex-col  justify-center'>
 
@@ -127,16 +127,16 @@ const FriendProfile = () => {
 
                             </div >
                             {/* right bar */}
-                            <div className='w-[80%] h-[96%] overflow-hidden '>
+                            <div className='w-[80%] h-full overflow-hidden '>
                                 <div className='w-full h-full hover:overflow-clip hover:overflow-y-auto'>
                                 <div className='sticky z-10 top-0 w-full h-20 right-0 flex items-center justify-between shadow-slate-900 shadow-2xl bg-blue-950'>
                                     <div className='w-[80%] h-full flex items-center justify-start' >
 
                                         <FaUserFriends onClick={handleFriendsCard} className={`ml-3 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full ${friendsCard && "hidden"}  `} />
-                                        <p className='sm:hidden md:inline text-gray-400 mt-3 mr-3'>Friends</p>
+                                        <p className={`sm:hidden md:inline text-gray-400 mt-3 mr-3 ${friendsCard && "hidden"}  `}>Friends</p>
 
                                         {friendsCard &&
-                                            <input className='w-[80%] ml-5 focus:outline-none text-sm  text-gray-400 pl-8 py-2 rounded  cursor-pointercursor-pointer '
+                                            <input className='relative w-[80%] ml-5 focus:outline-none text-sm  text-gray-400 pl-8 py-2 rounded  cursor-pointercursor-pointer '
                                                 type="text"
                                                 placeholder="search..."
                                                 onChange={(e) => {
@@ -145,7 +145,7 @@ const FriendProfile = () => {
                                                 }}
                                                 value={searchFriends}
                                             />}
-                                        <ImSearch className={`absolute top-8 left-8 text-blue-900 ${!friendsCard && "hidden"} `} />
+                                        <ImSearch className={`absolute top-8 ml-8 text-blue-900 ${!friendsCard && "hidden"} `} />
                                     </div>
 
 
@@ -170,6 +170,7 @@ const FriendProfile = () => {
 
             </div>
         </div>
+        // </div>
     
 
     )

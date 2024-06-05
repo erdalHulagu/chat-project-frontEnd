@@ -57,8 +57,8 @@ const UserHome = () => {
 
 
     return (
-        < div className='h-[98%] w-full z-10 '>
-            <div className='w-full  bg-slate-100 shadow-2xl shadow-slate-900 rounded-t-lg h-24 p-0 flex  items-center justify-between border-b z-10  '>
+        < div className='h-full w-full absolute '>
+            <div className='w-full  bg-slate-100 shadow-2xl shadow-slate-900 rounded-t-lg h-24  flex  items-center justify-between border-b z-10  '>
 
                 <div className='flex  items-center w-[50%] '>
                     {/* nav bar */}
@@ -149,7 +149,7 @@ const UserHome = () => {
                             </div>
 
                         </div>
-                        : <div className='  flex items-center justify-center  text-white object-cover h-full w-full text-center opacity-20'
+                        : <div className='  flex items-center justify-center  text-white object-cover h-full w-full text-center '
                             style={{ backgroundImage: `url('https://cdn.pixabay.com/photo/2016/08/11/23/48/mountains-1587287_1280.jpg') ` }}>
                             <div className='relative flex items-center justify-center w-[16%]'>
                                 <p className='absolute text-lg'>asiliasiakausbdklaujsbskjdbcskdjbcls</p>

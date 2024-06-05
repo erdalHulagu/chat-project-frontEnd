@@ -25,7 +25,7 @@ const MyStatus = () => {
 
       {friendStatus ? <StatusDisplayer />
         :
-        <div className='h-full w-full flex'>
+        <div className='h-full w-full flex absolute bg-slate-300 rounded'>
           {/* left bar */}
           <div className='w-[40%] lg:w-[25%] sm: rounded-l-lg h-full bg-slate-100 '>
             <SiInstatus onClick={handleFriendStatus} />
@@ -45,7 +45,7 @@ const MyStatus = () => {
             </div>
             <div className='h-[86%] w-full  rounded-bl-lg '>
               <div className='w-[96%] h-[90%] mx-1 hover:overflow-y-scroll overflow-clip'>
-                {[...Array(20)].map((item) => <div><FriendStatusCard /></div>)}
+                {[...Array(20)].map((item,id) => <div><FriendStatusCard key={id} /></div>)}
               </div>
             </div>
           </div>

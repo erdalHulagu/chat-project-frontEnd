@@ -17,7 +17,7 @@ const ProfileSettingDropdownMenu = ({ handleCreateGroup, handleCreateCominityGro
   }
 
   const handleNavigateHome = () => {
-    navigate('/home')
+    navigate('/userHome')
   }
   const handleNavigateLogout = () => {
     navigate('/')

@@ -18,6 +18,7 @@ const CustomRouters = () => {
         <Route path="/" element={<MenuPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/updateProfile" element={<UpdateProfilePage />} />
         <Route path="/main" element={<MainPages />} />
         <Route path='/profile' element={<MyProfilePage />} />
         <Route path='/updateProfile' element={<UpdateProfilePage/>}/>

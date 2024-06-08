@@ -81,10 +81,12 @@ const UserHome = () => {
                 </div>
                 
             </div>
-            <div className='h-[88%] w-full flex  rounded-b-lg'>
-                {/* left column */}
+            {/* left column */}
+          
+            <div className=' absolute h-[90%] w-full flex '>
+                
 
-                <div className='rounded-b-lg min-w-28  w-[40%] h-full bg-gradient-to-b from-slate-100  to-slate-50 border-r'>
+                <div className='rounded-bl-lg min-w-28  w-[40%] h-full bg-gradient-to-b from-slate-100  to-slate-50 border-r'>
                     <div className='sticky top-0 flex justify-between h-28  shadow-slate-600  shadow-md '>
                         {/* search */}
                         < div className=' relative  w-full  pt-1  top-0    bg-slate-200'>
@@ -159,7 +161,7 @@ const UserHome = () => {
                 </div>
 
             </div>
-
+           
         </div>
 
     )

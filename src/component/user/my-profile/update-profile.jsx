@@ -52,8 +52,15 @@ const UpdateProfile = () => {
     });
 
     return (
-        <Container className="mt-4 ">
-            <Form noValidate onSubmit={formik.handleSubmit}>
+        < div className="h-full w-full flex  items-center justify-center absolute">
+         <div className=" relative ml-10 flex items-center justify-center rounded-full">
+                <img className="absolute" src={require(`../../../assets/img/logo.png`)} alt="" />
+            </div>
+        
+        <div className=" h-[90%] w-full flex items-center justify-center rounded ">
+        <div className='opacity-80 w-full rounded  max-w-xl  flex items-center justify-center '>
+           
+        <Form className="w-[70%]  text-white" noValidate onSubmit={formik.handleSubmit}>
                 <Form.Group className="mb-2" controlId="formBasicEmail">
                     <Form.Label>Name</Form.Label>
                     <Form.Control
@@ -145,9 +152,10 @@ const UpdateProfile = () => {
                 </div>
 
             </Form>
-        </Container>
+        </div>
+        </div>
 
-
+        </div>
 
     );
 };

@@ -30,7 +30,7 @@ const StatusDisplayer = () => {
     }, [currentStoryIndex]);
 
     return (
-        <div className='w-full h-full rounded absoulte'>
+        <div className='w-full h-full rounded absoulte z-10'>
 
 
             <div className='w-[94%] h-[10%] flex items-center justify-center mx-[3%]'>

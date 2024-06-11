@@ -18,7 +18,7 @@ const Group = () => {
 
 
     const handleNavigate = () => {
-        navigate("/groups")
+        navigate(-1)
     }
     const handleCreateGroup = () => {
 
@@ -40,10 +40,10 @@ const Group = () => {
 
 
     return (
-        <div className='h-full w-full flex overflow-hidden'>
+        <div className='h-full w-full flex overflow-hidden z-1'>
             {/* left top bar */}
-            <div className='w-[40%] lg:w-[25%] sm: rounded-l-lg  bg-slate-200 '>
-                <div className=' flex justify-between rounded-tl-lg h-[14%] border-b w-[full]  bg-blue-950 border-slate-100 border'>
+            <div className='w-[40%] lg:w-[25%] sm: rounded-l-lg  bg-slate-200'>
+                <div className=' flex justify-between rounded-tl-lg h-[14%] border-b w-[full]  bg-blue-950 border-slate-100 '>
 
                     <div className='flex items-center justify-center w-[50%] -ml-3' >
                         <BiSolidLeftArrowSquare onClick={handleNavigate} className='  text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
@@ -81,9 +81,9 @@ const Group = () => {
 
             </div>
             {/* Right Bottom Bar */}
-            <div className='h-[86%] w-[60%] lg:w-[75%]  rounded-bl-lg  '>
+            <div className='h-[86%] w-[60%] lg:w-[75%]  rounded-bl-lg '>
                 <div className=' h-full w-full flex justify-center items-center'>
-                    <p className='font-bold'>Click on contact to view up date</p>
+                    <p className='font-bold text-slate-200 text-xl'>Click on contact to view up date</p>
                 </div>
             </div>
         </div>

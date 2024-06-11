@@ -15,6 +15,7 @@ import { encryptedLocalStorage } from '../../../helper/auth-token/encrypt-storag
 import { question } from '../../../helper/swal'
 import { logout } from '../../../redux/store/slices/auth-slice'
 import { useAppDispatch, useAppSelector } from '../../../redux/store/hooks'
+import UserHomeDropDownMenu from './user-home-dropdown-menu'
 
 const UserHome = () => {
     const { isUserLogin, user } = useAppSelector((state) => state.auth);
@@ -54,6 +55,9 @@ const UserHome = () => {
     const handleNavigateStatus = () => {
         navigate("/status");
     }
+    const handleNavigateGroup = () => {
+        navigate("/group");
+    }
 
 
     return (
@@ -72,10 +76,10 @@ const UserHome = () => {
 
                 <div className=' w-[60%] '>
                     <ul className='left-0 text-decoration: none flex justify-between items-center'>
-                        <li className=''><HiUserGroup className='text-blue-950 w-12 h-12 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full' /></li>
+                        <li className=''><HiUserGroup className='text-blue-950 w-12 h-12 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full'  onClick={handleNavigateGroup}/></li>
                         <li className=''><SiInstatus className=' text-blue-950 w-12 h-12 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full' onClick={handleNavigateStatus} /></li>
                         <li className=''><BsFillChatLeftDotsFill className=' text-blue-950  w-12 h-12 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full' /></li>
-                        <li className='' ><BsArrowDownSquareFill className=' text-blue-950 w-12 h-12 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full mr-1' /></li>
+                        <li className='' ><UserHomeDropDownMenu/></li>
 
                     </ul>
                 </div>
@@ -153,8 +157,8 @@ const UserHome = () => {
                         </div>
                         : <div className='  flex items-center justify-center  text-white object-cover h-full w-full text-center '
                             style={{ backgroundImage: `url('https://cdn.pixabay.com/photo/2016/08/11/23/48/mountains-1587287_1280.jpg') ` }}>
-                            <div className='relative flex items-center justify-center w-[16%]'>
-                                <p className='absolute text-lg'>asiliasiakausbdklaujsbskjdbcskdjbcls</p>
+                            <div className='relative flex items-center justify-center w-[80%]'>
+                                <p className='text-slate-200 absolute text-2xl font-bold'>Connect To The World</p>
                             </div>
                         </div>}
 

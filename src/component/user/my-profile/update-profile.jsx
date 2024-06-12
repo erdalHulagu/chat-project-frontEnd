@@ -52,28 +52,32 @@ const UpdateProfile = () => {
     });
 
     return (
-        < div className="h-full w-full flex  items-center justify-center absolute">
-            <div className="w-[50%] h-full flex flex-col items-center justify-center">
+        < div className="h-full w-full   flex  absolute">
+            <div className="rounded-l w-[40%] max-w-md h-full flex flex-col items-center justify-center  bg-slate-400">
 
 
-                <div className=" w-full h-full relative  flex flex-col items-center justify-center rounded-full">
-                    <img className=" rounded-full" src={require(`../../../assets/img/logo.png`)} alt="" />
-                    <div className="h-[50%] w-full flex flex-col justify-center items-center ">
-                        <li className="p-3 border w-[60%] text-slate-200">name</li>
-                        <li className="p-3 border w-[60%]  text-slate-200">surname</li>
-                        <li className="p-3 border w-[60%]  text-slate-200">mobile</li>
-                        <li className="p-3 border w-[60%]  text-slate-200">address</li>
+                <div className=" w-full max-w-md h-full relative  flex flex-col items-center justify-center rounded-full">
+                    <div className="w-full max-w-md shadow-lg shadow-slate-800">
+                        <img className=" rounded-full p-3" src={require(`../../../assets/img/logo.png`)} alt="" />
+                    </div>
+
+                    <div className="h-[80%] w-full flex flex-col   ">
+                        <td className="p-3 h-24  text-sm  shadow-lg shadow-slate-800 text-gray-500">First Name    <th className="  text-slate-200" >Meryem Isra</th></td>
+                        <td className="p-3 h-24  text-sm  shadow-lg shadow-slate-800 text-gray-500">Last Name     <th className="  text-slate-200">Hulagu</th></td>
+                        <td className="p-3 h-24   text-sm shadow-lg shadow-slate-800 text-gray-500">Phone Number  <th className="  text-slate-200">07865688922</th></td>
+                        <td className="p-3 h-24  text-sm shadow-lg shadow-slate-800 text-gray-500">Post Code     <th className="  text-slate-200">DY44 5GH</th></td>
+                        <td className="p-3 h-full  text-sm shadow-lg shadow-slate-800  text-gray-500">Adsress       <th className="  text-slate-200" >No Street </th></td>
                     </div>
                 </div>
 
 
             </div>
-            <div className=" h-[90%] w-[70%] flex rounded ">
+            <div className=" h-full w-[70%] flex rounded items-center justify-center">
                 <div className='opacity-80 w-full rounded  max-w-2xl  flex justify-center '>
 
                     <Form className="w-[70%]  text-white" noValidate onSubmit={formik.handleSubmit}>
                         <Form.Group className="mb-5" controlId="formBasicEmail">
-                            <Form.Label>Name</Form.Label>
+                            <Form.Label>First Name</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="First Name"

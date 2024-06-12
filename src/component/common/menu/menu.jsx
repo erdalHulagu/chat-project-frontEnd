@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { Spinner } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 const Menu = () => {
 
 
     const [loading, setLoading] = useState(true);
+    const navigate=useNavigate();
 
     useEffect(() => {
         const timer = setTimeout(() => {
             setLoading(false);
+navigate('/register');
         }, 3000);
 
 

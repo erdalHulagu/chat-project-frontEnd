@@ -6,11 +6,13 @@ import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { getUser, login, updateUser } from "../../../service/user-service";
 import { toast } from "../../../helper/swal";
+import { useAppSelector } from "../../../redux/store/hooks";
 const UpdateProfile = () => {
-
+    const { isUserLogin, user } = useAppSelector((state) => state.auth);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const initialValues = {
+        id:user.id,
         firstName: "",
         lastName: "",
         email: "",
@@ -53,25 +55,30 @@ const UpdateProfile = () => {
 
     return (
         < div className="h-full w-full   flex  absolute">
-            <div className="rounded-l w-[40%] max-w-md h-full flex flex-col items-center justify-center  bg-slate-400">
+            <div className="rounded-l w-[40%] max-w-md h-full flex flex-col items-center justify-center  bg-slate-200">
 
-
+            {isUserLogin &&
                 <div className=" w-full max-w-md h-full relative  flex flex-col items-center justify-center rounded-full">
-                    <div className="w-full max-w-md shadow-lg shadow-slate-800">
-                        <img className=" rounded-full p-3" src={require(`../../../assets/img/logo.png`)} alt="" />
+                    <div className="w-full h-[35%] max-w-md shadow-lg shadow-slate-800 flex items-center justify-center">
+                        <img className="h-60 w-60 rounded-full p-3" src={require(`../../../assets/img/logo.png`)} alt="" />
                     </div>
+                    
+                        <div className="h-[80%] w-full flex flex-col   ">
 
-                    <div className="h-[80%] w-full flex flex-col   ">
-                        <td className="p-3 h-24  text-sm  shadow-lg shadow-slate-800 text-gray-500">First Name    <th className="  text-slate-200" >Meryem Isra</th></td>
-                        <td className="p-3 h-24  text-sm  shadow-lg shadow-slate-800 text-gray-500">Last Name     <th className="  text-slate-200">Hulagu</th></td>
-                        <td className="p-3 h-24   text-sm shadow-lg shadow-slate-800 text-gray-500">Phone Number  <th className="  text-slate-200">07865688922</th></td>
-                        <td className="p-3 h-24  text-sm shadow-lg shadow-slate-800 text-gray-500">Post Code     <th className="  text-slate-200">DY44 5GH</th></td>
-                        <td className="p-3 h-full  text-sm shadow-lg shadow-slate-800  text-gray-500">Adsress       <th className="  text-slate-200" >No Street </th></td>
-                    </div>
+                            <td className="p-3 h-24  text-sm  shadow-lg shadow-slate-800 text-gray-500">First Name    <th className="  text-slate-600" >{user.firstName}</th></td>
+                            <td className="p-3 h-24  text-sm  shadow-lg shadow-slate-800 text-gray-500">Last Name     <th className="  text-slate-600">{user.lastName}</th></td>
+                            <td className="p-3 h-24   text-sm shadow-lg shadow-slate-800 text-gray-500">Phone Number  <th className="  text-slate-600">{user.phone}</th></td>
+                            <td className="p-3 h-24  text-sm shadow-lg shadow-slate-800 text-gray-500">Post Code     <th className="  text-slate-600">{user.address}</th></td>
+                            <td className="p-3 h-full  text-sm shadow-lg shadow-slate-800  text-gray-500">Adsress       <th className="  text-slate-600" >{user.address} </th></td>
+
+
+                        </div>
+                   
                 </div>
-
+}
 
             </div>
+
             <div className=" h-full w-[70%] flex rounded items-center justify-center">
                 <div className='opacity-80 w-full rounded  max-w-2xl  flex justify-center '>
 
@@ -131,7 +138,7 @@ const UpdateProfile = () => {
                             <Form.Label>Address</Form.Label>
                             <Form.Control
                                 type="email"
-                                placeholder="Adress"
+                                placeholder="Address"
                                 {...formik.getFieldProps("address")}
                                 isInvalid={formik.touched.address && !!formik.errors.address}
                                 isValid={formik.touched.address && !formik.errors.address}

@@ -58,7 +58,7 @@ const Register = () => {
             <div className='opacity-80 w-full rounded  max-w-xl  flex items-center justify-center '>
             <Form className="w-[70%]  text-white"  noValidate onSubmit={formik.handleSubmit}>
                 <Form.Group className="mb-2" controlId="formBasicEmail">
-                    <Form.Label>Name</Form.Label>
+                    <Form.Label>First Name</Form.Label>
                     <Form.Control
                         type="text"
                         placeholder="First Name"
@@ -112,7 +112,7 @@ const Register = () => {
                     <Form.Label>Address</Form.Label>
                     <Form.Control
                         type="email"
-                        placeholder="Adress"
+                        placeholder="Address"
                         {...formik.getFieldProps("address")}
                         isInvalid={formik.touched.address && !!formik.errors.address}
                         isValid={formik.touched.address && !formik.errors.address}

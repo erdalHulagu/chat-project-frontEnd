@@ -42,7 +42,7 @@ const Login = () => {
             const respUser=await getUser();
             dispatch(loginSuccess(respUser.data));
             toast("login successfull")
-            navigate("/home")
+            navigate("/userHome")
             
 
         } catch (err) {

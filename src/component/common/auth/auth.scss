@@ -1,0 +1,63 @@
+@use "../../../assets/scss/variables" as v;
+@use "../../../assets/scss/mixins" as m;
+
+.auth {
+  .banner {
+    @include m.bg-image("../../../assets/img/auth/bg.jpg");
+    min-height: 100vh;
+    @include m.flexbox(row, center, center);
+    position: relative;
+
+    &::after {
+      @include m.watermark(v.$color1);
+    }
+
+    img {
+      z-index: 1;
+    }
+
+    .toolbar {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      color: v.$color2;
+      z-index: 1;
+      font-size: 3rem;
+      @include m.flexbox($gap: 1rem);
+
+      @media (max-width: 992px) {
+        top: 50px;
+        right: 1rem;
+        transform: translateY(-50%);
+        @include m.flexbox(
+          $direction: row-reverse,
+          $justify-content: space-between
+        );
+      }
+
+      
+      svg {
+        cursor: pointer;
+      }
+    }
+
+    @media (max-width: 992px) {
+      min-height: auto;
+      height: 100px;
+    }
+  }
+
+  .forms {
+    padding: 4rem;
+
+    @media (max-width: 576px) {
+      padding: 4rem 2rem;
+    }
+
+    .tab-content {
+      border-right: 1px solid rgb(222, 226, 230);
+      border-left: 1px solid rgb(222, 226, 230);
+      border-bottom: 1px solid rgb(222, 226, 230);
+    }
+  }
+}

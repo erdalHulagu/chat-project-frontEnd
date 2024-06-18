@@ -11,6 +11,7 @@ import UpdateProfilePage from '../page/user/update-profile-page'
 import GroupPage from '../page/user/group-page'
 import UserHomePage from '../page/user/user-home-page'
 import UnauthorizedPage from '../page/common/unauthorized-page'
+import NotFoundPage from '../page/common/not-found-page'
 
 const CustomRouters = () => {
   return (
@@ -28,7 +29,9 @@ const CustomRouters = () => {
         <Route path='/status' element={<StatusPage/>}/>
         <Route path='/group' element={<GroupPage/>}/>
         <Route path='/userHome' element={<UserHomePage/>}/>
-        <Route path="unauthorized" element={<UnauthorizedPage/>}/>
+        <Route path="/unauthorized" element={<UnauthorizedPage/>}/>
+        <Route path="notFound" element={<NotFoundPage/>}/>
+
       
       </Routes>
     </>

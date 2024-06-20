@@ -9,7 +9,7 @@ import MyPhotos from '../my-photos/my-photos-card';
 import { Col, Row } from 'react-bootstrap'
 import friends from "../my-photos/friends.json"
 import { useDispatch } from 'react-redux';
-import { setFriendProfile } from '../../../redux/store/slices/friendsProfileSlices';
+import { setFriendProfile } from '../../../redux/store/slices/friend/friendsProfileSlices';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../../redux/store/hooks';
 import ProfileSettingDropdownMenu from './profile-setting-dropdown-menu';

@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
 import { toast } from "../../../helper/swal";
 import { useAppDispatch } from "../../../redux/store/hooks";
-import { loginFailed, loginSuccess } from "../../../redux/store/slices/auth-slice";
+import { loginFailed, loginSuccess } from "../../../redux/store/slices/auth/auth-slice";
 
 const Login = () => {
     

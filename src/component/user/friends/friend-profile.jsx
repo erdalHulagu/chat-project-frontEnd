@@ -49,15 +49,8 @@ const FriendProfile = () => {
 
     return (
         <div fluid className="h-full w-full flex items-center justify-center">
-            {/* <div className="h-48 bg-blue-950  flex  justify-center shadow-black shadow-2xl ">
-                
-                <div className='w-full h-40 mt-1  flex  justify-end  '>
-                    <div className=' flex mt-4 pt-2 h-10 text-center  w-24 rounded-lg text-gray-400 cursor-pointer hover:text-red-700 ' onClick={handleNavigate}>
-                        <IoIosHome className='mt-1 mr-1 ' />Home
-                    </div>
-                    <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950   hover:bg-gray-100   ' onClick={handleSignOut}  >Sign-out</button>
-                </div> */}
-                <div className='h-full w-full absolute  bg-gradient-to-b from-purple-300  via-purple-50 to-white  rounded'>
+         
+                <div className='absolute h-full w-full bg-gradient-to-b from-purple-300  via-purple-50 to-white  rounded'>
                 <div className={`${isEnlarged ? 'h-full  w-full  absolute bottom-22  rounded-lg shadow-slate-700 shadow-2xl flex justify-center ' : " h-full w-full  absolute bottom-22  rounded-lg shadow-slate-700 shadow-2xl "}`} >
                     {/* top bar */}
                     {isEnlarged ? <div className='rounded w-full h-auto max-h-[86vh] flex justify-center '><FriendPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </div> : <>
@@ -74,7 +67,7 @@ const FriendProfile = () => {
 
 
                         </div>
-                        <div className='w-full h-[90%] rounded-b-lg flex'>
+                        <div className='w-full h-[90%] absolute rounded-b-lg flex'>
                             {/* left bar */}
                             <div className='w-[40%]  marker:rounded-bl-lg '>
                                 <div className='w-full flex items-center h-full'>

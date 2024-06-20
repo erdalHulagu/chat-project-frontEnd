@@ -5,7 +5,11 @@ const authHeader = () => {
 
   let header = {};
   if (token) {
-    header = { Authorization: `Bearer ${token}` };
+
+    header = {
+      "Content-Type":"application/json",
+       Authorization: `Bearer ${token}`, };
+      
   }
 
   return header;

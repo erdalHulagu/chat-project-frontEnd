@@ -4,8 +4,8 @@ import profileReducer from './slices/friend/friendsProfileSlices'
 import createdGroupReducer from './slices/group/created-group-slice';
 import chatReducer from './slices/chat/chat-slice'
 import messageReducer from './slices/message/message-slice';
-import userSlice from './slices/user/auth/user.slice';
 import authSlice from './slices/user/auth/auth-slice';
+import userReducer from './slices/user/user/user.slice';
 export const store = configureStore({
   reducer: {
     profile: profileReducer,
@@ -13,7 +13,7 @@ export const store = configureStore({
     createGroup:createdGroupReducer,
     chat:chatReducer,
     message:messageReducer,
-    user:userSlice,
+    user:userReducer,
 
     
     // other reducers...

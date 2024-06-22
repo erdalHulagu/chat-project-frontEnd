@@ -1,5 +1,5 @@
 import axios from "axios"
-import { BASE_API_URL } from "../api/base-api-url"
+import { BASE_API_URL } from "../base-api-url"
 import authHeader from "../helper/auth-token/auth-header";
 
 export const createMessage=(message)=>{

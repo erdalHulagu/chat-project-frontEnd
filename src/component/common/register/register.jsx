@@ -6,8 +6,8 @@ import { useState } from "react";
 import {  Container, Form, Spinner, Toast } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import { register } from "../../../service/user-service";
 import { toast } from "../../../helper/swal";
+import { register } from "../../../api/service/user-service";
 
 const Register = ({setKey}) => {
   

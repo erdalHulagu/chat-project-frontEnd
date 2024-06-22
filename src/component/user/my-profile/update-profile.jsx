@@ -4,9 +4,9 @@ import React, { useState } from "react";
 import { Container, Form, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import { getUser, login, updateUser } from "../../../service/user-service";
 import { toast } from "../../../helper/swal";
 import { useAppSelector } from "../../../redux/store/hooks";
+import { updateUser } from "../../../api/service/user-service";
 const UpdateProfile = () => {
     const { isUserLogin, user } = useAppSelector((state) => state.auth);
     const navigate = useNavigate();

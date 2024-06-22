@@ -1,6 +1,5 @@
 import { toast } from "../../../../helper/swal";
-import { createChat, createGroupChat, getAllChat } from "../../../../service/chat-service";
-
+import { createChat,createGroupChat,getAllChat } from "../../../../api/service/chat-service";
 
 //create single chat
 export const singleUserChat = async (values) => {

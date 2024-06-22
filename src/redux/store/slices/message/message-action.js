@@ -1,6 +1,7 @@
 import { toast } from "../../../../helper/swal";
-import { createMessage } from "../../../../service/message-service";
+import { createMessage,allMessages } from "../../../../api/service/message-service";
 
+// create message
 export const createSingleMessage = async (values) => {
 
     try {
@@ -14,6 +15,8 @@ export const createSingleMessage = async (values) => {
         toast("catch error", err);
     }
 };
+
+// get all messages
 export const getAllMessage = async (values) => {
 
     try {

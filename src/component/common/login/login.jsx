@@ -5,12 +5,12 @@ import { Container, Form, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { BiSolidLeftArrowSquare } from "react-icons/bi"
 import * as Yup from "yup";
-import { getUser, login } from "../../../service/user-service";
+import { getUser, login } from "../../../api/service/user-service";
 import { useDispatch, useSelector } from "react-redux";
 import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
 import { toast } from "../../../helper/swal";
 import { useAppDispatch } from "../../../redux/store/hooks";
-import { loginFailed, loginSuccess } from "../../../redux/store/slices/auth/auth-slice";
+import { loginFailed, loginSuccess } from "../../../redux/store/slices/user/auth/auth-slice";
 
 const Login = () => {
     

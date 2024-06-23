@@ -35,8 +35,7 @@ export const updatePassword = (credential) => {
 }
 
 //search user
+
 export const searchUser = (user) => {
-  return axios.get(`${BASE_API_URL}/users/search?firstName=${user.firstName}`
-    , user
-    , { headers: authHeader() })
+  return axios.get(`${BASE_API_URL}/users/search?firstName=${user.firstName}`, { headers: authHeader() });
 };

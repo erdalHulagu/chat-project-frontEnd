@@ -5,7 +5,7 @@ import createdGroupReducer from './slices/group/created-group-slice';
 import chatReducer from './slices/chat/chat-slice'
 import messageReducer from './slices/message/message-slice';
 import authSlice from './slices/user/auth/auth-slice';
-import userReducer from './slices/user/user/user.slice';
+import userSearchReducer from './slices/user/user/user-search-slice';
 export const store = configureStore({
   reducer: {
     profile: profileReducer,
@@ -13,7 +13,7 @@ export const store = configureStore({
     createGroup:createdGroupReducer,
     chat:chatReducer,
     message:messageReducer,
-    user:userReducer,
+    userSearch:userSearchReducer,
 
     
     // other reducers...

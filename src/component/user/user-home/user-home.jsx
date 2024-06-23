@@ -16,21 +16,15 @@ import { question } from '../../../helper/swal'
 import { logout } from '../../../redux/store/slices/user/auth/auth-slice'
 import { useAppDispatch, useAppSelector } from '../../../redux/store/hooks'
 import UserHomeDropDownMenu from './user-home-dropdown-menu'
+import { searchUsers } from '../../../redux/store/slices/user/user/user-search-action'
 
 const UserHome = () => {
+   const dispatch= useAppDispatch();
     const { isUserLogin, user } = useAppSelector((state) => state.auth);
-    // const dispatch = useAppDispatch();
+    const searchResults = useAppSelector((state) => state.userSearch.searchResults);
     const navigate = useNavigate();
   
-    // const handleLogout = () => {
-    //   question("Logout", "Are you sure to logout?").then((result) => {
-    //     if (result.isConfirmed) {
-    //       dispatch(logout());
-    //       encryptedLocalStorage.removeItem("token");
-    //       navigate("/");/*  */
-    //     }
-    //   });
-    // };
+  
 
     const [query, setQuery] = useState(false)
     const [search, setSearch] = useState("")
@@ -42,7 +36,12 @@ const UserHome = () => {
     }
 
 
-    const handleSearch = () => { }
+    const handleSearch = (value) => {
+        setSearch(value);
+        if (value) {
+          dispatch(searchUsers({ firstName: value }));
+        }
+      };
 
     const handleQuery = () => {
         setQuery(true);
@@ -116,7 +115,11 @@ const UserHome = () => {
                         </div>
                     </div>
                     <div className='max-h-[90%] h-[84%] overflow-clip hover:overflow-y-scroll' >
-                        {(search || userList) && [...Array(20)].map((item) => <div onClick={handleQuery} className=' '><ChatCard /></div>)}
+                    {(search || userList) && searchResults.map((item, index) => (
+              <div key={index} onClick={handleQuery}>
+                <ChatCard user={item} />
+              </div>
+            ))}
                     </div>
 
 

@@ -35,7 +35,7 @@ const Login = () => {
         setLoading(true);
         try {
             const respAuth =await login(values);
-            console.log(respAuth.data);
+            console.log("respAuth",respAuth.data);
             formik.resetForm();
             encryptedLocalStorage.setItem("token", respAuth.data.token)
 

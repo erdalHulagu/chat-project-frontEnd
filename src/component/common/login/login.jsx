@@ -8,7 +8,7 @@ import * as Yup from "yup";
 import { getUser, login } from "../../../api/service/user-service";
 import { useDispatch, useSelector } from "react-redux";
 import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
-import { toast } from "../../../helper/swal";
+import { error, toast } from "../../../helper/swal";
 import { useAppDispatch } from "../../../redux/store/hooks";
 import { loginFailed, loginSuccess } from "../../../redux/store/slices/user/auth/auth-slice";
 
@@ -47,7 +47,7 @@ const Login = () => {
 
         } catch (err) {
             dispatch(loginFailed());
-            toast("error");
+            error("incorrect email or password try again");
             
         } finally {
             setLoading(false);

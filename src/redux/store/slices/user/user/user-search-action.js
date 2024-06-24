@@ -7,6 +7,7 @@ export const searchUsers = createAsyncThunk('user/searchUsers', async (values, {
   try {
     const respSearch = await searchUser(values);
     encryptedLocalStorage.setItem("token", respSearch.data.token);
+    console.log("serachUser",respSearch.data);
     return respSearch.data;
   } catch (error) {
     toast(error);

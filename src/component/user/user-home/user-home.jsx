@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { HiUserGroup } from 'react-icons/hi'
 import { SiInstatus } from 'react-icons/si'
 import { ImSearch } from 'react-icons/im'
@@ -39,7 +39,7 @@ const UserHome = () => {
     const handleSearch = (value) => {
         setSearch(value);
         if (value) {
-          dispatch(searchUsers({ firstName: value }));
+          dispatch(searchUsers({ firstName: value}));
         }
       };
 
@@ -57,6 +57,7 @@ const UserHome = () => {
     const handleNavigateGroup = () => {
         navigate("/group");
     }
+    
 
 
     return (
@@ -115,9 +116,9 @@ const UserHome = () => {
                         </div>
                     </div>
                     <div className='max-h-[90%] h-[84%] overflow-clip hover:overflow-y-scroll' >
-                    {(search || userList) && searchResults.map((item, index) => (
+                    {(search || userList) && searchResults?.map((item, index) => (
               <div key={index} onClick={handleQuery}>
-                <ChatCard user={item} />
+                <ChatCard item={item} />
               </div>
             ))}
                     </div>

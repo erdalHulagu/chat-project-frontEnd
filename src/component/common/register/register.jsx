@@ -8,9 +8,11 @@ import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { toast } from "../../../helper/swal";
 import { register } from "../../../api/service/user-service";
+import { useAppDispatch } from "../../../redux/store/hooks";
 
-const Register = ({setKey}) => {
+const Register = () => {
   
+    const navigate=useNavigate();
     const [loading, setLoading] = useState(false);
     const initialValues = {
         firstName: "",
@@ -36,7 +38,7 @@ const Register = ({setKey}) => {
            toast("You're registered", "success");
             formik.resetForm();
             console.log("registered user",resp.data);
-            setKey("login");
+            navigate("/login")
 
         } catch (err) {
             toast(err.response.data.messsage,"error")

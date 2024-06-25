@@ -19,8 +19,9 @@ const Register = () => {
         lastName: "",
         email: "",
         password: "",
-        phoneNumber: "",
+        phone: "",
         address: "",
+        postCode:"",
         remember: false,
     };
 
@@ -41,7 +42,7 @@ const Register = () => {
             navigate("/login")
 
         } catch (err) {
-            toast(err.response.data.messsage,"error")
+            
             console.log(err);
             // alert(err.response.data.message);
         }finally{
@@ -124,16 +125,29 @@ const Register = () => {
                     </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="mb-2" controlId="formBasicEmail">
+                    <Form.Label>Post Code</Form.Label>
+                    <Form.Control
+                        type="email"
+                        placeholder="Post Code"
+                        {...formik.getFieldProps("postCode")}
+                        isInvalid={formik.touched.postCode && !!formik.errors.postCode}
+                        isValid={formik.touched.postCode && !formik.errors.postCode}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                        {formik.errors.postCode}
+                    </Form.Control.Feedback>
+                </Form.Group>
+                <Form.Group className="mb-2" controlId="formBasicEmail">
                     <Form.Label>Phone Number</Form.Label>
                     <Form.Control
                         type="text"
                         placeholder="Phone Number"
-                        {...formik.getFieldProps("phoneNumber")}
-                        isInvalid={formik.touched.phoneNumber && !!formik.errors.phoneNumber}
-                        isValid={formik.touched.phoneNumber && !formik.errors.phoneNumber}
+                        {...formik.getFieldProps("phone")}
+                        isInvalid={formik.touched.phone && !!formik.errors.phone}
+                        isValid={formik.touched.phone && !formik.errors.phone}
                     />
                     <Form.Control.Feedback type="invalid">
-                        {formik.errors.phoneNumber}
+                        {formik.errors.phone}
                     </Form.Control.Feedback>
                 </Form.Group>
 

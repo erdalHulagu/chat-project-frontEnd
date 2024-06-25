@@ -1,7 +1,6 @@
 import axios from "axios";
 import { BASE_API_URL } from "../base-api-url";
-import authHeader from "../helper/auth-token/auth-header";
-import { CREATE_CHAT } from "../redux/store/slices/chat/chat-type";
+import authHeader from "../../helper/auth-token/auth-header";
 
 
 //chat endpoints

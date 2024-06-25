@@ -2,18 +2,22 @@
 import { configureStore } from '@reduxjs/toolkit';
 import profileReducer from './slices/friend/friendsProfileSlices'
 import createdGroupReducer from './slices/group/created-group-slice';
-import chatReducer from './slices/chat/chat-slice'
 import messageReducer from './slices/message/message-slice';
 import authSlice from './slices/user/auth/auth-slice';
 import userSearchReducer from './slices/user/user/user-search-slice';
+import getAllUsersChatsReducer from './slices/chat/chat-slices/getAll-users-chats-slice';
+import singleUserChatReducer from './slices/chat/chat-slices/single-user-chat-slice';
+import usersGroupChatReducer from './slices/chat/chat-slices/users-group-chat-slice';
 export const store = configureStore({
   reducer: {
     profile: profileReducer,
     auth:authSlice,
     createGroup:createdGroupReducer,
-    chat:chatReducer,
     message:messageReducer,
     userSearch:userSearchReducer,
+    allUsersChat:getAllUsersChatsReducer,
+    usersSingleChat:singleUserChatReducer,
+    usersGroupChats:usersGroupChatReducer,
 
     
     // other reducers...

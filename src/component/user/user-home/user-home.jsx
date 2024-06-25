@@ -17,36 +17,39 @@ import { logout } from '../../../redux/store/slices/user/auth/auth-slice'
 import { useAppDispatch, useAppSelector } from '../../../redux/store/hooks'
 import UserHomeDropDownMenu from './user-home-dropdown-menu'
 import { searchUsers } from '../../../redux/store/slices/user/user/user-search-action'
+import { getAllUsersChats } from '../../../redux/store/slices/chat/chat-thunks/get-all-users-chats'
 
 const UserHome = () => {
-   const dispatch= useAppDispatch();
+    const dispatch = useAppDispatch();
     const { isUserLogin, user } = useAppSelector((state) => state.auth);
+    const allChats = useAppSelector((state) => state.allUsersChat.allChats);
     const searchResults = useAppSelector((state) => state.userSearch.searchResults);
     const navigate = useNavigate();
-  
-  
+
+
 
     const [query, setQuery] = useState(false)
     const [search, setSearch] = useState("")
-    const [userList, setUserList] = useState(false)
-    
+    const [showUserList, setShowUserList] = useState(false);
 
-    const hadleUserList = () => {
-        setUserList(true);
-    }
+    useEffect(() => {
+        if (isUserLogin) {
+            dispatch(getAllUsersChats());
+        }
+    }, [isUserLogin, dispatch]);
 
 
     const handleSearch = (value) => {
         setSearch(value);
         if (value) {
-          dispatch(searchUsers({ firstName: value}));
+            dispatch(searchUsers({ firstName: value }));
         }
-      };
+    };
 
-      const handleUsersChats=()=>{
-        dispatch()
+    const handleUserList = () => {
+        setShowUserList(!showUserList);
 
-      }
+    }
 
     const handleQuery = () => {
         setQuery(true);
@@ -62,7 +65,7 @@ const UserHome = () => {
     const handleNavigateGroup = () => {
         navigate("/group");
     }
-    
+
 
 
     return (
@@ -71,29 +74,29 @@ const UserHome = () => {
 
                 <div className='flex  items-center w-[50%] '>
                     {/* nav bar */}
-                    
+
                     <>
-                    <img onClick={handleProfile} className=' hover:opacity-70 border-2 cursor-pointer w-20 h-20 rounded-full my-5 mx-4' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
-                    <p onClick={handleProfile} className='cursor-pointer text-gray-950 hover:text-red-700 text-xs font-extrabold'>{user.firstName} {user.lastName}</p>
+                        <img onClick={handleProfile} className=' hover:opacity-70 border-2 cursor-pointer w-20 h-20 rounded-full my-5 mx-4' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
+                        <p onClick={handleProfile} className='cursor-pointer text-gray-950 hover:text-red-700 text-xs font-extrabold'>{user.firstName} {user.lastName}</p>
                     </>
 
-                    </div>
+                </div>
 
                 <div className=' w-[60%] '>
                     <ul className='left-0 text-decoration: none flex justify-between items-center'>
-                        <li className=''><HiUserGroup className='text-blue-950 w-12 h-12 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full'  onClick={handleNavigateGroup}/></li>
+                        <li className=''><HiUserGroup className='text-blue-950 w-12 h-12 p-3  hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full' onClick={handleNavigateGroup} /></li>
                         <li className=''><SiInstatus className=' text-blue-950 w-12 h-12 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full' onClick={handleNavigateStatus} /></li>
                         <li className=''><BsFillChatLeftDotsFill className=' text-blue-950  w-12 h-12 p-3 hover:opacity-80 hover:bg-gray-300 hover:text-red-800 cursor-pointer rounded-full' /></li>
-                        <li className='' ><UserHomeDropDownMenu/></li>
+                        <li className='' ><UserHomeDropDownMenu /></li>
 
                     </ul>
                 </div>
-                
+
             </div>
             {/* left column */}
-          
+
             <div className=' absolute h-[90%] w-full flex '>
-                
+
 
                 <div className='rounded-bl-lg min-w-28  w-[40%] h-full bg-gradient-to-b from-slate-100  to-slate-50 border-r'>
                     <div className='sticky top-0 flex justify-between h-28  shadow-slate-600  shadow-md '>
@@ -113,7 +116,7 @@ const UserHome = () => {
                             <ImSearch className='absolute  top-7 left-6 text-blue-950' />
 
 
-                            <div onClick={hadleUserList} className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mt-1  '>
+                            <div onClick={handleUserList} className='cursor-pointer  text-blue-950 hover:text-red-700 flex  mt-1  '>
                                 <PiUserListFill className='text-xl mt-1 text-blue-950 ml-4  hover:text-red-700 ' />
                                 <p className='ml-2 mt-1 text-sm'>Chat List</p>
                             </div>
@@ -121,11 +124,11 @@ const UserHome = () => {
                         </div>
                     </div>
                     <div className='max-h-[90%] h-[84%] overflow-clip hover:overflow-y-scroll' >
-                    {(search || userList) && searchResults?.map((item, index) => (
-              <div key={index} onClick={handleQuery}>
-                <ChatCard item={item} />
-              </div>
-            ))}
+                        {(search || showUserList) && searchResults?.map((item, index) => (
+                            <div key={index} onClick={handleQuery}>
+                                <ChatCard item={item} />
+                            </div>
+                        ))}
                     </div>
 
 
@@ -174,7 +177,7 @@ const UserHome = () => {
                 </div>
 
             </div>
-           
+
         </div>
 
     )

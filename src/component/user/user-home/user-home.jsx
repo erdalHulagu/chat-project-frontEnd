@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '../../../redux/store/hooks'
 import UserHomeDropDownMenu from './user-home-dropdown-menu'
 import { searchUsers } from '../../../redux/store/slices/user/user/user-search-action'
 import { getAllUsersChats } from '../../../redux/store/slices/chat/chat-thunks/get-all-users-chats'
+import { singleUserChat } from '../../../redux/store/slices/chat/chat-thunks/single-user-chat'
 
 const UserHome = () => {
     const dispatch = useAppDispatch();
@@ -31,10 +32,12 @@ const UserHome = () => {
     const [query, setQuery] = useState(false)
     const [search, setSearch] = useState("")
     const [showUserList, setShowUserList] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState(null);
 
     useEffect(() => {
         if (isUserLogin) {
             dispatch(getAllUsersChats());
+            dispatch(searchUsers())
         }
     }, [isUserLogin, dispatch]);
 
@@ -46,13 +49,15 @@ const UserHome = () => {
         }
     };
 
+    const handleCreateChat = (userId) => {
+        dispatch(singleUserChat({userId}));
+        setSelectedUserId(userId);
+        setQuery(true);
+    }
+
     const handleUserList = () => {
         setShowUserList(!showUserList);
 
-    }
-
-    const handleQuery = () => {
-        setQuery(true);
     }
 
     const handleProfile = () => {
@@ -66,6 +71,7 @@ const UserHome = () => {
         navigate("/group");
     }
 
+    const selectedUser = searchResults.find(user => user.id === selectedUserId);
 
 
     return (
@@ -125,8 +131,13 @@ const UserHome = () => {
                     </div>
                     <div className='max-h-[90%] h-[84%] overflow-clip hover:overflow-y-scroll' >
                         {(search || showUserList) && searchResults?.map((item, index) => (
-                            <div key={index} onClick={handleQuery}>
-                                <ChatCard item={item} />
+                            <div key={index} onClick={() => handleCreateChat(item.id)}>
+                                <ChatCard
+
+                                    item={item}
+                                    id={item.id}
+                                    selectedUserId={() => handleCreateChat(item.id)}
+                                />
                             </div>
                         ))}
                     </div>
@@ -137,10 +148,10 @@ const UserHome = () => {
 
                 <div className=' w-[60%] h-full relaltive flex flex-col rounded-br-lg '>
 
-                    {query ?
-                        <div className='h-30 w-full rounded-b-lg  overflow-hidden'>
+                    {query && selectedUserId ?
+                        <div className='h-30 w-full rounded-b-lg  overflow-hidden absolute'>
                             <div className='w-full  bg-slate-200 top-0 sticky'>
-                                <ChatCard />
+                                <ChatCard item={selectedUser} />
                             </div>
                             <div className='w-full h-[84%] overflow-y-scroll overflow-clip px-[5%]'>
                                 <div className=' flex flex-col justify-center  py-20 space-y-10 '>

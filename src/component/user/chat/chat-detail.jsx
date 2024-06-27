@@ -1,11 +1,4 @@
-
-import React from 'react'
-import { useNavigate } from 'react-router-dom';
-import { useAppSelector } from '../../../redux/store/hooks';
-
-const ChatCard = ({item, handleCreatedChat}) => {
-
-
+const ChatDetail = ({item, handleCreatedChat}) => {
 
     return (
         
@@ -25,4 +18,4 @@ const ChatCard = ({item, handleCreatedChat}) => {
     )
 }
 
-export default ChatCard
+export default ChatDetail

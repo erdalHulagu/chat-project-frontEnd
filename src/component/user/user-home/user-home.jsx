@@ -6,14 +6,10 @@ import { PiUserListFill, PiPlusCircleFill } from 'react-icons/pi'
 import { FaMicrophoneAlt } from 'react-icons/fa'
 import { RiEmojiStickerFill } from 'react-icons/ri'
 
-import { BsFillChatLeftDotsFill, BsArrowDownSquareFill } from 'react-icons/bs'
+import { BsFillChatLeftDotsFill } from 'react-icons/bs'
 import MessageCard from '../chat/message-card';
 import ChatCard from '../chat/chat-card'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { encryptedLocalStorage } from '../../../helper/auth-token/encrypt-storage'
-import { question } from '../../../helper/swal'
-import { logout } from '../../../redux/store/slices/user/auth/auth-slice'
 import { useAppDispatch, useAppSelector } from '../../../redux/store/hooks'
 import UserHomeDropDownMenu from './user-home-dropdown-menu'
 import { searchUsers } from '../../../redux/store/slices/user/user/user-search-action'
@@ -38,6 +34,7 @@ const UserHome = () => {
         if (isUserLogin) {
             dispatch(getAllUsersChats());
             dispatch(searchUsers())
+            handleCreateChat();
         }
     }, [isUserLogin, dispatch]);
 
@@ -48,9 +45,10 @@ const UserHome = () => {
             dispatch(searchUsers({ firstName: value }));
         }
     };
+   
 
     const handleCreateChat = (userId) => {
-        dispatch(singleUserChat({userId}));
+        dispatch(singleUserChat(userId));
         setSelectedUserId(userId);
         setQuery(true);
     }
@@ -131,12 +129,10 @@ const UserHome = () => {
                     </div>
                     <div className='max-h-[90%] h-[84%] overflow-clip hover:overflow-y-scroll' >
                         {(search || showUserList) && searchResults?.map((item, index) => (
-                            <div key={index} onClick={() => handleCreateChat(item.id)}>
+                            <div key={index} handleCreatedChat={handleCreateChat}>
                                 <ChatCard
 
-                                    item={item}
-                                    id={item.id}
-                                    selectedUserId={() => handleCreateChat(item.id)}
+                                    item={selectedUser}
                                 />
                             </div>
                         ))}

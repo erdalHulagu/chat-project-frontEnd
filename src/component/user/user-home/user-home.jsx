@@ -15,6 +15,7 @@ import UserHomeDropDownMenu from './user-home-dropdown-menu'
 import { searchUsers } from '../../../redux/store/slices/user/user/user-search-action'
 import { getAllUsersChats } from '../../../redux/store/slices/chat/chat-thunks/get-all-users-chats'
 import { singleUserChat } from '../../../redux/store/slices/chat/chat-thunks/single-user-chat'
+import ChatDetail from '../chat/chat-detail'
 
 const UserHome = () => {
     const dispatch = useAppDispatch();
@@ -49,7 +50,7 @@ const UserHome = () => {
 
     const handleCreateChat = (userId) => {
         dispatch(singleUserChat(userId));
-        setSelectedUserId(userId);
+        // setSelectedUserId(userId);
         setQuery(true);
     }
 
@@ -147,7 +148,7 @@ const UserHome = () => {
                     {query && selectedUserId ?
                         <div className='h-30 w-full rounded-b-lg  overflow-hidden absolute'>
                             <div className='w-full  bg-slate-200 top-0 sticky'>
-                                <ChatCard item={selectedUser} />
+                                <ChatDetail  item={selectedUser} />
                             </div>
                             <div className='w-full h-[84%] overflow-y-scroll overflow-clip px-[5%]'>
                                 <div className=' flex flex-col justify-center  py-20 space-y-10 '>

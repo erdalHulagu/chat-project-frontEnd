@@ -1,16 +1,8 @@
 import React, { useState } from 'react'
-import UserHome from '../../user/user-home/user-home';
 import { BiSolidUser } from 'react-icons/bi'
 import { useNavigate } from 'react-router-dom';
-import MyStatus from '../../user/status/my-status';
-import Group from '../../user/group/group-chat/group';
-import AddExsistingGroup from '../../user/group/group-chat/create-existing-group/add-existing-comminity';
 import { IoIosHome } from 'react-icons/io';
 import CustomRouters from '../../../router/custom-routers';
-import Menu from '../menu/menu';
-import Register from '../register/register';
-import Login from '../login/login';
-
 
 
 
@@ -52,19 +44,6 @@ const Main = () => {
 
 
     return (
-        // <>
-        //     {
-        //         !(login || register) ?
-        //         <Menu register={register} 
-        //               login={login} 
-        //               handleLogin={handleLogin} 
-        //               handleRegister={handleRegister}/>
-
-
-
-
-
-        //      :
 
         <div fluid className="h-screen bg-purple-100 ">
 
@@ -91,35 +70,16 @@ const Main = () => {
                     <button className='mt-4 h-10  w-24 hover:opacity-30 rounded-lg text-gray-400  hover:text-slate-950 hover:bg-gray-100  ' onClick={handleLogin}>Login</button>
                     <button className='mt-4 h-10 mr-3 w-24 hover:opacity-30  rounded-lg text-gray-400  hover:text-slate-950 hover:bg-gray-100' onClick={handleRegister}  >Register</button>
 
-
                 </div>
-
-
                 <div className=" h-[84vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded  shadow-slate-900  shadow-xl " >
                     <div className=' rounded w-full h-full flex  justify-center'>
                         <img className='rounded object-cover absolute w-full h-full' src="https://media.istockphoto.com/id/1327187531/tr/vektör/global-network-connection-world-map-point-and-line-composition-concept-of-global-business.jpg?s=612x612&w=0&k=20&c=vfLYnJcaXytQn-7D4XYJQZcbXrvvUjHrujtJAl6JoeA=" alt="" />
                        
                         <CustomRouters />
                     </div> 
-                    {/* <div className='w-full h-full absolute'>
-
-
-
-                        {register &&
-                            <div className=' opacity-90  rounded bg-slate-300 w-[80%] max-w-lg mt-20 h-[80%]  p-10 flex items-center justify-center shadow-slate-400  shadow-2xl'>
-                                <Register />
-                            </div>}
-                        {login &&
-                            <div className=' opacity-90  rounded bg-slate-300  max-w-lg mt-20 h-[80%]  p-10 flex items-center justify-center  shadow-slate-400  shadow-2xl'>
-                                <Login />
-                            </div>}
-                    </div> */}
-                   
                 </div>
             </div>
         </div>
-        // }
-        // </>
     )
 }
 

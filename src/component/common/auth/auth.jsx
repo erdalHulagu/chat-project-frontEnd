@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Col, Container, Row, Tab, Tabs } from "react-bootstrap";
+import { Col, Container, Row, Tab, Tabs } from "react-bootstrap";
 import logo from "../../../assets/img/logo/logo.png";
 import { setting } from "../../../setting/setting";
 import { RiCloseCircleLine, RiHome7Line } from "react-icons/ri";

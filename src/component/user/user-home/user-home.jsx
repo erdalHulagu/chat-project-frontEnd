@@ -53,6 +53,10 @@ const UserHome = () => {
         // setSelectedUserId(userId);
         setQuery(true);
     }
+    const handleQuery = () => {
+        setQuery(true);
+    }
+    
 
     const handleUserList = () => {
         setShowUserList(!showUserList);
@@ -130,10 +134,10 @@ const UserHome = () => {
                     </div>
                     <div className='max-h-[90%] h-[84%] overflow-clip hover:overflow-y-scroll' >
                         {(search || showUserList) && searchResults?.map((item, index) => (
-                            <div key={index} handleCreatedChat={handleCreateChat}>
+                            <div key={index} onClick={handleQuery} >
                                 <ChatCard
 
-                                    item={selectedUser}
+                                    item={item}
                                 />
                             </div>
                         ))}

@@ -3,6 +3,7 @@ import { BiSolidUser } from 'react-icons/bi'
 import { useNavigate } from 'react-router-dom';
 import { IoIosHome } from 'react-icons/io';
 import CustomRouters from '../../../router/custom-routers';
+import { question } from '../../../helper/swal';
 
 
 
@@ -20,8 +21,13 @@ const Main = () => {
     const handleProfile = () => {
         navigate('/profile');
     }
-    const handleSignOut = () => {
+    
+    const handleSignOut = async () => {
+      const quest = await question();
+      if (quest) {
         navigate('/');
+      }
+     
     }
     const handleRegister = () => {
 

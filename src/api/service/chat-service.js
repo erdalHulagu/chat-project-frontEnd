@@ -4,8 +4,8 @@ import authHeader from "../../helper/auth-token/auth-header";
 
 
 //chat endpoints
-export const createChat = (chat) => {
-    return axios.post(`${BASE_API_URL}/chats/single`, chat,{ headers: authHeader() });
+export const createChat = (userId) => {
+    return axios.post(`${BASE_API_URL}/chats/single?${userId}`, { headers: authHeader() });
 
 
 };
@@ -15,7 +15,7 @@ export const createGroupChat = (chat) => {
 
 };
 export const getAllChat = (chat) => {
-    return axios.getAll(`${BASE_API_URL}/chats/allChats`,chat, { headers: authHeader() });
+    return axios.getAll(`${BASE_API_URL}/chats/allChats`,chat, { headers: authHeader(chat.token) });
 
 
 };

@@ -3,9 +3,9 @@ import { singleUserChat } from "../chat-thunks/single-user-chat";
 
 const initialState = {
     singleChat: {
-        data: null,
         loading: false,
         error: null,
+        data: null,
     }
 };
 

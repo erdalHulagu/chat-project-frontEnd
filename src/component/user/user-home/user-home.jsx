@@ -10,12 +10,12 @@ import { BsFillChatLeftDotsFill } from 'react-icons/bs'
 import MessageCard from '../chat/message-card';
 import ChatCard from '../chat/chat-card'
 import { useNavigate } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from '../../../redux/store/hooks'
+import {useAppDispatch, useAppSelector } from '../../../redux/store/hooks'
 import UserHomeDropDownMenu from './user-home-dropdown-menu'
 import { searchUsers } from '../../../redux/store/slices/user/user/user-search-action'
 import { getAllUsersChats } from '../../../redux/store/slices/chat/chat-thunks/get-all-users-chats'
-import { singleUserChat } from '../../../redux/store/slices/chat/chat-thunks/single-user-chat'
 import ChatDetail from '../chat/chat-detail'
+import { singleUserChat } from '../../../redux/store/slices/chat/chat-thunks/single-user-chat'
 
 const UserHome = () => {
     const dispatch = useAppDispatch();
@@ -35,7 +35,6 @@ const UserHome = () => {
         if (isUserLogin) {
             dispatch(getAllUsersChats());
             dispatch(searchUsers())
-            handleCreateChat();
         }
     }, [isUserLogin, dispatch]);
 
@@ -46,17 +45,23 @@ const UserHome = () => {
             dispatch(searchUsers({ firstName: value }));
         }
     };
-   
 
-    const handleCreateChat = (userId) => {
+
+    // const handleCreateChat = (userId) => {
+    //     dispatch(singleUserChat(userId));
+    //     setQuery(true);
+    // }
+    const handleClickOnCreateChat = (userId) => {
         dispatch(singleUserChat(userId));
-        // setSelectedUserId(userId);
+        setSelectedUserId(userId);
         setQuery(true);
+
     }
-    const handleQuery = () => {
-        setQuery(true);
-    }
-    
+
+    // const handleQuery = () => {
+    //     setQuery(true);
+    // }
+
 
     const handleUserList = () => {
         setShowUserList(!showUserList);
@@ -73,8 +78,13 @@ const UserHome = () => {
     const handleNavigateGroup = () => {
         navigate("/group");
     }
+const handleSelectedUser = () => {
+    if(selectedUser.id)
+      return selectedUser  
+  
+}
 
-    const selectedUser = searchResults.find(user => user.id === selectedUserId);
+    const selectedUser = searchResults.find(user => user === selectedUserId);
 
 
     return (
@@ -133,14 +143,18 @@ const UserHome = () => {
                         </div>
                     </div>
                     <div className='max-h-[90%] h-[84%] overflow-clip hover:overflow-y-scroll' >
-                        {(search || showUserList) && searchResults?.map((item, index) => (
-                            <div key={index} onClick={handleQuery} >
-                                <ChatCard
+                        {(search || showUserList)
+                            && searchResults?.map((item, index) => (
+                                <div onClick={() => handleClickOnCreateChat(item.id)} key={index}>
+                                    <ChatCard item={item} />
+                                </div>
+                            ))
+                            // : allChats?.data?.map((chat) => (
+                            //     <div>
+                            //         <ChatCard key={chat.id} chat={chat} onClick={() => setSelectedUserId(chat.id)} />
+                            //     </div>))
 
-                                    item={item}
-                                />
-                            </div>
-                        ))}
+                            }
                     </div>
 
 
@@ -152,7 +166,7 @@ const UserHome = () => {
                     {query && selectedUserId ?
                         <div className='h-30 w-full rounded-b-lg  overflow-hidden absolute'>
                             <div className='w-full  bg-slate-200 top-0 sticky'>
-                                <ChatDetail  item={selectedUser} />
+                                <ChatDetail selectedUser={handleSelectedUser} />
                             </div>
                             <div className='w-full h-[84%] overflow-y-scroll overflow-clip px-[5%]'>
                                 <div className=' flex flex-col justify-center  py-20 space-y-10 '>

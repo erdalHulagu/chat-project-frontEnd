@@ -49,11 +49,11 @@ const UserHome = () => {
 
 
    
-    const handleClickOnCreateChat = (userId) => {
+    const handleClickOnCreateChat = (user) => {
        
-        if (userId) {
-            dispatch(singleUserChat(userId));
-            setSelectedUserId(userId);
+        if (user) {
+            dispatch(singleUserChat(user));
+            setSelectedUserId(user);
             setQuery(true);
         } else {
             console.error('UserId is undefined');

@@ -35,6 +35,7 @@ const UserHome = () => {
         if (isUserLogin) {
             dispatch(getAllUsersChats());
             dispatch(searchUsers())
+            // dispatch(singleUserChat());
         }
     }, [isUserLogin, dispatch]);
 
@@ -47,20 +48,18 @@ const UserHome = () => {
     };
 
 
-    // const handleCreateChat = (userId) => {
-    //     dispatch(singleUserChat(userId));
-    //     setQuery(true);
-    // }
+   
     const handleClickOnCreateChat = (userId) => {
-        dispatch(singleUserChat(userId));
-        setSelectedUserId(userId);
-        setQuery(true);
-
+       
+        if (userId) {
+            dispatch(singleUserChat(userId));
+            setSelectedUserId(userId);
+            setQuery(true);
+        } else {
+            console.error('UserId is undefined');
+        }
     }
 
-    // const handleQuery = () => {
-    //     setQuery(true);
-    // }
 
 
     const handleUserList = () => {
@@ -78,13 +77,10 @@ const UserHome = () => {
     const handleNavigateGroup = () => {
         navigate("/group");
     }
-const handleSelectedUser = () => {
-    if(selectedUser.id)
-      return selectedUser  
-  
-}
 
-    const selectedUser = searchResults.find(user => user === selectedUserId);
+
+    const selectedUser = searchResults.find(user => user.id === selectedUserId);
+   
 
 
     return (
@@ -145,7 +141,7 @@ const handleSelectedUser = () => {
                     <div className='max-h-[90%] h-[84%] overflow-clip hover:overflow-y-scroll' >
                         {(search || showUserList)
                             && searchResults?.map((item, index) => (
-                                <div onClick={() => handleClickOnCreateChat(item.id)} key={index}>
+                                <div  onClick={() => handleClickOnCreateChat(item.id)} key={index}>
                                     <ChatCard item={item} />
                                 </div>
                             ))
@@ -164,9 +160,9 @@ const handleSelectedUser = () => {
                 <div className=' w-[60%] h-full relaltive flex flex-col rounded-br-lg '>
 
                     {query && selectedUserId ?
-                        <div className='h-30 w-full rounded-b-lg  overflow-hidden absolute'>
-                            <div className='w-full  bg-slate-200 top-0 sticky'>
-                                <ChatDetail selectedUser={handleSelectedUser} />
+                        <div className='h-30 w-full rounded-b-lg  overflow-scroll '>
+                            <div className=' w-full  bg-slate-200 top-0 sticky'>
+                                <ChatDetail selectedUser={selectedUser} />
                             </div>
                             <div className='w-full h-[84%] overflow-y-scroll overflow-clip px-[5%]'>
                                 <div className=' flex flex-col justify-center  py-20 space-y-10 '>

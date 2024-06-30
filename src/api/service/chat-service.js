@@ -5,7 +5,8 @@ import authHeader from "../../helper/auth-token/auth-header";
 
 //chat endpoints
 export const createChat = (userId) => {
-    return axios.post(`${BASE_API_URL}/chats/single?${userId}`, { headers: authHeader() });
+    // return axios.post(`${BASE_API_URL}/chats/single?userId=${userId}`, { headers: authHeader() });
+    return axios.post(`${BASE_API_URL}/chats/single?${userId}`);
 
 
 };

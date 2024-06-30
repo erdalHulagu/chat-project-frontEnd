@@ -13,10 +13,10 @@ import { useAppDispatch } from "../../../redux/store/hooks";
 import { loginFailed, loginSuccess } from "../../../redux/store/slices/user/auth/auth-slice";
 
 const Login = () => {
-    
+
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate();
-  const dispatch= useAppDispatch();
+    const dispatch = useAppDispatch();
 
     const initialValues = {
         email: "",
@@ -34,24 +34,24 @@ const Login = () => {
     const onSubmit = async (values) => {
         setLoading(true);
         try {
-            const respAuth =await login(values);
-            console.log("respAuth",respAuth.data);
+            const respAuth = await login(values);
+            console.log("respAuth", respAuth.data);
             formik.resetForm();
             encryptedLocalStorage.setItem("token", respAuth.data.token)
 
-            const respUser=await getUser();
+            const respUser = await getUser();
             dispatch(loginSuccess(respUser.data));
             toast("login successfull")
             navigate("/userHome")
-            
+
 
         } catch (err) {
             dispatch(loginFailed());
             error("incorrect email or password try again");
-            
+
         } finally {
             setLoading(false);
-            
+
         }
     };
 
@@ -65,50 +65,50 @@ const Login = () => {
 
         <div className=" h-[90%] w-full flex items-center justify-center rounded ">
             <div className='opacity-80 w-full rounded  max-w-xl  flex items-center justify-center '>
-            <Form className="w-[70%]  text-white"  noValidate onSubmit={formik.handleSubmit}>
+                <Form className="w-[70%]  text-white" noValidate onSubmit={formik.handleSubmit}>
 
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label>Email address</Form.Label>
-                    <Form.Control
-                        type="email"
-                        placeholder="Enter email"
-                        {...formik.getFieldProps("email")}
-                        isInvalid={formik.touched.email && !!formik.errors.email}
-                        isValid={formik.touched.email && !formik.errors.email}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                        {formik.errors.email}
-                    </Form.Control.Feedback>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control
-                        type="password"
-                        placeholder="Password"
-                        {...formik.getFieldProps("password")}
-                        isInvalid={formik.touched.password && !!formik.errors.password}
-                        isValid={formik.touched.password && !formik.errors.password}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                        {formik.errors.password}
-                    </Form.Control.Feedback>
-                </Form.Group>
+                    <Form.Group className="mb-3" controlId="formBasicEmail">
+                        <Form.Label>Email address</Form.Label>
+                        <Form.Control
+                            type="email"
+                            placeholder="Enter email"
+                            {...formik.getFieldProps("email")}
+                            isInvalid={formik.touched.email && !!formik.errors.email}
+                            isValid={formik.touched.email && !formik.errors.email}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {formik.errors.email}
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group className="mb-3" controlId="formBasicPassword">
+                        <Form.Label>Password</Form.Label>
+                        <Form.Control
+                            type="password"
+                            placeholder="Password"
+                            {...formik.getFieldProps("password")}
+                            isInvalid={formik.touched.password && !!formik.errors.password}
+                            isValid={formik.touched.password && !formik.errors.password}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {formik.errors.password}
+                        </Form.Control.Feedback>
+                    </Form.Group>
 
-                <div className="w-full h-14 flex items-center justify-end ">
-                    <div>
-                    <button className=" mb-3 h-10  w-24 rounded-lg bg-gray-100 text-slate-900  hover:text-gray-100 hover:bg-slate-700   "  
-                            type="submit"
-                            disabled={!(formik.dirty && formik.isValid) || loading}
-                        >
-                            {loading && <Spinner animation="border" size="sm" />}
-                            Login
-                        </button>
+                    <div className="w-full h-14 flex items-center justify-end ">
+                        <div>
+                            <button className=" mb-3 h-10  w-24 rounded-lg bg-gray-100 text-slate-900  hover:text-gray-100 hover:bg-slate-700   "
+                                type="submit"
+                                disabled={!(formik.dirty && formik.isValid) || loading}
+                            >
+                                {loading && <Spinner animation="border" size="sm" />}
+                                Login
+                            </button>
+                        </div>
+
                     </div>
 
-                </div>
-
-            </Form>
-        </div>
+                </Form>
+            </div>
         </div>
 
 

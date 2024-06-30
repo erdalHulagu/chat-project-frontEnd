@@ -31,7 +31,7 @@ export const error = (title, icon = "danger", timer = 4000) => {
 };
 export const question = async ( ) => {
   const result = await Swal.fire({
-  position: "top-up",
+  position: "top",
   title: "Are you sure?",
   icon: "warning",
   showCancelButton: true,
@@ -41,3 +41,27 @@ export const question = async ( ) => {
 })
 return result.isConfirmed;
 }
+// export const question = async ( ) => {
+//   const result = await Swal.fire({
+//   title: 'Top drawer 👋',
+//   position: 'top',
+//   showClass: {
+//     popup: `
+//     animate__animated
+//     animate__fadeInDown
+//     animate__faster
+//   `,
+//   },
+//   hideClass: {
+//     popup: `
+//     animate__animated
+//     animate__fadeOutUp
+//     animate__faster
+//   `,
+//   },
+//   grow: 'row',
+//   showConfirmButton: false,
+//   showCloseButton: true,
+// })
+// return result.isConfirmed;
+// }

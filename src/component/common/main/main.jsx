@@ -51,7 +51,7 @@ const Main = () => {
 
     return (
 
-        <div fluid className="h-screen bg-purple-100 ">
+        <div className="h-screen bg-purple-100 ">
 
             <div className="h-48 bg-blue-950  flex  justify-center shadow-2xl ">
                 <div className='h-30 w-30 flex left-3 mt-4'>

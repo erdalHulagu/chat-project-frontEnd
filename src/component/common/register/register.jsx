@@ -1,14 +1,13 @@
 
-import axios from "axios";
+
 import { useFormik } from "formik";
 import React from "react";
 import { useState } from "react";
-import {  Container, Form, Spinner, Toast } from "react-bootstrap";
+import {  Form, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { toast } from "../../../helper/swal";
 import { register } from "../../../api/service/user-service";
-import { useAppDispatch } from "../../../redux/store/hooks";
 
 const Register = () => {
   

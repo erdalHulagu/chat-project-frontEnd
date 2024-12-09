@@ -16,7 +16,7 @@ const FriendProfile = () => {
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
     const [friendPhotos, setFriendPhotos] = useState(false);
-
+    const [isEnlarged, setIsEnlarged] = useState(false);
 
     //--------------------------------------
     const handleNavigate = () => {
@@ -39,7 +39,7 @@ const FriendProfile = () => {
         setFriendsCard(true);
         setFriendPhotos(false);
     }
-    const [isEnlarged, setIsEnlarged] = useState(false);
+   
 
     const handleToggleSize = () => {
         setIsEnlarged(!isEnlarged);

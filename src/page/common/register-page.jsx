@@ -4,8 +4,11 @@ import Register from '../../component/common/register/register'
 const RegisterPage = () => {
   return (
     <>
+    
       <Register/>
     </>
+      
+   
   )
 }
 

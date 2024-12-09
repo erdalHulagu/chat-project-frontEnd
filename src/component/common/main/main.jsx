@@ -80,7 +80,6 @@ const Main = () => {
                 <div className=" h-[84vh] w-[94%] bg-gradient-to-b from-purple-300 via-purple-100 to-white absolute bottom-22  top-28 rounded  shadow-slate-900  shadow-xl  " >
                     <div className=' rounded w-full h-full flex  justify-center '>
                         <img className='rounded object-cover absolute w-full h-full ' src="https://media.istockphoto.com/id/1327187531/tr/vektör/global-network-connection-world-map-point-and-line-composition-concept-of-global-business.jpg?s=612x612&w=0&k=20&c=vfLYnJcaXytQn-7D4XYJQZcbXrvvUjHrujtJAl6JoeA=" alt="" />
-                       
                         <CustomRouters />
                     </div> 
                 </div>

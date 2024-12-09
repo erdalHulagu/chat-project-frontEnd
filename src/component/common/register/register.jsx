@@ -21,7 +21,7 @@ const Register = () => {
         phone: "",
         address: "",
         postCode: "",
-        profileImage: "",
+        // profileImage: "",
         remember: false,
     };
 
@@ -57,11 +57,13 @@ const Register = () => {
     });
 
     return (
-        <div className=" h-[90%] w-full flex  items-center justify-center rounded">
+        <div className=" h-full w-full flex  items-center justify-center rounded">
 
 
-            <div className='opacity-80 w-full rounded  max-w-xl  flex flex-col items-center justify-center '>
-             
+            <div className='h-full  opacity-80 w-full rounded  max-w-xl  flex flex-col items-center justify-center '>
+                
+                   
+            <img className='bg-white h-48 w-48 mx-2 max-w-xl rounded-full' src={require(`../../../assets/img/user.webp`)} alt="" />
 
                 <Form className="w-[70%]  text-white" noValidate onSubmit={formik.handleSubmit}>
                     <Form.Group className="mb-2" controlId="formBasicEmail">
@@ -157,7 +159,7 @@ const Register = () => {
 
                     <div className="w-full h-14 flex items-center justify-end ">
                         <div>
-                            <button className=" mb-3 h-10  w-24 rounded-lg bg-gray-100 text-slate-900  hover:text-gray-100 hover:bg-slate-700   " type="submit"
+                            <button className="  h-10  w-24 rounded-lg bg-gray-100 text-slate-900  hover:text-gray-100 hover:bg-slate-700   " type="submit"
                                 disabled={!(formik.dirty && formik.isValid) || loading}
                             >
                                 {loading && <Spinner animation="border" size="sm" />}

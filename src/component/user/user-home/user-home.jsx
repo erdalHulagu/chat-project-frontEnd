@@ -46,7 +46,7 @@ const UserHome = () => {
 
     const handleClickOnCreateChat = (user) => {
         if (user && user.id) {
-            dispatch(singleUserChat(user.id));
+        dispatch(singleUserChat(user.id));
             setSelectedUserId(user.id);
             setQuery(true);
         } else {

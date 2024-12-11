@@ -17,11 +17,12 @@ const UpdateProfile = () => {
         lastName: "",
         email: "",
         password: "",
-        phoneNumber: "",
+        phone: "",
         address: "",
-        remember: false,
+        postCode:"",
+        profileImage:""
     };
-
+    console.log("profile user  : ",user.profileImage);
     const validationSchema = Yup.object({
         email: Yup.string()
             .email("Type in a valid email adress")
@@ -60,7 +61,7 @@ const UpdateProfile = () => {
             {isUserLogin &&
                 <div className=" w-full max-w-md h-full relative  flex flex-col items-center justify-center rounded-full">
                     <div className="w-full h-[35%] max-w-md shadow-lg shadow-slate-800 flex items-center justify-center">
-                        <img className="h-60 w-60 rounded-full p-3" src={require(`../../../assets/img/logo.png`)} alt="" />
+                        <img className="h-60 w-60 rounded-full p-3" src={user.profileImage} alt="" />
                     </div>
                     
                         <div className="h-[80%] w-full flex flex-col   ">
@@ -68,7 +69,7 @@ const UpdateProfile = () => {
                             <td className="p-3 h-24  text-sm  shadow-lg shadow-slate-800 text-gray-500">First Name    <th className="  text-slate-600" >{user.firstName}</th></td>
                             <td className="p-3 h-24  text-sm  shadow-lg shadow-slate-800 text-gray-500">Last Name     <th className="  text-slate-600">{user.lastName}</th></td>
                             <td className="p-3 h-24   text-sm shadow-lg shadow-slate-800 text-gray-500">Phone Number  <th className="  text-slate-600">{user.phone}</th></td>
-                            <td className="p-3 h-24  text-sm shadow-lg shadow-slate-800 text-gray-500">Post Code     <th className="  text-slate-600">{user.address}</th></td>
+                            <td className="p-3 h-24  text-sm shadow-lg shadow-slate-800 text-gray-500">Post Code     <th className="  text-slate-600">{user.postCode}</th></td>
                             <td className="p-3 h-full  text-sm shadow-lg shadow-slate-800  text-gray-500">Adsress       <th className="  text-slate-600" >{user.address} </th></td>
 
 
@@ -87,7 +88,7 @@ const UpdateProfile = () => {
                             <Form.Label>First Name</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="First Name"
+                                placeholder={user.firstName}
                                 {...formik.getFieldProps("firstName")}
                                 isInvalid={formik.touched.firstName && !!formik.errors.firstName}
                                 isValid={formik.touched.firstName && !formik.errors.firstName}
@@ -100,7 +101,7 @@ const UpdateProfile = () => {
                             <Form.Label>Last Name</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Last Name"
+                                placeholder={user.lastName}
                                 {...formik.getFieldProps("lastName")}
                                 isInvalid={formik.touched.lastName && !!formik.errors.lastName}
                                 isValid={formik.touched.lastName && !formik.errors.lastName}
@@ -112,7 +113,7 @@ const UpdateProfile = () => {
                             <Form.Label>Email address</Form.Label>
                             <Form.Control
                                 type="email"
-                                placeholder="Enter email"
+                                placeholder={user.email}
                                 {...formik.getFieldProps("email")}
                                 isInvalid={formik.touched.email && !!formik.errors.email}
                                 isValid={formik.touched.email && !formik.errors.email}
@@ -125,7 +126,7 @@ const UpdateProfile = () => {
                             <Form.Label>Password</Form.Label>
                             <Form.Control
                                 type="password"
-                                placeholder="Password"
+                                placeholder="......."
                                 {...formik.getFieldProps("password")}
                                 isInvalid={formik.touched.password && !!formik.errors.password}
                                 isValid={formik.touched.password && !formik.errors.password}
@@ -138,7 +139,7 @@ const UpdateProfile = () => {
                             <Form.Label>Address</Form.Label>
                             <Form.Control
                                 type="email"
-                                placeholder="Address"
+                                placeholder={user.address}
                                 {...formik.getFieldProps("address")}
                                 isInvalid={formik.touched.address && !!formik.errors.address}
                                 isValid={formik.touched.address && !formik.errors.address}
@@ -151,7 +152,7 @@ const UpdateProfile = () => {
                             <Form.Label>Phone Number</Form.Label>
                             <Form.Control
                                 type="text"
-                                placeholder="Phone Number"
+                                placeholder={user.phone}
                                 {...formik.getFieldProps("phoneNumber")}
                                 isInvalid={formik.touched.phoneNumber && !!formik.errors.phoneNumber}
                                 isValid={formik.touched.phoneNumber && !formik.errors.phoneNumber}

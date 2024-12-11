@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { toast } from "../../../helper/swal";
 import { register } from "../../../api/service/user-service";
+import axios from "axios";
 
 const Register = () => {
 
@@ -20,9 +21,9 @@ const Register = () => {
         password: "",
         phone: "",
         address: "",
-        postCode: "",
-        // profileImage: "",
-        remember: false,
+        postCode: ""
+       
+
     };
 
     const validationSchema = Yup.object({
@@ -33,18 +34,26 @@ const Register = () => {
     });
 
     const onSubmit = async (values) => {
+        console.log("Formik'ten gelen değerler:", values); // Formik değerlerini konsola yazdır
         setLoading(true);
         try {
-            const resp = await register(values);
+            const resp=await axios.post(`http://localhost:8081/register`, values);
+            // const resp = await register(values);
             toast("You're registered", "success");
             formik.resetForm();
             console.log("registered user", resp.data);
             navigate("/login")
 
         } catch (err) {
+            const errorMessage =
+            err.response?.data?.message || "An error occurred during registration.";
+        toast(errorMessage, "error");
 
-            console.log(err);
-            // alert(err.response.data.message);
+        if (err.response?.data?.errors) {
+            Object.entries(err.response.data.errors).forEach(([field, message]) => {
+                formik.setFieldError(field, message);
+            });
+        }
         } finally {
             setLoading(false);
         }
@@ -62,9 +71,6 @@ const Register = () => {
 
             <div className='h-full  opacity-80 w-full rounded  max-w-xl  flex flex-col items-center justify-center '>
                 
-                   
-            <img className='bg-white h-48 w-48 mx-2 max-w-xl rounded-full' src={require(`../../../assets/img/user.webp`)} alt="" />
-
                 <Form className="w-[70%]  text-white" noValidate onSubmit={formik.handleSubmit}>
                     <Form.Group className="mb-2" controlId="formBasicEmail">
                         <Form.Label>First Name</Form.Label>

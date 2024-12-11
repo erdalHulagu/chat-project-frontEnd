@@ -5,6 +5,7 @@ import authHeader from "../../helper/auth-token/auth-header";
 
 // user endpoins 
 export const register = (user) => {
+  console.log("Gönderilen veri:", user); // Gönderilen JSON'u konsola yazdır
   return axios.post(`${BASE_API_URL}/register`, user);
 };
 

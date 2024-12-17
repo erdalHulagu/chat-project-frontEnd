@@ -21,7 +21,7 @@ export const getUser = () => {
 
 //update user
 export const updateUser = (user) => {
-  return axios.patch(`${BASE_API_URL}/users/auth`
+  return axios.put(`${BASE_API_URL}/users/auth`
     , user
     , { headers: authHeader() });
 };

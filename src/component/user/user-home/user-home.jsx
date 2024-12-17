@@ -11,10 +11,10 @@ import ChatCard from '../chat/chat-card';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../redux/store/hooks';
 import UserHomeDropDownMenu from './user-home-dropdown-menu';
-import { searchUsers } from '../../../redux/store/slices/user/user/user-search-action';
 import { getAllUsersChats } from '../../../redux/store/slices/chat/chat-thunks/get-all-users-chats';
 import ChatDetail from '../chat/chat-detail';
 import { singleUserChat } from '../../../redux/store/slices/chat/chat-thunks/single-user-chat';
+import { searchUsers } from '../../../redux/store/slices/user/user/serachUser/user-search-action';
 
 const UserHome = () => {
     const dispatch = useAppDispatch();
@@ -55,7 +55,6 @@ const UserHome = () => {
     };
 
     const handleUserList = () => setShowUserList(!showUserList);
-
     const handleProfile = () => navigate("/profile");
     const handleNavigateStatus = () => navigate("/status");
     const handleNavigateGroup = () => navigate("/group");

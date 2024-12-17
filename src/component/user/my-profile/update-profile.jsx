@@ -5,47 +5,76 @@ import { Container, Form, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { toast } from "../../../helper/swal";
-import { useAppSelector } from "../../../redux/store/hooks";
-import { updateUser } from "../../../api/service/user-service";
+import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
-
 const UpdateProfile = () => {
+    const dispatch = useAppDispatch();
     const { isUserLogin, user } = useAppSelector((state) => state.auth);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [update, setUpdate] = useState(false);
+    const [profileImage, setProfileImage] = useState(null);
+
+    useEffect(() => {
+        if (!isUserLogin) {
+            navigate("/login");
+        }
+    }, [isUserLogin, navigate]);
 
     const initialValues = {
-        firstName: "",
-        lastName: "",
-        email: "",
+        firstName: user?.firstName || "",
+        lastName: user?.lastName || "",
+        email: user?.email || "",
         password: "",
-        phone: "",
-        address: "",
-        postCode: "",
-        profileImage: "",
+        phone: user?.phone || "",
+        address: user?.address || "",
+        postCode: user?.postCode || "",
     };
 
     const validationSchema = Yup.object({
+        firstName: Yup.string().required("First name is required"),
+        lastName: Yup.string().required("Last name is required"),
         email: Yup.string()
             .email("Type in a valid email address")
-            .required("Don't leave blank"),
-        password: Yup.string().required("Type in a password"),
+            .required("Email is required"),
+        password: Yup.string().min(6, "Password must be at least 6 characters"),
         phone: Yup.string()
             .matches(/^\d{10}$/, "Phone number must be 10 digits")
             .required("Phone number is required"),
+        address: Yup.string().required("Address is required"),
         postCode: Yup.string()
             .matches(/^\d{5}$/, "Post code must be 5 digits")
             .required("Post code is required"),
     });
 
+    const handleProfileImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setProfileImage(file);
+        }
+    };
+
     const onSubmit = async (values) => {
         setLoading(true);
+
         try {
-            const resp = await updateUser(values);
+            const formData = new FormData();
+            formData.append("firstName", values.firstName);
+            formData.append("lastName", values.lastName);
+            formData.append("email", values.email);
+            formData.append("password", values.password);
+            formData.append("phone", values.phone);
+            formData.append("address", values.address);
+            formData.append("postCode", values.postCode);
+
+            if (profileImage) {
+                formData.append("profileImage", profileImage);
+            }
+
+            const resp = await updateUser(formData);
             toast("Profile updated successfully", "success");
-            formik.resetForm();
-            navigate("/profile"); // Update sonrası yönlendirme
+            dispatch(updateUserSlice(resp.data));
+            setUpdate(false);
         } catch (err) {
             toast(err.response?.data?.message || "Something went wrong", "error");
         } finally {
@@ -59,21 +88,6 @@ const UpdateProfile = () => {
         onSubmit,
     });
 
-    useEffect(() => {
-        if (user) {
-            formik.setValues({
-                firstName: user.firstName || "",
-                lastName: user.lastName || "",
-                email: user.email || "",
-                password: "",
-                phone: user.phone || "",
-                address: user.address || "",
-                postCode: user.postCode || "",
-                profileImage: user.profileImage || "",
-            });
-        }
-    }, [user]);
-
     const updateProfile = () => {
         setUpdate(!update);
     };
@@ -86,32 +100,30 @@ const UpdateProfile = () => {
                         <div className="w-full h-[35%] max-w-md shadow-lg shadow-slate-800 flex items-center justify-center">
                             <img
                                 className="h-60 w-60 rounded-full p-3"
-                                src={user.profileImage}
-                                alt=""
+                                src={user?.profileImage || "/default-avatar.png"}
+                                alt="Profile"
                             />
                         </div>
-
                         <div className="h-[80%] w-full flex flex-col">
-                            <td className="p-3 h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
-                                First Name <th className="text-slate-600">{user.firstName}</th>
-                            </td>
-                            <td className="p-3 h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
-                                Last Name <th className="text-slate-600">{user.lastName}</th>
-                            </td>
-                            <td className="p-3 h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
-                                Phone Number <th className="text-slate-600">{user.phone}</th>
-                            </td>
-                            <td className="p-3 h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
-                                Post Code <th className="text-slate-600">{user.postCode}</th>
-                            </td>
-                            <td className="p-3 h-full text-sm shadow-lg shadow-slate-800 text-gray-500">
-                                Address <th className="text-slate-600">{user.address}</th>
-                            </td>
+                            <div className="p-3 h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
+                                First Name <span className="text-slate-600">{user?.firstName}</span>
+                            </div>
+                            <div className="p-3 h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
+                                Last Name <span className="text-slate-600">{user?.lastName}</span>
+                            </div>
+                            <div className="p-3 h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
+                                Phone Number <span className="text-slate-600">{user?.phone}</span>
+                            </div>
+                            <div className="p-3 h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
+                                Post Code <span className="text-slate-600">{user?.postCode}</span>
+                            </div>
+                            <div className="p-3 h-full text-sm shadow-lg shadow-slate-800 text-gray-500">
+                                Address <span className="text-slate-600">{user?.address}</span>
+                            </div>
                         </div>
                     </div>
                 )}
             </div>
-
             <div className="h-full w-[70%] rounded">
                 <div className="opacity-80 w-full rounded max-w-2xl flex justify-center">
                     {!update ? (
@@ -143,125 +155,15 @@ const UpdateProfile = () => {
                                     noValidate
                                     onSubmit={formik.handleSubmit}
                                 >
-                                    <Form.Group className="mb-5" controlId="formFirstName">
-                                        <Form.Label>First Name</Form.Label>
+                                    {/* Other Fields */}
+                                    <Form.Group className="mb-5" controlId="formProfileImage">
+                                        <Form.Label>Profile Image</Form.Label>
                                         <Form.Control
-                                            type="text"
-                                            {...formik.getFieldProps("firstName")}
-                                            isInvalid={
-                                                formik.touched.firstName && !!formik.errors.firstName
-                                            }
-                                            isValid={
-                                                formik.touched.firstName && !formik.errors.firstName
-                                            }
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleProfileImageChange}
                                         />
-                                        <Form.Control.Feedback type="invalid">
-                                            {formik.errors.firstName}
-                                        </Form.Control.Feedback>
                                     </Form.Group>
-
-                                    <Form.Group className="mb-5" controlId="formLastName">
-                                        <Form.Label>Last Name</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            {...formik.getFieldProps("lastName")}
-                                            isInvalid={
-                                                formik.touched.lastName && !!formik.errors.lastName
-                                            }
-                                            isValid={
-                                                formik.touched.lastName && !formik.errors.lastName
-                                            }
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {formik.errors.lastName}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-
-                                    <Form.Group className="mb-5" controlId="formEmail">
-                                        <Form.Label>Email Address</Form.Label>
-                                        <Form.Control
-                                            type="email"
-                                            {...formik.getFieldProps("email")}
-                                            isInvalid={
-                                                formik.touched.email && !!formik.errors.email
-                                            }
-                                            isValid={
-                                                formik.touched.email && !formik.errors.email
-                                            }
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {formik.errors.email}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-
-                                    <Form.Group className="mb-5" controlId="formPassword">
-                                        <Form.Label>Password</Form.Label>
-                                        <Form.Control
-                                            type="password"
-                                            {...formik.getFieldProps("password")}
-                                            isInvalid={
-                                                formik.touched.password && !!formik.errors.password
-                                            }
-                                            isValid={
-                                                formik.touched.password && !formik.errors.password
-                                            }
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {formik.errors.password}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-
-                                    <Form.Group className="mb-5" controlId="formAddress">
-                                        <Form.Label>Address</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            {...formik.getFieldProps("address")}
-                                            isInvalid={
-                                                formik.touched.address && !!formik.errors.address
-                                            }
-                                            isValid={
-                                                formik.touched.address && !formik.errors.address
-                                            }
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {formik.errors.address}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-
-                                    <Form.Group className="mb-5" controlId="formPostCode">
-                                        <Form.Label>Post Code</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            {...formik.getFieldProps("postCode")}
-                                            isInvalid={
-                                                formik.touched.postCode && !!formik.errors.postCode
-                                            }
-                                            isValid={
-                                                formik.touched.postCode && !formik.errors.postCode
-                                            }
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {formik.errors.postCode}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-
-                                    <Form.Group className="mb-5" controlId="formPhoneNumber">
-                                        <Form.Label>Phone Number</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            {...formik.getFieldProps("phone")}
-                                            isInvalid={
-                                                formik.touched.phone && !!formik.errors.phone
-                                            }
-                                            isValid={
-                                                formik.touched.phone && !formik.errors.phone
-                                            }
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {formik.errors.phone}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-
                                     <div className="w-full h-10 flex items-center justify-end">
                                         <button
                                             className="border mb-5 h-10 w-24 hover:opacity-30 rounded-lg cursor-pointer text-gray-300 hover:text-slate-950 hover:bg-gray-50"

@@ -1,38 +1,31 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { updateUsers } from "./update-user-action";
 
 const initialState = {
-  user: null,
-  loading: false,
-  error: null,
+  isUserLogin: false,
+  user: null, // Varsayılan olarak null
+  imageId: "",
 };
 
 const userUpdateSlice = createSlice({
-  name: "userUpdate",
+  name: "updateCurrentUser",
   initialState,
+
   reducers: {
-    resetUpdateState: (state) => {
-      state.user = null;
-      state.loading = false;
-      state.error = null;
+    updateRequest: (state) => {
+      state.isUserLogin = true; // Loading başlat
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(updateUsers.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateUsers.fulfilled, (state, action) => {
-        state.user = action.payload; // Update user state with updated data
-        state.loading = false;
-      })
-      .addCase(updateUsers.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
+    updateSuccess: (state, action) => {
+      state.isUserLogin = true;
+      state.user = action.payload; // Güncellenen kullanıcı verisi
+      state.imageId = action.payload.profileImageId || ""; // Profil resmi ID'si
+    },
+    updateFailed: (state) => {
+      state.isUserLogin = false;
+      state.user = null; // Kullanıcıyı sıfırlıyoruz
+      state.imageId = ""; // Varsayılan değere dönüyoruz
+    },
   },
 });
 
-export const { resetUpdateState } = userUpdateSlice.actions;
+export const { updateSuccess, updateFailed, updateRequest } = userUpdateSlice.actions;
 export default userUpdateSlice.reducer;

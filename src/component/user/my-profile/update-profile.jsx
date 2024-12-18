@@ -1,4 +1,3 @@
-
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Form, Spinner } from "react-bootstrap";
@@ -7,15 +6,15 @@ import * as Yup from "yup";
 import { toast } from "../../../helper/swal";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
-import { updateUsers } from "../../../redux/store/slices/user/upDateUser/update-user-action";
+import { updateUserProfile } from "../../../redux/store/slices/user/upDateUser/update-user-action";
 
 const UpdateProfile = () => {
   const dispatch = useAppDispatch();
   const { isUserLogin, user } = useAppSelector((state) => state.auth);
-  const { loading, error } = useAppSelector((state) => state.updateCurrentUser);
   const navigate = useNavigate();
   const [update, setUpdate] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!isUserLogin) {
@@ -24,7 +23,6 @@ const UpdateProfile = () => {
     }
   }, [isUserLogin, navigate]);
 
-  // Profil Görüntüleme ve Güncelleme Arasında Geçiş
   const updateProfile = () => {
     setUpdate(!update);
   };
@@ -61,27 +59,10 @@ const UpdateProfile = () => {
   };
 
   const onSubmit = async (values) => {
-    const formData = new FormData();
-    formData.append("firstName", values.firstName);
-    formData.append("lastName", values.lastName);
-    formData.append("email", values.email);
-    formData.append("password", values.password);
-    formData.append("phone", values.phone);
-    formData.append("address", values.address);
-    formData.append("postCode", values.postCode);
-    if (profileImage) formData.append("profileImage", profileImage);
-
-    try {
-      const resultAction = await dispatch(updateUsers(formData));
-      if (updateUsers.fulfilled.match(resultAction)) {
-        toast.success("Profile updated successfully!");
-        setUpdate(false);
-      } else {
-        toast.error(resultAction.payload || "Failed to update profile");
-      }
-    } catch (err) {
-      toast.error("An unexpected error occurred");
-    }
+    setLoading(true); // Yükleniyor durumunu başlat
+    const imageId = user?.profileImageId; // Kullanıcıdan profil resmi ID'sini al
+    await dispatch(updateUserProfile({ ...values }, imageId)); // Redux eylem oluşturucusunu çağır
+    setLoading(false); // Yükleniyor durumunu durdur
   };
 
   const formik = useFormik({
@@ -107,16 +88,16 @@ const UpdateProfile = () => {
               <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
                 First Name <span className="text-slate-600">{user?.firstName}</span>
               </div>
-              <div className="p-3 lex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
+              <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
                 Last Name <span className="text-slate-600">{user?.lastName}</span>
               </div>
-              <div className="p-3 lex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
+              <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
                 Phone Number <span className="text-slate-600">{user?.phone}</span>
               </div>
-              <div className="p-3 lex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
+              <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
                 Post Code <span className="text-slate-600">{user?.postCode}</span>
               </div>
-              <div className="p-3 lex flex-col h-full text-sm shadow-lg shadow-slate-800 text-gray-500">
+              <div className="p-3 flex flex-col h-full text-sm shadow-lg shadow-slate-800 text-gray-500">
                 Address <span className="text-slate-600">{user?.address}</span>
               </div>
             </div>
@@ -142,48 +123,112 @@ const UpdateProfile = () => {
               noValidate
               onSubmit={formik.handleSubmit}
             >
-              <Form.Group controlId="formFirstName">
+              <Form.Group controlId="firstName">
                 <Form.Label>First Name</Form.Label>
                 <Form.Control
                   type="text"
-                  {...formik.getFieldProps("firstName")}
-                  isInvalid={formik.touched.firstName && !!formik.errors.firstName}
+                  placeholder="First Name"
+                  name="firstName"
+                  onChange={formik.handleChange}
+                  value={formik.values.firstName}
+                  isInvalid={!!formik.errors.firstName}
                 />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.firstName}
+                </Form.Control.Feedback>
               </Form.Group>
-              <Form.Group controlId="formFirstName">
+
+              <Form.Group controlId="lastName">
                 <Form.Label>Last Name</Form.Label>
                 <Form.Control
                   type="text"
-                  {...formik.getFieldProps("lastName")}
-                  isInvalid={formik.touched.lastName && !!formik.errors.lastName}
+                  placeholder="Last Name"
+                  name="lastName"
+                  onChange={formik.handleChange}
+                  value={formik.values.lastName}
+                  isInvalid={!!formik.errors.lastName}
                 />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.lastName}
+                </Form.Control.Feedback>
               </Form.Group>
-              <Form.Group controlId="formPhone">
+
+              <Form.Group controlId="email">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  placeholder="Email"
+                  name="email"
+                  onChange={formik.handleChange}
+                  value={formik.values.email}
+                  isInvalid={!!formik.errors.email}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.email}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group controlId="password">
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type="password"
+                  placeholder="Password"
+                  name="password"
+                  onChange={formik.handleChange}
+                  value={formik.values.password}
+                  isInvalid={!!formik.errors.password}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.password}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group controlId="phone">
                 <Form.Label>Phone Number</Form.Label>
                 <Form.Control
                   type="text"
-                  {...formik.getFieldProps("phone")}
-                  isInvalid={formik.touched.phone && !!formik.errors.phone}
+                  placeholder="Phone Number"
+                  name="phone"
+                  onChange={formik.handleChange}
+                  value={formik.values.phone}
+                  isInvalid={!!formik.errors.phone}
                 />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.phone}
+                </Form.Control.Feedback>
               </Form.Group>
-              <Form.Group controlId="formAdress">
+
+              <Form.Group controlId="address">
                 <Form.Label>Address</Form.Label>
                 <Form.Control
                   type="text"
-                  {...formik.getFieldProps("address")}
-                  isInvalid={formik.touched.address && !!formik.errors.address}
+                  placeholder="Address"
+                  name="address"
+                  onChange={formik.handleChange}
+                  value={formik.values.address}
+                  isInvalid={!!formik.errors.address}
                 />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.address}
+                </Form.Control.Feedback>
               </Form.Group>
-              <Form.Group controlId="formFirstName">
+
+              <Form.Group controlId="postCode">
                 <Form.Label>Post Code</Form.Label>
                 <Form.Control
                   type="text"
-                  {...formik.getFieldProps("postCode")}
-                  isInvalid={formik.touched.postCode && !!formik.errors.postCode}
+                  placeholder="Post Code"
+                  name="postCode"
+                  onChange={formik.handleChange}
+                  value={formik.values.postCode}
+                  isInvalid={!!formik.errors.postCode}
                 />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.postCode}
+                </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group className="mb-5" controlId="formProfileImage">
+              <Form.Group controlId="profileImage">
                 <Form.Label>Profile Image</Form.Label>
                 <Form.Control
                   type="file"
@@ -192,13 +237,21 @@ const UpdateProfile = () => {
                 />
               </Form.Group>
 
-              <button
-                className="border mb-5 h-10 w-24 hover:opacity-30 rounded-lg cursor-pointer text-gray-300 hover:text-slate-950 hover:bg-gray-50"
-                type="submit"
-                disabled={!(formik.dirty && formik.isValid) || loading}
-              >
-                {loading ? <Spinner animation="border" size="sm" /> : "Update"}
-              </button>
+              <div className="flex justify-between mt-3">
+                <div
+                  onClick={updateProfile}
+                  className="cursor-pointer text-gray-300 hover:text-red-600"
+                >
+                  <FaLongArrowAltLeft /> Back
+                </div>
+                <button
+                  type="submit"
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  disabled={loading}
+                >
+                  {loading ? <Spinner animation="border" size="sm" /> : "Save Changes"}
+                </button>
+              </div>
             </Form>
           )}
         </div>

@@ -15,19 +15,29 @@ export const login = (credential) => {
 }
 
 //get user
-export const getUser = () => {
+export const getUser =async () => {
   return axios.get(`${BASE_API_URL}/users/profile`, { headers: authHeader() });
 }
 
-//update user
-export const updateUser = (user) => {
-  return axios.put(`${BASE_API_URL}/users/auth`
-    , user
-    , { headers: authHeader() });
+// update user  eski update rent cardaki gibi
+export const updateUser =async (updateUserRequest,imageId) => {
+  return axios.put(`${BASE_API_URL}/users/auth/${imageId}`, updateUserRequest, { headers: authHeader() });
 };
 
+
+// export const updateUser = async (updateUserRequest, imageId) => {
+//   try {
+//     const response = await axios.put(`${BASE_API_URL}/users/auth/${imageId}`, updateUserRequest, {
+//       headers: authHeader(), // Yetkilendirme başlığı
+//     });
+//     return response.data; // API'den dönen veriyi geri döndür
+//   } catch (error) {
+//     console.error("Error updating user:", error);
+//     throw error; // Hataları yakalamak için at
+//   }
+// };
 //update password
-export const updatePassword = (credential) => {
+export const updatePassword =async (credential) => {
   return axios.patch(`${BASE_API_URL}/users/auth/password`
     , credential
     , {

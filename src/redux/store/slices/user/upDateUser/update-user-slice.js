@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   isUserLogin: false,
   user: null, // Varsayılan olarak null
-  imageId: "",
+  // imageId: "",
 };
 
 const userUpdateSlice = createSlice({
@@ -17,12 +17,12 @@ const userUpdateSlice = createSlice({
     updateSuccess: (state, action) => {
       state.isUserLogin = true;
       state.user = action.payload; // Güncellenen kullanıcı verisi
-      state.imageId = action.payload.profileImageId || ""; // Profil resmi ID'si
+      // state.imageId = action.payload.profileImageId || ""; // Profil resmi ID'si
     },
     updateFailed: (state) => {
       state.isUserLogin = false;
       state.user = null; // Kullanıcıyı sıfırlıyoruz
-      state.imageId = ""; // Varsayılan değere dönüyoruz
+      // state.imageId = ""; // Varsayılan değere dönüyoruz
     },
   },
 });

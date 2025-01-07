@@ -35,6 +35,7 @@ const UpdateProfile = () => {
     phone: user?.phone || "",
     address: user?.address || "",
     postCode: user?.postCode || "",
+    profileImage : user?.profileImage || "",
   };
 
   const validationSchema = Yup.object({
@@ -45,18 +46,18 @@ const UpdateProfile = () => {
       .required("Email is required"),
     password: Yup.string().min(6, "Password must be at least 6 characters"),
     phone: Yup.string()
-      .matches(/^\d{10}$/, "Phone number must be 10 digits")
+      .matches(/^\d{11}$/, "Phone number must be 10 digits")
       .required("Phone number is required"),
     address: Yup.string().required("Address is required"),
-    postCode: Yup.string()
-      .matches(/^\d{5}$/, "Post code must be 5 digits")
-      .required("Post code is required"),
+  //   postCode: Yup.string()
+  //     .matches(/^\d{6}$/, "Post code must be 5 digits")
+  //     .required("Post code is required"),
   });
 
-  const handleProfileImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) setProfileImage(file);
-  };
+  // const handleProfileImageChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) setProfileImage(file);
+  // };
 
   const onSubmit = async (values) => {
     setLoading(true); // Yükleniyor durumunu başlat
@@ -228,14 +229,15 @@ const UpdateProfile = () => {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group controlId="profileImage">
-                <Form.Label>Profile Image</Form.Label>
-                <Form.Control
-                  type="file"
-                  accept="image/*"
-                  onChange={handleProfileImageChange}
-                />
-              </Form.Group>
+              {//<Form.Group controlId="profileImage">
+                //<Form.Label>Profile Image</Form.Label>
+                //<Form.Control
+                  //type="file"
+                  //accept="image/*"
+                  //onChange={handleProfileImageChange}
+               ///>
+              // </Form.Group>
+              }
 
               <div className="flex justify-between mt-3">
                 <div

@@ -3,10 +3,10 @@ import { encryptedLocalStorage } from "../../../../../helper/auth-token/encrypt-
 import { updateSuccess, updateFailed, updateRequest } from "./update-user-slice";
 
 // Kullanıcı güncelleme eylemi
-export const updateUserProfile = (values, imageId) => async (dispatch) => {
+export const updateUserProfile = (values) => async (dispatch) => {
   dispatch(updateRequest()); // Loading durumunu başlat
   try {
-    const updatedUserData = await updateUser(values, imageId); // API çağrısı
+    const updatedUserData = await updateUser(values); // API çağrısı
     encryptedLocalStorage.setItem("token", updatedUserData.data.token); // Token'ı kaydet
     dispatch(updateSuccess(updatedUserData.data)); 
     // Kullanıcı bilgilerini güncelle

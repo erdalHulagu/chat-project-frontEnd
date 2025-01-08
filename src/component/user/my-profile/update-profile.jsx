@@ -61,7 +61,7 @@ const UpdateProfile = () => {
 
   const onSubmit = async (values) => {
     setLoading(true); // Yükleniyor durumunu başlat
-    const imageId = user?.profileImageId; // Kullanıcıdan profil resmi ID'sini al
+    const imageId = user?.profileImage; // Kullanıcıdan profil resmi ID'sini al
     await dispatch(updateUserProfile({ ...values }, imageId)); // Redux eylem oluşturucusunu çağır
     setLoading(false); // Yükleniyor durumunu durdur
   };

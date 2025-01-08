@@ -9,6 +9,7 @@ import singleUserChatReducer from './slices/chat/chat-slices/single-user-chat-sl
 import usersGroupChatReducer from './slices/chat/chat-slices/users-group-chat-slice';
 import userSearchReducer from './slices/user/user/serachUser/user-search-slice';
 import updateUserReducer from './slices/user/upDateUser/update-user-slice';
+import thunk from "redux-thunk";
 export const store = configureStore({
   reducer: {
     profile: profileReducer,
@@ -24,7 +25,8 @@ export const store = configureStore({
 
     
     // other reducers...
-  }
+  },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
 });
 
 export default store;

@@ -7,12 +7,13 @@ export const updateUserProfile = (values) => async (dispatch) => {
   dispatch(updateRequest()); // Loading durumunu başlat
   try {
     const updatedUserData = await updateUser(values); // API çağrısı
+    console.log("update user data :",updatedUserData)
     encryptedLocalStorage.setItem("token", updatedUserData.data.token); // Token'ı kaydet
     dispatch(updateSuccess(updatedUserData.data)); 
     // Kullanıcı bilgilerini güncelle
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Failed to update user"; // Hata mesajını al
-    console.error(errorMessage); // Hata mesajını konsola yaz
+    console.error("error message :",errorMessage); // Hata mesajını konsola yaz
     dispatch(updateFailed()); // Hata durumunu işaretle
   }
 };

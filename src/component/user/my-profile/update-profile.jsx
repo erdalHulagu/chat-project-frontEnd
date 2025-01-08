@@ -61,8 +61,8 @@ const UpdateProfile = () => {
 
   const onSubmit = async (values) => {
     setLoading(true); // Yükleniyor durumunu başlat
-    const imageId = user?.profileImage; // Kullanıcıdan profil resmi ID'sini al
-    await dispatch(updateUserProfile({ ...values }, imageId)); // Redux eylem oluşturucusunu çağır
+    // const imageId = user?.profileImage; // Kullanıcıdan profil resmi ID'sini al
+    await dispatch(updateUserProfile({ ...values })); // Redux eylem oluşturucusunu çağır
     setLoading(false); // Yükleniyor durumunu durdur
   };
 
@@ -81,7 +81,7 @@ const UpdateProfile = () => {
             <div className="w-full h-[35%] max-w-md shadow-lg shadow-slate-800 flex items-center justify-center">
               <img
                 className="h-60 w-60 rounded-full p-3"
-                src={user?.profileImage || "/default-avatar.png"}
+                src={user?.profileImage || require(`../../../assets/img/user.webp`)}
                 alt="Profile"
               />
             </div>

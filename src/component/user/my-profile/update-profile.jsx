@@ -11,9 +11,9 @@ import { updateUserProfile } from "../../../redux/store/slices/user/upDateUser/u
 const UpdateProfile = () => {
   const dispatch = useAppDispatch();
   const { isUserLogin, user } = useAppSelector((state) => state.auth);
+  const{firstName,lastName,email,phone,address,postCode,profileImage}=user;
   const navigate = useNavigate();
   const [update, setUpdate] = useState(false);
-  const [profileImage, setProfileImage] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -28,14 +28,12 @@ const UpdateProfile = () => {
   };
 
   const initialValues = {
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
-    email: user?.email || "",
-    password: "",
-    phone: user?.phone || "",
-    address: user?.address || "",
-    postCode: user?.postCode || "",
-    profileImage : user?.profileImage || "",
+    firstName: firstName || "",
+    lastName: lastName || "",
+    phone: phone || "",
+    address: address || "",
+    postCode: postCode || "",
+    profileImage : profileImage || "",
   };
 
   const validationSchema = Yup.object({
@@ -62,7 +60,7 @@ const UpdateProfile = () => {
   const onSubmit = async (values) => {
     setLoading(true); // Yükleniyor durumunu başlat
     // const imageId = user?.profileImage; // Kullanıcıdan profil resmi ID'sini al
-    await dispatch(updateUserProfile({ ...values })); // Redux eylem oluşturucusunu çağır
+    dispatch(updateUserProfile(values)); // Redux eylem oluşturucusunu çağır
     setLoading(false); // Yükleniyor durumunu durdur
   };
 
@@ -81,25 +79,28 @@ const UpdateProfile = () => {
             <div className="w-full h-[35%] max-w-md shadow-lg shadow-slate-800 flex items-center justify-center">
               <img
                 className="h-60 w-60 rounded-full p-3"
-                src={user?.profileImage || require(`../../../assets/img/user.webp`)}
+                src={profileImage || require(`../../../assets/img/user.webp`)}
                 alt="Profile"
               />
             </div>
             <div className="h-[80%] w-full flex flex-col">
               <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
-                First Name <span className="text-slate-600">{user?.firstName}</span>
+                First Name <span className="text-slate-600">{firstName}</span>
               </div>
               <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
-                Last Name <span className="text-slate-600">{user?.lastName}</span>
+                Last Name <span className="text-slate-600">{lastName}</span>
               </div>
               <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
-                Phone Number <span className="text-slate-600">{user?.phone}</span>
+                Phone Number <span className="text-slate-600">{phone}</span>
               </div>
               <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
-                Post Code <span className="text-slate-600">{user?.postCode}</span>
+                Email Address <span className="text-slate-600">{email}</span>
+              </div>
+              <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
+                Post Code <span className="text-slate-600">{postCode}</span>
               </div>
               <div className="p-3 flex flex-col h-full text-sm shadow-lg shadow-slate-800 text-gray-500">
-                Address <span className="text-slate-600">{user?.address}</span>
+                Address <span className="text-slate-600">{address}</span>
               </div>
             </div>
           </div>
@@ -153,37 +154,6 @@ const UpdateProfile = () => {
                   {formik.errors.lastName}
                 </Form.Control.Feedback>
               </Form.Group>
-
-              <Form.Group controlId="email">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  placeholder="Email"
-                  name="email"
-                  onChange={formik.handleChange}
-                  value={formik.values.email}
-                  isInvalid={!!formik.errors.email}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {formik.errors.email}
-                </Form.Control.Feedback>
-              </Form.Group>
-
-              <Form.Group controlId="password">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Password"
-                  name="password"
-                  onChange={formik.handleChange}
-                  value={formik.values.password}
-                  isInvalid={!!formik.errors.password}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {formik.errors.password}
-                </Form.Control.Feedback>
-              </Form.Group>
-
               <Form.Group controlId="phone">
                 <Form.Label>Phone Number</Form.Label>
                 <Form.Control

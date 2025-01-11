@@ -11,6 +11,7 @@ import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storag
 import { error, toast } from "../../../helper/swal";
 import { useAppDispatch } from "../../../redux/store/hooks";
 import { loginFailed, loginSuccess } from "../../../redux/store/slices/user/auth/auth-slice";
+import { loginProfile } from "../../../redux/store/slices/user/auth/auth_action";
 
 const Login = () => {
 
@@ -33,26 +34,32 @@ const Login = () => {
 
     const onSubmit = async (values) => {
         setLoading(true);
-        try {
-            const respAuth = await login(values);
-            console.log("respAuth", respAuth.data);
-            formik.resetForm();
-            encryptedLocalStorage.setItem("token", respAuth.data.token)
-
-            const respUser = await getUser();
-            dispatch(loginSuccess(respUser.data));
-            toast("login successfull")
+        if(dispatch(loginProfile(values))){
             navigate("/userHome")
+        }
+        // dispatch(loginProfile(values));
 
 
-        } catch (err) {
-            dispatch(loginFailed());
-            error("incorrect email or password try again");
+        // try {
+        //     const respAuth = await login(values);
+        //     console.log("respAuth", respAuth.data);
+        //     formik.resetForm();
+        //     encryptedLocalStorage.setItem("token", respAuth.data.token)
 
-        } finally {
+        //     const respUser = await getUser();
+        //     dispatch(loginSuccess(respUser.data));
+        //     toast("login successfull")
+        //     navigate("/userHome")
+
+
+        // } catch (err) {
+        //     dispatch(loginFailed());
+        //     error("incorrect email or password try again");
+
+        // } finally {
             setLoading(false);
 
-        }
+        
     };
 
     const formik = useFormik({

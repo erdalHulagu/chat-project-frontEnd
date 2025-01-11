@@ -1,6 +1,6 @@
-import { updateUser } from "../../../../../api/service/user-service";
-import { encryptedLocalStorage } from "../../../../../helper/auth-token/encrypt-storage"; // encryptedLocalStorage'ı ekle
-import { toast } from "../../../../../helper/swal";
+import { updateUser } from "../../../../../../api/service/user-service";
+import { encryptedLocalStorage } from "../../../../../../helper/auth-token/encrypt-storage"; // encryptedLocalStorage'ı ekle
+import { toast } from "../../../../../../helper/swal";
 import { updateSuccess, updateFailed, updateRequest } from "./update-user-slice";
 
 // Kullanıcı güncelleme eylemi

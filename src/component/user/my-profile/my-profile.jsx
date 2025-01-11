@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../../redux/store/hooks';
 import ProfileSettingDropdownMenu from './profile-setting-dropdown-menu';
 import { RiUserSettingsFill } from 'react-icons/ri';
+import { getImageById } from '../../../api/service/image-service';
+import { error, toast } from '../../../helper/swal';
 const MyProfile = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -23,6 +25,16 @@ const MyProfile = () => {
     const [searchFriends, setSearchFriends] = useState("");
     const [myPhotos, setMyPhotos] = useState(false);
 
+    const userImage = async () =>{
+
+    try {
+            const image = await getImageById(user.profileImage);
+            console.log("image", image.data);
+        } catch (err) {
+            error("incorrect email or password try again");
+
+    };
+}
 
     //--------------------------------------
     const handleNavigate = () => {
@@ -102,7 +114,7 @@ const MyProfile = () => {
 
                                                 <label htmlFor="imgInput">
                                                     <div className=' w-full h-full flex items-center justify-center '>
-                                                        <img className='shadow-2xl shadow-slate-800 rounded-full cursor-pointer w-36 h-36 my-5 ' src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg" alt="" />
+                                                        <img className='shadow-2xl shadow-slate-800 rounded-full cursor-pointer w-36 h-36 my-5 ' src={`userImage||https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg`} alt="" />
                                                         <MdPhotoCamera className='absolute ml-20 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
                                                     </div>
 

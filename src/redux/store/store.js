@@ -8,7 +8,7 @@ import getAllUsersChatsReducer from './slices/chat/chat-slices/getAll-users-chat
 import singleUserChatReducer from './slices/chat/chat-slices/single-user-chat-slice';
 import usersGroupChatReducer from './slices/chat/chat-slices/users-group-chat-slice';
 import userSearchReducer from './slices/user/user/serachUser/user-search-slice';
-import updateUserReducer from './slices/user/upDateUser/update-user-slice';
+import updateUserReducer from './slices/user/user/upDateUser/update-user-slice';
 import thunk from "redux-thunk";
 export const store = configureStore({
   reducer: {

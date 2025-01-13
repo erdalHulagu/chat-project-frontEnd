@@ -20,12 +20,12 @@ export const getUser =async () => {
 }
 
 // update user  eski update rent cardaki gibi
-export const updateUser = async (updateUserRequest) => {
-  return axios.put(`${BASE_API_URL}/users/auth`, updateUserRequest, { headers: authHeader() });
-};
-// export const updateUser =async (updateUserRequest,imageId) => {
-//   return axios.put(`${BASE_API_URL}/users/auth/${imageId}`, updateUserRequest, { headers: authHeader() });
+// export const updateUser = async (updateUserRequest,imageId) => {
+//   return axios.put(`${BASE_API_URL}/users/update`, updateUserRequest, image{ headers: authHeader() });
 // };
+export const updateUser =async (updateUserRequest,imageId) => {
+  return axios.put(`${BASE_API_URL}/users/update/${imageId}`, updateUserRequest, { headers: authHeader() });
+};
 
 // export const updateUser = async (updateUserRequest, imageId) => {
 //   try {

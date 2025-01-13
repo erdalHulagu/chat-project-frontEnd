@@ -34,6 +34,7 @@ const UpdateProfile = () => {
 // console.log("image data :",imageData)
           // if (imageData && imageData.url) {
             setProfileImageUrl(imageData);
+            console.log("dataaaaaaaaaa",profileImageUrl,"orrrrr",setProfileImageUrl)
           // } else if (imageData && imageData.base64) {
           //   setProfileImageUrl(`data:image/png;base64,${imageData.base64}`);
           // } else {

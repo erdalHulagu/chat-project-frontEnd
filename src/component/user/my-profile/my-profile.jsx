@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BiSolidLeftArrowSquare, BiSolidPencil } from 'react-icons/bi'
 import { IoIosHome, IoMdPhotos } from 'react-icons/io';
 import { ImSearch } from 'react-icons/im';
@@ -24,18 +24,25 @@ const MyProfile = () => {
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
     const [myPhotos, setMyPhotos] = useState(false);
+    const [profileImage, setprofileImage] = useState("");
 
-    const userImage = async () =>{
+    useEffect(() => {
+        const userImage = async () => {
+            if (user.profileImage) {
+                try {
+                    const image = await getImageById(user.profileImage);
+                    console.log("image", image.data);
+                    setprofileImage(image);
+                } catch (err) {
+                    error("Image not found: " + err.message);
+                };
 
-    try {
-            const image = await getImageById(user.profileImage);
-            console.log("image", image.data);
-        } catch (err) {
-            error("incorrect email or password try again");
-
-    };
-}
-
+            } else {
+                setprofileImage(require(`../../../assets/img/user.webp`))
+            }
+        };
+            userImage();
+        },[user]);
     //--------------------------------------
     const handleNavigate = () => {
         navigate(-1);
@@ -114,7 +121,7 @@ const MyProfile = () => {
 
                                                 <label htmlFor="imgInput">
                                                     <div className=' w-full h-full flex items-center justify-center '>
-                                                        <img className='shadow-2xl shadow-slate-800 rounded-full cursor-pointer w-36 h-36 my-5 ' src={`userImage||https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg`} alt="" />
+                                                        <img className='shadow-2xl shadow-slate-800 rounded-full cursor-pointer w-36 h-36 my-5 ' src={profileImage} alt="" />
                                                         <MdPhotoCamera className='absolute ml-20 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
                                                     </div>
 

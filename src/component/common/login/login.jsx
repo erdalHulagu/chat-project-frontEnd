@@ -1,16 +1,10 @@
 // import axios from "axios";
 import { useFormik } from "formik";
 import React, { useState } from "react";
-import { Container, Form, Spinner } from "react-bootstrap";
+import {  Form, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { BiSolidLeftArrowSquare } from "react-icons/bi"
 import * as Yup from "yup";
-import { getUser, login } from "../../../api/service/user-service";
-import { useDispatch, useSelector } from "react-redux";
-import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
-import { error, toast } from "../../../helper/swal";
 import { useAppDispatch } from "../../../redux/store/hooks";
-import { loginFailed, loginSuccess } from "../../../redux/store/slices/user/auth/auth-slice";
 import { loginProfile } from "../../../redux/store/slices/user/auth/auth_action";
 
 const Login = () => {

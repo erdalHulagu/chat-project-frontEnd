@@ -20,25 +20,27 @@ const MyProfile = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { isUserLogin, user } = useAppSelector((state) => state.auth);
+   
 
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
     const [myPhotos, setMyPhotos] = useState(false);
-    const [profileImage, setprofileImage] = useState("");
-
+    const [profileImage, setProfileImage] = useState("");
     useEffect(() => {
         const userImage = async () => {
-            if (user.profileImage) {
+            if (user?.profileImage) {
                 try {
                     const image = await getImageById(user.profileImage);
+                    const base64Image = `data:image/jpeg;base64,${image.data}`;
+                    setProfileImage(base64Image);
                     console.log("image", image.data);
-                    setprofileImage(image);
+                    // setprofileImage(image);
                 } catch (err) {
                     error("Image not found: " + err.message);
                 };
 
             } else {
-                setprofileImage(require(`../../../assets/img/user.webp`))
+                setProfileImage(require(`../../../assets/img/user.webp`))
             }
         };
             userImage();
@@ -73,13 +75,9 @@ const MyProfile = () => {
 
 
     const handleFriendProfile = (friend) => {
-        // if (friend.id===id) {
-
-        // }
-        dispatch(setFriendProfile(friend))
-        navigate('/friendProfile')
-
-    }
+        dispatch(setFriendProfile(friend));
+        navigate('/friendProfile');
+    };
 
 
 

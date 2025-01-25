@@ -15,8 +15,12 @@ export const loginProfile=  (values)=> async (dispatch) => {
         encryptedLocalStorage.setItem("token", respAuth.data.token)
 
         const respUser = await getUser();
-        dispatch(loginSuccess(respUser.data));
+        if (respUser) {
+            toast("login successfull")
+        }
         toast("login successfull")
+        dispatch(loginSuccess(respUser.data));
+        
        
 
         

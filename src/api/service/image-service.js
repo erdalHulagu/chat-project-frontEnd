@@ -10,12 +10,12 @@ export const downloadImage=(imageId)=>{
     return axios.get(`${BASE_API_URL}/images/download/${imageId}`);
 }
 
-// export const getImageById=(imageId)=>{
-//     return axios.get(`${BASE_API_URL}/images/display/${imageId}`);
-// }
-export const getImageById=()=>{
-    return axios.get(`${BASE_API_URL}/users/userImage`);
+export const getImageById=(imageId)=>{
+    return axios.get(`${BASE_API_URL}/images/display/${imageId}`,{ responseType: "arraybuffer" });
 }
+// export const getImageById=()=>{
+//     return axios.get(`${BASE_API_URL}/users/userImage`);
+// }
 export const deleteImage=(imageId)=>{
     return axios.delete(`${BASE_API_URL}/images/delete/${imageId}`);
 }

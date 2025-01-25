@@ -20,27 +20,28 @@ const MyProfile = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { isUserLogin, user } = useAppSelector((state) => state.auth);
-   
+    const { firstName, lastName, email, phone, address, postCode, profileImage } = user;
 
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
     const [myPhotos, setMyPhotos] = useState(false);
-    const [profileImage, setProfileImage] = useState("");
+    const [profImage, setProfImage] = useState("");
     useEffect(() => {
         const userImage = async () => {
-            if (user?.profileImage) {
+            if (profileImage) {
                 try {
-                    const image = await getImageById(user.profileImage);
-                    const base64Image = `data:image/jpeg;base64,${image.data}`;
-                    setProfileImage(base64Image);
-                    console.log("image", image.data);
-                    // setprofileImage(image);
+                    const resp = await getImageById(profileImage);
+                    const blob = new Blob([resp.data], { type: "image/png" }); // Blob oluşturma
+                    const imageUrl = URL.createObjectURL(blob); // Tarayıcıya uygun bir URL oluştur
+                    setProfImage(imageUrl);
+                    console.log("image data.....", profImage);
+                  
                 } catch (err) {
-                    error("Image not found: " + err.message);
+                    error("Image not found: " + err.data.message);
                 };
 
             } else {
-                setProfileImage(require(`../../../assets/img/user.webp`))
+                setProfImage(require(`../../../assets/img/user.webp`))
             }
         };
             userImage();
@@ -99,7 +100,7 @@ const MyProfile = () => {
                             <div className='w-full text-slate-800 bg-slate-100 rounded-t-lg h-[12%] flex  items-center justify-between shadow-slate-950 shadow-2xl border-b'>
 
 
-                                <h4 className='ml-6 font-semibold '>{user.firstName} {user.lastName}'s Profile</h4>
+                                <h4 className='ml-6 font-semibold '>{firstName} {lastName}'s Profile</h4>
                                 <div className='z-20 h-62 w-40'>
 
                                     <ProfileSettingDropdownMenu />
@@ -119,7 +120,7 @@ const MyProfile = () => {
 
                                                 <label htmlFor="imgInput">
                                                     <div className=' w-full h-full flex items-center justify-center '>
-                                                        <img className='shadow-2xl shadow-slate-800 rounded-full cursor-pointer w-36 h-36 my-5 ' src={profileImage} alt="" />
+                                                        <img className='shadow-2xl shadow-slate-800 rounded-full cursor-pointer w-36 h-36 my-5 ' type="file" src={profImage} alt="" />
                                                         <MdPhotoCamera className='absolute ml-20 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
                                                     </div>
 

@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Form, Spinner } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import { toast, error } from "../../../helper/swal";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
@@ -17,6 +17,7 @@ const UpdateProfile = () => {
   const [update, setUpdate] = useState(false);
   const [loading, setLoading] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState("");
+  //  const{profileImage}= useParams();
 
   useEffect(() => {
     if (!isUserLogin) {
@@ -25,32 +26,24 @@ const UpdateProfile = () => {
     }
   }, [isUserLogin, navigate]);
 
-  useEffect(() => {
-    const loadImage = async () => {
-      if (profileImage) {
-        try {
-          const response = await getImageById(profileImage);
-          const imageData = response.data;
-// console.log("image data :",imageData)
-          // if (imageData && imageData.url) {
-            setProfileImageUrl(imageData);
-            console.log("dataaaaaaaaaa",profileImageUrl,"orrrrr",setProfileImageUrl)
-          // } else if (imageData && imageData.base64) {
-          //   setProfileImageUrl(`data:image/png;base64,${imageData.base64}`);
-          // } else {
-          //   setProfileImageUrl(require(`../../../assets/img/user.webp`));
-          // }
-        } catch (err) {
-          console.error("Image not found: " + err.message);
-          setProfileImageUrl(require(`../../../assets/img/user.webp`));
-        }
-      } else {
-        setProfileImageUrl(require(`../../../assets/img/user.webp`));
-      }
-    };
 
-    loadImage();
-  }, [profileImage]);
+
+ 
+  const loadImage = async () => {
+    if (user?.profileImage) {
+    try {
+      const resp = await getImageById(profileImage); // API'den gelen binary veri
+      const blob = new Blob([resp.data], { type: "image/png" }); // Blob oluşturma
+      const imageUrl = URL.createObjectURL(blob); // Tarayıcıya uygun bir URL oluştur
+      setProfileImageUrl(imageUrl); // Görsel URL'yi state'e kaydet
+    } catch (err) {
+      console.error("Error loading image:", err);
+    }
+  } else {
+    setProfileImageUrl(require(`../../../assets/img/user.webp`))
+}
+  };
+
 
   const updateProfile = () => {
     setUpdate(!update);
@@ -62,7 +55,7 @@ const UpdateProfile = () => {
     phone: phone || "",
     address: address || "",
     postCode: postCode || "",
-    profileImage: null, // Set to null initially, will handle file separately
+    profileImage: "", // Set to null initially, will handle file separately
   };
 
   const validationSchema = Yup.object({
@@ -103,7 +96,7 @@ const UpdateProfile = () => {
     }
 
     try {
-       dispatch(updateUserProfile(formData)); // Dispatch FormData
+      dispatch(updateUserProfile(formData)); // Dispatch FormData
       toast.success("Profile updated successfully!");
     } catch (err) {
       error("Failed to update profile. Try again!");
@@ -118,6 +111,10 @@ const UpdateProfile = () => {
     onSubmit,
   });
 
+  useEffect(() => {
+    loadImage();
+  }, []);
+
   return (
     <div className="h-full w-full flex absolute">
       {/* Profile Display */}
@@ -126,9 +123,10 @@ const UpdateProfile = () => {
           <div className="w-full max-w-md h-full relative flex flex-col items-center justify-center rounded-full">
             <div className="w-full h-[35%] max-w-md shadow-lg shadow-slate-800 flex items-center justify-center">
               <img
+                type="file"
                 className="h-60 w-60 rounded-full p-3"
                 src={profileImageUrl}
-                alt="Profile"
+                alt=""
               />
             </div>
             <div className="h-[80%] w-full flex flex-col">
@@ -216,69 +214,68 @@ const UpdateProfile = () => {
                 <Form.Control.Feedback type="invalid">
                   {formik.errors.phone}
                 </Form.Control.Feedback>
-                </Form.Group>
-  
-                <Form.Group controlId="address">
-                  <Form.Label>Address</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Address"
-                    name="address"
-                    onChange={formik.handleChange}
-                    value={formik.values.address}
-                    isInvalid={!!formik.errors.address}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {formik.errors.address}
-                  </Form.Control.Feedback>
-                </Form.Group>
-  
-                <Form.Group controlId="postCode">
-                  <Form.Label>Post Code</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Post Code"
-                    name="postCode"
-                    onChange={formik.handleChange}
-                    value={formik.values.postCode}
-                    isInvalid={!!formik.errors.postCode}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {formik.errors.postCode}
-                  </Form.Control.Feedback>
-                </Form.Group>
-  
-                <Form.Group controlId="profileImage">
-                  <Form.Label>Profile Image</Form.Label>
-                  <Form.Control
-                    type="file"
-                    accept="image/*"
-                    onChange={handleProfileImageChange}
-                  />
-                </Form.Group>
-  
-                <div className="flex justify-between mt-3">
-                  <div
-                    onClick={updateProfile}
-                    className="cursor-pointer text-gray-300 hover:text-red-600"
-                  >
-                    <FaLongArrowAltLeft /> Back
-                  </div>
-                  <button
-                    type="submit"
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    disabled={loading}
-                  >
-                    {loading ? <Spinner animation="border" size="sm" /> : "Save Changes"}
-                  </button>
+              </Form.Group>
+
+              <Form.Group controlId="address">
+                <Form.Label>Address</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Address"
+                  name="address"
+                  onChange={formik.handleChange}
+                  value={formik.values.address}
+                  isInvalid={!!formik.errors.address}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.address}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group controlId="postCode">
+                <Form.Label>Post Code</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Post Code"
+                  name="postCode"
+                  onChange={formik.handleChange}
+                  value={formik.values.postCode}
+                  isInvalid={!!formik.errors.postCode}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.postCode}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group controlId="profileImage">
+                <Form.Label>Profile Image</Form.Label>
+                <Form.Control
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfileImageChange}
+                />
+              </Form.Group>
+
+              <div className="flex justify-between mt-3">
+                <div
+                  onClick={updateProfile}
+                  className="cursor-pointer text-gray-300 hover:text-red-600"
+                >
+                  <FaLongArrowAltLeft /> Back
                 </div>
-              </Form>
-            )}
-          </div>
+                <button
+                  type="submit"
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  disabled={loading}
+                >
+                  {loading ? <Spinner animation="border" size="sm" /> : "Save Changes"}
+                </button>
+              </div>
+            </Form>
+          )}
         </div>
       </div>
-    );
-  };
-  
-  export default UpdateProfile;
-  
+    </div>
+  );
+};
+
+export default UpdateProfile;

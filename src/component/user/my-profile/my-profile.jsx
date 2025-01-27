@@ -19,33 +19,15 @@ import { error, toast } from '../../../helper/swal';
 const MyProfile = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { isUserLogin, user } = useAppSelector((state) => state.auth);
-    const { firstName, lastName, email, phone, address, postCode, profileImage } = user;
+    const { isUserLogin, user ,image} = useAppSelector((state) => state.auth);
+    const { firstName, lastName, email, phone, address, postCode, profileImage ,myImages} = user;
 
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
     const [myPhotos, setMyPhotos] = useState(false);
     const [profImage, setProfImage] = useState("");
-    useEffect(() => {
-        const userImage = async () => {
-            if (profileImage) {
-                try {
-                    const resp = await getImageById(profileImage);
-                    const blob = new Blob([resp.data], { type: "image/png" }); // Blob oluşturma
-                    const imageUrl = URL.createObjectURL(blob); // Tarayıcıya uygun bir URL oluştur
-                    setProfImage(imageUrl);
-                    console.log("image data.....", profImage);
-                  
-                } catch (err) {
-                    error("Image not found: " + err.data.message);
-                };
-
-            } else {
-                setProfImage(require(`../../../assets/img/user.webp`))
-            }
-        };
-            userImage();
-        },[user]);
+    const [myImgs, setMyImgs] = useState("")
+    
     //--------------------------------------
     const handleNavigate = () => {
         navigate(-1);
@@ -72,7 +54,45 @@ const MyProfile = () => {
     const handleToggleSize = () => {
         setIsEnlarged(!isEnlarged);
     };
+    // useEffect(() => {
+    //     const userImage = async () => {
+    //         if (profileImage) {
+    //             try {
+    //                 const resp = await getImageById(profileImage);
+    //                 const blob = new Blob([resp.data], { type: "image/png" }); // Blob oluşturma
+    //                 const imageUrl = URL.createObjectURL(blob); // Tarayıcıya uygun bir URL oluştur
+    //                 setProfImage(imageUrl);
+    //                 console.log("image data.....", profImage);
+                  
+    //             } catch (err) {
+    //                 error("Image not found: " + err.data.message);
+    //             };
 
+    //         } else {
+    //             setProfImage(require(`../../../assets/img/user.webp`))
+    //         }
+    //     };
+    //         userImage();
+    //     },[user]);
+    useEffect(() => {
+        const userImage = async () => {
+            if (profileImage) {
+                try {
+                    const resp = await getImageById(profileImage);
+                    setProfImage(resp);
+                    console.log("image data.....", profImage)
+
+                  
+                } catch (err) {
+                    error("Image not found: " + err.data.message);
+                };
+
+            } else {
+                setProfImage(require(`../../../assets/img/user.webp`))
+            }
+        };
+            userImage();
+        },[user]);
 
 
     const handleFriendProfile = (friend) => {
@@ -94,7 +114,7 @@ const MyProfile = () => {
                     :
                     " h-full w-full  bottom-22  top-28 rounded-lg shadow-slate-700 shadow-2xl "}`} >
                     {/* top bar */}
-                    {isEnlarged ? <div className='rounded w-full h-auto max-h-[86vh] flex justify-center '><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </div>
+                    {isEnlarged ? <div className='rounded w-full h-auto max-h-[86vh] flex justify-center '><MyPhotos myImages={myImages} isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </div>
                         :
                         <>
                             <div className='w-full text-slate-800 bg-slate-100 rounded-t-lg h-[12%] flex  items-center justify-between shadow-slate-950 shadow-2xl border-b'>
@@ -197,7 +217,7 @@ const MyProfile = () => {
                                     </div >
                                     <div >
                                         <Row >
-                                            {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
+                                            {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><MyPhotos  isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
                                             {friendsCard && !myPhotos && friends.map((friend) => <Col key={friend.id} md={12} lg={6} xl={4}> <FriendsCard   {...friend} handleFriendProfile={handleFriendProfile(friend)} /></Col >)}
 
                                         </Row>

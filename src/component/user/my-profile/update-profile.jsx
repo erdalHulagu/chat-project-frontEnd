@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Form, Spinner } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { toast, error } from "../../../helper/swal";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
@@ -17,8 +17,8 @@ const UpdateProfile = () => {
   const [update, setUpdate] = useState(false);
   const [loading, setLoading] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState("");
-  //  const{profileImage}= useParams();
 
+  // Kullanıcı oturum kontrolü
   useEffect(() => {
     if (!isUserLogin) {
       toast.error("Please log in to update your profile!");
@@ -26,36 +26,43 @@ const UpdateProfile = () => {
     }
   }, [isUserLogin, navigate]);
 
-
-
- 
+  // Profil resmi yükleme
   const loadImage = async () => {
     if (user?.profileImage) {
-    try {
-      const resp = await getImageById(profileImage); // API'den gelen binary veri
-      const blob = new Blob([resp.data], { type: "image/png" }); // Blob oluşturma
-      const imageUrl = URL.createObjectURL(blob); // Tarayıcıya uygun bir URL oluştur
-      setProfileImageUrl(imageUrl); // Görsel URL'yi state'e kaydet
-    } catch (err) {
-      console.error("Error loading image:", err);
+      try {
+        const resp = await getImageById(profileImage);
+        setProfileImageUrl(resp);
+      } catch (err) {
+        error("Image not found: " + err.data.message);
+      }
+    } else {
+      setProfileImageUrl(require(`../../../assets/img/user.webp`));
     }
-  } else {
-    setProfileImageUrl(require(`../../../assets/img/user.webp`))
-}
   };
 
+  useEffect(() => {
+    loadImage();
+  }, []);
 
-  const updateProfile = () => {
-    setUpdate(!update);
+  // Profil resmi değişimi
+  const handleProfileImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      formik.setFieldValue("profileImage", file); // Formik'e dosyayı set et
+      setProfileImageUrl(URL.createObjectURL(file)); // Önizleme URL'sini ayarla
+    } else {
+      toast.error("Please upload a valid image file!");
+    }
   };
 
+  // Formik başlangıç değerleri ve validasyon şeması
   const initialValues = {
     firstName: firstName || "",
     lastName: lastName || "",
     phone: phone || "",
     address: address || "",
     postCode: postCode || "",
-    profileImage: "", // Set to null initially, will handle file separately
+    profileImage: null,
   };
 
   const validationSchema = Yup.object({
@@ -69,20 +76,11 @@ const UpdateProfile = () => {
       .required("Phone number is required"),
     address: Yup.string().required("Address is required"),
     postCode: Yup.string()
-      .matches(/^\d{3}$/, "Post code must be 5 digits")
+      .matches(/^\d{5}$/, "Post code must be 5 digits")
       .required("Post code is required"),
   });
 
-  const handleProfileImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith("image/")) {
-      setProfileImageUrl(URL.createObjectURL(file)); // Show preview of the selected image
-      formik.setFieldValue("profileImage", file); // Set the file for FormData
-    } else {
-      toast.error("Please upload a valid image file!");
-    }
-  };
-
+  // Form gönderim işlemi
   const onSubmit = async (values) => {
     setLoading(true);
     const formData = new FormData();
@@ -92,11 +90,11 @@ const UpdateProfile = () => {
     formData.append("address", values.address);
     formData.append("postCode", values.postCode);
     if (values.profileImage) {
-      formData.append("profileImage", values); // Append the image file
+      formData.append("profileImage", values.profileImage);
     }
 
     try {
-      dispatch(updateUserProfile(formData)); // Dispatch FormData
+      await dispatch(updateUserProfile(formData));
       toast.success("Profile updated successfully!");
     } catch (err) {
       error("Failed to update profile. Try again!");
@@ -111,24 +109,45 @@ const UpdateProfile = () => {
     onSubmit,
   });
 
-  useEffect(() => {
-    loadImage();
-  }, []);
+  const updateProfile = () => {
+    setUpdate(!update);
+  };
 
   return (
     <div className="h-full w-full flex absolute">
-      {/* Profile Display */}
+      {/* Profil Görüntüleme */}
       <div className="rounded-l w-[40%] max-w-md h-full flex flex-col items-center justify-center bg-slate-200">
         {isUserLogin && (
           <div className="w-full max-w-md h-full relative flex flex-col items-center justify-center rounded-full">
             <div className="w-full h-[35%] max-w-md shadow-lg shadow-slate-800 flex items-center justify-center">
-              <img
-                type="file"
-                className="h-60 w-60 rounded-full p-3"
-                src={profileImageUrl}
-                alt=""
-              />
+              <Form.Group
+                className="mt-5 flex flex-col items-center"
+                controlId="profileImage"
+              >
+                {/* Profil Resmi */}
+                <label htmlFor="profileImageInput" className="relative cursor-pointer">
+                  <img
+                    src={profileImageUrl}
+                    alt="Uploaded Profile"
+                    className="h-60 w-60 rounded-full p-3 mb-10 shadow-md"
+                  />
+                  {/* <div className="absolute bottom-3 right-3 bg-white rounded-full p-2 shadow-md">
+                    <FaLongArrowAltRight className="text-gray-600 hover:text-blue-500" />
+                  </div> */}
+                </label>
+
+                {/* Gizli Dosya Input */}
+                <input
+                  type="file"
+                  id="profileImageInput"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleProfileImageChange}
+                />
+              </Form.Group>
             </div>
+
+            {/* Kullanıcı Detayları */}
             <div className="h-[80%] w-full flex flex-col">
               <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
                 First Name <span className="text-slate-600">{firstName}</span>
@@ -153,7 +172,7 @@ const UpdateProfile = () => {
         )}
       </div>
 
-      {/* Profile Update */}
+      {/* Profil Güncelleme */}
       <div className="h-full w-[70%] rounded">
         <div className="opacity-80 w-full rounded max-w-2xl flex justify-center">
           {!update ? (
@@ -171,6 +190,7 @@ const UpdateProfile = () => {
               noValidate
               onSubmit={formik.handleSubmit}
             >
+              {/* Form Alanları */}
               <Form.Group controlId="firstName">
                 <Form.Label>First Name</Form.Label>
                 <Form.Control
@@ -246,28 +266,29 @@ const UpdateProfile = () => {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group controlId="profileImage">
-                <Form.Label>Profile Image</Form.Label>
-                <Form.Control
-                  type="file"
-                  accept="image/*"
-                  onChange={handleProfileImageChange}
-                />
-              </Form.Group>
-
-              <div className="flex justify-between mt-3">
-                <div
-                  onClick={updateProfile}
-                  className="cursor-pointer text-gray-300 hover:text-red-600"
-                >
-                  <FaLongArrowAltLeft /> Back
-                </div>
+              <div className="flex justify-end gap-2 mt-4">
                 <button
                   type="submit"
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                   disabled={loading}
+                  className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
                 >
-                  {loading ? <Spinner animation="border" size="sm" /> : "Save Changes"}
+                  {loading ? (
+                    <Spinner
+                      animation="border"
+                      size="sm"
+                      variant="light"
+                      className="mr-2"
+                    />
+                  ) : (
+                    "Save Changes"
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={updateProfile}
+                  className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 transition"
+                >
+                  Cancel
                 </button>
               </div>
             </Form>

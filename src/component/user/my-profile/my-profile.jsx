@@ -19,15 +19,15 @@ import { error, toast } from '../../../helper/swal';
 const MyProfile = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { isUserLogin, user ,image} = useAppSelector((state) => state.auth);
-    const { firstName, lastName, email, phone, address, postCode, profileImage ,myImages} = user;
+    const { isUserLogin, user, image } = useAppSelector((state) => state.auth);
+    const { firstName, lastName, email, phone, address, postCode, profileImage, myImages } = user;
 
     const [friendsCard, setFriendsCard] = useState(false);
     const [searchFriends, setSearchFriends] = useState("");
     const [myPhotos, setMyPhotos] = useState(false);
     const [profImage, setProfImage] = useState("");
     const [myImgs, setMyImgs] = useState("")
-    
+
     //--------------------------------------
     const handleNavigate = () => {
         navigate(-1);
@@ -54,45 +54,25 @@ const MyProfile = () => {
     const handleToggleSize = () => {
         setIsEnlarged(!isEnlarged);
     };
-    // useEffect(() => {
-    //     const userImage = async () => {
-    //         if (profileImage) {
-    //             try {
-    //                 const resp = await getImageById(profileImage);
-    //                 const blob = new Blob([resp.data], { type: "image/png" }); // Blob oluşturma
-    //                 const imageUrl = URL.createObjectURL(blob); // Tarayıcıya uygun bir URL oluştur
-    //                 setProfImage(imageUrl);
-    //                 console.log("image data.....", profImage);
-                  
-    //             } catch (err) {
-    //                 error("Image not found: " + err.data.message);
-    //             };
 
-    //         } else {
-    //             setProfImage(require(`../../../assets/img/user.webp`))
-    //         }
-    //     };
-    //         userImage();
-    //     },[user]);
-    useEffect(() => {
-        const userImage = async () => {
-            if (profileImage) {
-                try {
-                    const resp = await getImageById(profileImage);
-                    setProfImage(resp);
-                    console.log("image data.....", profImage)
 
-                  
-                } catch (err) {
-                    error("Image not found: " + err.data.message);
-                };
+    const userImage = async () => {
+        if (profileImage) {
+            try {
+                const resp = await getImageById(profileImage);
+                setProfImage(resp);
+                console.log("image data.....", profImage)
 
-            } else {
-                setProfImage(require(`../../../assets/img/user.webp`))
-            }
-        };
-            userImage();
-        },[user]);
+
+            } catch (err) {
+                error("Image not found: " + err.data.message);
+            };
+
+        } else {
+            setProfImage(require(`../../../assets/img/user.webp`))
+        }
+    };
+
 
 
     const handleFriendProfile = (friend) => {
@@ -100,8 +80,9 @@ const MyProfile = () => {
         navigate('/friendProfile');
     };
 
-
-
+    useEffect(() => {
+        userImage();
+    }, [user]);
 
     return (
         <div className="h-full w-full flex items-center justify-center ">
@@ -217,7 +198,7 @@ const MyProfile = () => {
                                     </div >
                                     <div >
                                         <Row >
-                                            {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><MyPhotos  isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
+                                            {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
                                             {friendsCard && !myPhotos && friends.map((friend) => <Col key={friend.id} md={12} lg={6} xl={4}> <FriendsCard   {...friend} handleFriendProfile={handleFriendProfile(friend)} /></Col >)}
 
                                         </Row>

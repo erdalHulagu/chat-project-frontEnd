@@ -26,6 +26,9 @@ export const getUser =async () => {
 export const updateUser =async (updateUserRequest,imageId) => {
   return axios.put(`${BASE_API_URL}/users/update/${imageId}`, updateUserRequest, { headers: authHeader() });
 };
+// export const updateUser = async (formData) => {
+//   return axios.post(`${BASE_API_URL}/users/update`, formData, { headers: { ...authHeader(), "Content-Type": "multipart/form-data" } });
+// };
 
 // export const updateUser = async (updateUserRequest, imageId) => {
 //   try {

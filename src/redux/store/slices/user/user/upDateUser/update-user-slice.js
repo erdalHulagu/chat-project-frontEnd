@@ -2,8 +2,9 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   isUserLogin: false,
-  user: null, // Varsayılan olarak null
-  // imageId: "",
+  user: {},
+  imageId: "",
+  errorMessage: "",
 };
 
 const userUpdateSlice = createSlice({
@@ -12,20 +13,21 @@ const userUpdateSlice = createSlice({
 
   reducers: {
     updateRequest: (state) => {
-      state.isUserLogin = true; // Loading başlat
+      state.isUserLogin = true;
     },
     updateSuccess: (state, action) => {
       state.isUserLogin = true;
-      state.user = action.payload; // Güncellenen kullanıcı verisi
-      // state.imageId = action.payload.profileImageId || ""; // Profil resmi ID'si
+      state.user = action.payload.user; // Güncellenen kullanıcı verisi
+      state.imageId = action.payload.profileImage || ""; // Profil resmi ID'si
     },
-    updateFailed: (state) => {
+    updateFailed: (state, action) => {
       state.isUserLogin = false;
-      state.user = null; // Kullanıcıyı sıfırlıyoruz
-      // state.imageId = ""; // Varsayılan değere dönüyoruz
+      state.user = {};
+      state.imageId = "";
+      state.errorMessage = action.payload; // Hata mesajını kaydet
     },
   },
 });
-
-export const { updateSuccess, updateFailed, updateRequest } = userUpdateSlice.actions;
+export const { updateSuccess, updateFailed, updateRequest } =
+  userUpdateSlice.actions;
 export default userUpdateSlice.reducer;

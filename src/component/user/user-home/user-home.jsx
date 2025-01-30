@@ -18,7 +18,7 @@ import { searchUsers } from '../../../redux/store/slices/user/user/serachUser/us
 
 const UserHome = () => {
     const dispatch = useAppDispatch();
-    const { isUserLogin, user } = useAppSelector((state) => state.auth);
+    const { isUserLogin, user ,imageUrl} = useAppSelector((state) => state.auth);
     const allChats = useAppSelector((state) => state.allUsersChat.allChats);
     const searchResults = useAppSelector((state) => state.userSearch.searchResults);
     const navigate = useNavigate();
@@ -68,7 +68,7 @@ const UserHome = () => {
                     <img 
                         onClick={handleProfile}
                         className='hover:opacity-70 border-2 cursor-pointer w-20 h-20 rounded-full my-5 mx-4'
-                        src="https://cdn.pixabay.com/photo/2018/01/14/23/12/nature-3082832_1280.jpg"
+                        src={imageUrl}
                         alt="Profile"
                     />
                     <p onClick={handleProfile} className='cursor-pointer text-gray-950 hover:text-red-700 text-xs font-extrabold'>

@@ -311,27 +311,21 @@
 // };
 
 // export default UpdateProfile;
-
-
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Form, Spinner, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import { toast, error } from "../../../helper/swal";
+import { toast } from "../../../helper/swal";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
-import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
 import { updateUserProfile } from "../../../redux/store/slices/user/user/upDateUser/update-user-action";
-import { deleteImage, getImageById } from "../../../api/service/image-service";
 
 const UpdateProfile = () => {
   const dispatch = useAppDispatch();
-  const { isUserLogin, user } = useAppSelector((state) => state.auth);
-  const { firstName, lastName, email, phone, address, postCode, profileImage } = user;
   const navigate = useNavigate();
-  const [update, setUpdate] = useState(false);
+  const { isUserLogin, user, imageUrl } = useAppSelector((state) => state.auth);
   const [updating, setUpdating] = useState(false);
-  const [profileImageUrl, setProfileImageUrl] = useState("");
+  const [profileImageUrl, setProfileImageUrl] = useState(imageUrl || "../../../assets/img/user.webp");
 
   useEffect(() => {
     if (!isUserLogin) {
@@ -340,38 +334,31 @@ const UpdateProfile = () => {
     }
   }, [isUserLogin, navigate]);
 
-  const loadImage = async () => {
-    if (user?.profileImage) {
-      try {
-        const resp = await getImageById(profileImage);
-        setProfileImageUrl(resp.data);
-      } catch (err) {
-        error("Image not found: " + err.data.message);
-      }
-    } else {
-      setProfileImageUrl(require("../../../assets/img/user.webp"));
-    }
-  };
-
-  useEffect(() => {
-    loadImage();
-  }, []);
-
   const formik = useFormik({
-    initialValues: { firstName, lastName, phone, address, postCode, profileImage: "" },
+    initialValues: {
+      firstName: user.firstName || "",
+      lastName: user.lastName || "",
+      phone: user.phone || "",
+      address: user.address || "",
+      postCode: user.postCode || "",
+      profileImage: null,
+    },
     validationSchema: Yup.object({
       firstName: Yup.string().required("First name is required"),
       lastName: Yup.string().required("Last name is required"),
-      // phone: Yup.string().matches(/\^\d{10}\$/, "Phone number must be 10 digits").required("Phone number is required"),
       address: Yup.string().required("Address is required"),
-      // postCode: Yup.string().matches(/\^\d{5}\$/, "Post code must be 5 digits").required("Post code is required"),
+      profileImage: Yup.mixed().required("Profile image is required"),
     }),
     onSubmit: async (values) => {
       setUpdating(true);
+      const formData = new FormData();
+      for (const key in values) {
+        formData.append(key, values[key]);
+      }
       try {
-        await dispatch(updateUserProfile(values, values.profileImage));
-       
-      } catch {
+        await dispatch(updateUserProfile(formData));
+        toast.success("Profile updated successfully!");
+      } catch (error) {
         toast.error("Failed to update profile. Try again!");
       } finally {
         setUpdating(false);
@@ -379,7 +366,7 @@ const UpdateProfile = () => {
     },
   });
 
-  const handleProfileImageChange = (event) => {
+  const handleProfileImageChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
       formik.setFieldValue("profileImage", file);
@@ -391,23 +378,17 @@ const UpdateProfile = () => {
     }
   };
 
-  const updateProfile = () => {
-    setUpdate(!update);
-  };
-
   return (
     <div className="h-full w-full flex absolute">
       <div className="rounded-l w-[40%] max-w-md h-full flex flex-col items-center justify-center bg-slate-200">
         {isUserLogin && (
-          <div className="w-full max-w-md h-full relative flex flex-col items-center justify-center rounded-full">
-            <div className="w-full h-[35%] max-w-md shadow-lg shadow-slate-800 flex items-center justify-center">
-              <Form.Group className="mt-5 flex flex-col items-center" controlId="profileImage">
-                <label htmlFor="profileImageInput" className="relative cursor-pointer">
-                  <img src={profileImageUrl} alt="Uploaded Profile" className="h-60 w-60 rounded-full p-3 mb-10 shadow-md" />
-                </label>
-                <input type="file" id="profileImageInput" accept="image/*" className="hidden" onChange={handleProfileImageChange} />
-              </Form.Group>
-            </div>
+          <div className="w-full max-w-md flex flex-col items-center justify-center">
+            <Form.Group className="mt-5 flex flex-col items-center" controlId="profileImage">
+              <label htmlFor="profileImageInput" className="cursor-pointer">
+                <img src={profileImageUrl} alt="Profile" className="h-60 w-60 rounded-full p-3 mb-10 shadow-md" />
+              </label>
+              <input type="file" id="profileImageInput" accept="image/*" className="hidden" onChange={handleProfileImageChange} />
+            </Form.Group>
           </div>
         )}
       </div>
@@ -416,22 +397,17 @@ const UpdateProfile = () => {
           <Form.Group controlId="firstName">
             <Form.Label>First Name</Form.Label>
             <Form.Control type="text" {...formik.getFieldProps("firstName")} isInvalid={formik.touched.firstName && formik.errors.firstName} />
+            <Form.Control.Feedback type="invalid">{formik.errors.firstName}</Form.Control.Feedback>
           </Form.Group>
           <Form.Group controlId="lastName">
             <Form.Label>Last Name</Form.Label>
             <Form.Control type="text" {...formik.getFieldProps("lastName")} isInvalid={formik.touched.lastName && formik.errors.lastName} />
-          </Form.Group>
-          <Form.Group controlId="phone">
-            <Form.Label>Phone</Form.Label>
-            <Form.Control type="text" {...formik.getFieldProps("phone")} isInvalid={formik.touched.phone && formik.errors.phone} />
+            <Form.Control.Feedback type="invalid">{formik.errors.lastName}</Form.Control.Feedback>
           </Form.Group>
           <Form.Group controlId="address">
             <Form.Label>Address</Form.Label>
             <Form.Control type="text" {...formik.getFieldProps("address")} isInvalid={formik.touched.address && formik.errors.address} />
-          </Form.Group>
-          <Form.Group controlId="postCode">
-            <Form.Label>Post Code</Form.Label>
-            <Form.Control type="text" {...formik.getFieldProps("postCode")} isInvalid={formik.touched.postCode && formik.errors.postCode} />
+            <Form.Control.Feedback type="invalid">{formik.errors.address}</Form.Control.Feedback>
           </Form.Group>
           <Button type="submit" disabled={updating} className="mt-3">
             {updating ? <Spinner animation="border" size="sm" /> : "Update Profile"}

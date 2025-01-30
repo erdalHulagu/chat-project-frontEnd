@@ -2,9 +2,14 @@ import axios from "axios";
 import { BASE_API_URL } from "../base-api-url";
 import authHeader from "../../helper/auth-token/auth-header";
 
+// export const uploadImage = (file) => {
+//     return axios.post(`${BASE_API_URL}/images/upload`, file, {
+//         headers: { ...authHeader(), "Content-Type": "multipart/form-data" }
+//     });
+// }
 export const uploadImage = (file) => {
     return axios.post(`${BASE_API_URL}/images/upload`, file, {
-        headers: { ...authHeader(), "Content-Type": "multipart/form-data" }
+        headers: { ...authHeader() }
     });
 }
 export const downloadImage = (imageId) => {
@@ -12,11 +17,14 @@ export const downloadImage = (imageId) => {
 }
 
 export const getImageById = async (imageId) => {
-    const userImage =await axios.get(`${BASE_API_URL}/images/display/${imageId}`, { responseType: "arraybuffer" });
-    const blob = new Blob([userImage.data], { type: "image/png" });
-    const imageUrl = URL.createObjectURL(blob);
-    return imageUrl;
+    return await axios.get(`${BASE_API_URL}/images/display/${imageId}`, { responseType: "arraybuffer" });
 }
+// export const getImageById = async (imageId) => {
+//     const userImage =await axios.get(`${BASE_API_URL}/images/display/${imageId}`, { responseType: "arraybuffer" });
+//     const blob = new Blob([userImage.data], { type: "image/png" });
+//     const imageUrl = URL.createObjectURL(blob);
+//     return imageUrl;
+// }
 // export const getImageById = (imageId) => {
 //     return axios.get(`${BASE_API_URL}/images/display/${imageId}`, { responseType: "arraybuffer" });
 // }

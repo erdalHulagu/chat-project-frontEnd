@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState={
     isUserLogin:false,
     user:{},
-    image:null
+    imageUrl:null
 }
 
 export const authSlice = createSlice({
@@ -14,22 +14,24 @@ export const authSlice = createSlice({
       loginSuccess: (state, action) => {
         state.isUserLogin = true;
         state.user = action.payload;
-        state.image= action.payload;
-      },
-  
+        state.imageUrl = action.payload.profilImage; // Doğru şekilde al
+    },
+      setImageURL: (state, action) => {
+      state.imageUrl = action.payload; 
+    },
       loginFailed: (state) => {
         state.isUserLogin = false;
         state.user = {};
-        state.image=null;
+        state.imageUrl=null;
        
         
       },
       logout: (state) => {
         state.isUserLogin = false;
         state.user = {};
-        state.image=null;
+        state.imageUrl=null;
       },
     },
   });
-  export const { loginSuccess, loginFailed, logout } = authSlice.actions;
+  export const { loginSuccess, loginFailed, logout ,setImageURL} = authSlice.actions;
   export default authSlice.reducer;

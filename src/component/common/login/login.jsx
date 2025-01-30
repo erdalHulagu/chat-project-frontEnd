@@ -31,26 +31,7 @@ const Login = () => {
         if(dispatch(loginProfile(values))){
             navigate("/userHome")
         }
-        // dispatch(loginProfile(values));
-
-
-        // try {
-        //     const respAuth = await login(values);
-        //     console.log("respAuth", respAuth.data);
-        //     formik.resetForm();
-        //     encryptedLocalStorage.setItem("token", respAuth.data.token)
-
-        //     const respUser = await getUser();
-        //     dispatch(loginSuccess(respUser.data));
-        //     toast("login successfull")
-        //     navigate("/userHome")
-
-
-        // } catch (err) {
-        //     dispatch(loginFailed());
-        //     error("incorrect email or password try again");
-
-        // } finally {
+        
             setLoading(false);
 
         

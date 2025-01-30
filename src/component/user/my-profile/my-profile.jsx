@@ -19,7 +19,9 @@ import { error, toast } from '../../../helper/swal';
 const MyProfile = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { isUserLogin, user, image } = useAppSelector((state) => state.auth);
+    const { isUserLogin, user, imageUrl } = useAppSelector((state) => state.auth);
+    console.log("image url ,,,,,,,",imageUrl)
+    console.log("user.....",user)
     const { firstName, lastName, email, phone, address, postCode, profileImage, myImages } = user;
 
     const [friendsCard, setFriendsCard] = useState(false);
@@ -56,33 +58,11 @@ const MyProfile = () => {
     };
 
 
-    const userImage = async () => {
-        if (profileImage) {
-            try {
-                const resp = await getImageById(profileImage);
-                setProfImage(resp);
-                console.log("image data.....", profImage)
-
-
-            } catch (err) {
-                error("Image not found: " + err.data.message);
-            };
-
-        } else {
-            setProfImage(require(`../../../assets/img/user.webp`))
-        }
-    };
-
-
-
     const handleFriendProfile = (friend) => {
         dispatch(setFriendProfile(friend));
         navigate('/friendProfile');
     };
 
-    useEffect(() => {
-        userImage();
-    }, [user]);
 
     return (
         <div className="h-full w-full flex items-center justify-center ">
@@ -121,7 +101,7 @@ const MyProfile = () => {
 
                                                 <label htmlFor="imgInput">
                                                     <div className=' w-full h-full flex items-center justify-center '>
-                                                        <img className='shadow-2xl shadow-slate-800 rounded-full cursor-pointer w-36 h-36 my-5 ' type="file" src={profImage} alt="" />
+                                                        <img className='shadow-2xl shadow-slate-800 rounded-full cursor-pointer w-36 h-36 my-5 ' type="file" src={imageUrl} alt="" />
                                                         <MdPhotoCamera className='absolute ml-20 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
                                                     </div>
 

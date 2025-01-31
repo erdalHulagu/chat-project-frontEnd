@@ -5,33 +5,26 @@ import { updateSuccess, updateFailed, updateRequest, updateImageURL } from "./up
 
 import { getImageById, uploadImage } from "../../../../../../api/service/image-service";
 
-export const updateUserProfile = (userUpdateRequest, profileImageFile) => async (dispatch) => {
+export const updateUserProfile = (formData) => async (dispatch) => {
   dispatch(updateRequest());
 
   try {
-    let imageFileId = null;
 
-    // if (profileImageFile) {
-    //   const formData = new FormData();
-    //   formData.append("profileImage", profileImageFile);
-
-      const uploadedImage = await uploadImage(profileImageFile);
+      const uploadedImage = await uploadImage(formData.imageFile);
+      const imageId=uploadedImage.data.id;
       console.log("imageId..............",uploadedImage)
-      imageFileId = uploadedImage; // ID'yi al
-    // }
+     
 
-    const updatedUserData = await updateUser(userUpdateRequest, imageFileId);
-    console.log("updatedUserData:", updatedUserData);
+    const updatedUserData = await updateUser({...formData}, imageId);
+    console.log("updatedUserData:", updatedUserData.data);
 
     toast("Update successful");
     dispatch(updateSuccess(updatedUserData.data));
 
-    if (imageFileId) {
-      const imageResponse = await getImageById(imageFileId);
+      const imageResponse = await getImageById(imageId);
       const blob = new Blob([imageResponse.data], { type: "image/png" });
       const imageUrl = URL.createObjectURL(blob);
       dispatch(updateImageURL(imageUrl));
-    }
 
   } catch (error) {
     const errorMessage = error.response?.data?.message || "Update failed...";

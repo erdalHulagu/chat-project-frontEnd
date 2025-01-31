@@ -16,7 +16,7 @@ const userUpdateSlice = createSlice({
     updateSuccess: (state, action) => {
       state.isUserLogin = true;
       state.userRequest = action.payload.user; // Güncellenen kullanıcı verisi
-      state.imageUrl = action.payload.profileImage || null; // Profil resmi ID değil, URL veya ID olabilir
+      state.imageUrl = action.payload.imageUrl || null; // Profil resmi ID değil, URL veya ID olabilir
     },
     updateImageURL: (state, action) => {
       state.imageUrl = action.payload; 

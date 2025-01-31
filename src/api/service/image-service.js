@@ -2,16 +2,16 @@ import axios from "axios";
 import { BASE_API_URL } from "../base-api-url";
 import authHeader from "../../helper/auth-token/auth-header";
 
-// export const uploadImage = (file) => {
-//     return axios.post(`${BASE_API_URL}/images/upload`, file, {
-//         headers: { ...authHeader(), "Content-Type": "multipart/form-data" }
-//     });
-// }
 export const uploadImage = (file) => {
     return axios.post(`${BASE_API_URL}/images/upload`, file, {
-        headers: { ...authHeader() }
+        headers: { ...authHeader(), "Content-Type": "multipart/form-data" }
     });
 }
+// export const uploadImage = (file) => {
+//     return axios.post(`${BASE_API_URL}/images/upload`, file, {
+//         headers: { ...authHeader() }
+//     });
+// }
 export const downloadImage = (imageId) => {
     return axios.get(`${BASE_API_URL}/images/download/${imageId}`);
 }

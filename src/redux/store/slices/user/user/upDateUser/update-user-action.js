@@ -11,14 +11,14 @@ export const updateUserProfile = (userUpdateRequest, profileImageFile) => async 
   try {
     let imageFileId = null;
 
-    if (profileImageFile) {
-      const formData = new FormData();
-      formData.append("profileImage", profileImageFile);
+    // if (profileImageFile) {
+    //   const formData = new FormData();
+    //   formData.append("profileImage", profileImageFile);
 
       const uploadedImage = await uploadImage(profileImageFile);
       console.log("imageId..............",uploadedImage)
       imageFileId = uploadedImage; // ID'yi al
-    }
+    // }
 
     const updatedUserData = await updateUser(userUpdateRequest, imageFileId);
     console.log("updatedUserData:", updatedUserData);

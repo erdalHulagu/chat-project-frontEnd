@@ -21,7 +21,7 @@ const UpdateProfile = () => {
   const [updating, setUpdating] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState(imageUrl || "../../../assets/img/user.webp");
   const [imageReturnId, setImageReturnId] = useState("")
-  const imageId1=useParams();
+
 
   useEffect(() => {
     if (!isUserLogin) {

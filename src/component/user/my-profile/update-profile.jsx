@@ -9,18 +9,21 @@ import { updateUserProfile } from "../../../redux/store/slices/user/user/upDateU
 import { HiArrowLongRight } from "react-icons/hi2";
 import { useFormik } from "formik";
 import ReactInputMask from "react-input-mask-next";
-import { getImageById, uploadImage } from "../../../api/service/image-service";
+import { deleteImage, getImageById, uploadImage } from "../../../api/service/image-service";
 import { updateUser } from "../../../api/service/user-service";
-import { NULL } from "sass";
 
+
+let imageChanged = false;
 const UpdateProfile = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { isUserLogin, user, imageUrl } = useAppSelector((state) => state.auth);
   const [update, setUpdate] = useState(false)
   const [updating, setUpdating] = useState(false);
-  const [profileImageUrl, setProfileImageUrl] = useState(imageUrl || "../../../assets/img/user.webp");
+  // const [profileImageUrl, setProfileImageUrl] = useState(imageUrl || "../../../assets/img/user.webp");
+  const [profileImageUrl, setProfileImageUrl] = useState("");
   const [imageReturnId, setImageReturnId] = useState("")
+  
 
 
   useEffect(() => {
@@ -34,71 +37,107 @@ const UpdateProfile = () => {
     setUpdate(!update);
   }
 
-  const initialValues = {
-    firstName: user.firstName || "",
-    lastName: user.lastName || "",
-    phone: user.phone || "",
-    address: user.address || "",
-    postCode: user.postCode || "",
-    email: user.email || "",
-    profileImage: null || "",
-  };
+  const [initialValues ,setInitialValues]= useState ({
+    firstName:  "",
+    lastName: "",
+    phone: "",
+    address:"",
+    postCode: "",
+    email:"",
+    profileImage: "",
+    // firstName: user.firstName || "",
+    // lastName: user.lastName || "",
+    // phone: user.phone || "",
+    // address: user.address || "",
+    // postCode: user.postCode || "",
+    // email: user.email || "",
+    // profileImage: null || "",
+  });
   const validationSchema = Yup.object({
     firstName: Yup.string().required("First name is required"),
     lastName: Yup.string().required("Last name is required"),
     address: Yup.string().required("Address is required"),
     profileImage: Yup.mixed().required("Profile image is required"),
   });
-
+  setInitialValues({...user})
   const onSubmit = async (values) => {
     setUpdating(true);
+
+    try {
+      let imageId = values.profileImage[0];
+      if (imageChanged) {
+
+        // Mevcut resmi siliyoruz
+        await deleteImage(imageId);
+        const formData = new FormData();
+        formData.append("imageFile", values.profileImage);
+
+        const resp = await uploadImage(formData);
+        imageId = resp.data.imageId;
+      }
+
+      delete values.profileImage;
+
+      await updateProfile(values, imageId);
+      toast("Vehicle was updated", "success");
+      navigate(-1);
+    } catch (err) {
+      toast(err.response.data.message, "error");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+
+  // const onSubmit = async (values) => {
+  //   setUpdating(true);
     
-    const formData = new FormData();
+  //   const formData = new FormData();
  
-    formData.append("imageFile", values.profileImage);
+  //   formData.append("imageFile", values.profileImage);
     
    
 
 
 
 
-    try {
+  //   try {
 
-      const uploadedImage = await uploadImage(formData);
-      console.log("uploadImage.........",uploadImage)
-      const imageId = uploadedImage.data.id;
-      console.log("imageId..............", uploadedImage)
-      delete values.imageFile;
+  //     const uploadedImage = await uploadImage(formData);
+  //     console.log("uploadImage.........",uploadImage)
+  //     const imageId = uploadedImage.data.id;
+  //     console.log("imageId..............", uploadedImage)
+  //     delete values.imageFile;
 
-      let newValues = {
-        firstName: values.firstName,
-        lastName: values.lastName,
-        phone: values.phone,
-        address: values.address,
-        postCode: values.postCode,
-        email: values.email,
+  //     let newValues = {
+  //       firstName: values.firstName,
+  //       lastName: values.lastName,
+  //       phone: values.phone,
+  //       address: values.address,
+  //       postCode: values.postCode,
+  //       email: values.email,
        
-    };
+  //   };
 
-      const updatedUserData = await updateUser(newValues,imageId);
-      console.log("updatedUserData:", updatedUserData.data);
+  //     const updatedUserData = await updateUser(newValues,imageId);
+  //     console.log("updatedUserData:", updatedUserData.data);
 
-      toast("Update successful");
-
-
-      const imageResponse = await getImageById(imageId);
-      const blob = new Blob([imageResponse.data], { type: "image/png" });
-      const imageUrl = URL.createObjectURL(blob);
-      setImageReturnId(imageUrl);
+  //     toast("Update successful");
 
 
-    } catch (error) {
-      toast.error("Failed to update profile. Try again!");
-    } finally {
-      setUpdating(false);
-    }
+  //     const imageResponse = await getImageById(imageId);
+  //     const blob = new Blob([imageResponse.data], { type: "image/png" });
+  //     const imageUrl = URL.createObjectURL(blob);
+  //     setImageReturnId(imageUrl);
 
-  }
+
+  //   } catch (error) {
+  //     toast.error("Failed to update profile. Try again!");
+  //   } finally {
+  //     setUpdating(false);
+  //   }
+
+  // }
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -107,6 +146,8 @@ const UpdateProfile = () => {
   const handleProfileImageChange = async (event) => {
     const file = event.target.files[0];
     if (!file) {
+      formik.setFieldValue("imageFile", file);
+
       toast.error("Please upload a valid image file!");
 
       
@@ -116,11 +157,13 @@ const UpdateProfile = () => {
       toast.error("Only JPG, JPEG, and PNG files are allowed!");
       
     }
-    formik.setFieldValue("imageFile", file);
+    
 
     const reader = new FileReader();
-    reader.onloadend = () => setProfileImageUrl(reader.result);
     reader.readAsDataURL(file);
+    reader.onloadend = () => setProfileImageUrl(reader.result);
+    
+    
 
 
 

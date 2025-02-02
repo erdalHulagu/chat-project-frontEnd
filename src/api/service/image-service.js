@@ -29,7 +29,7 @@ export const getImageById = async (imageId) => {
 //     return axios.get(`${BASE_API_URL}/images/display/${imageId}`, { responseType: "arraybuffer" });
 // }
 export const deleteImage = (imageId) => {
-    return axios.delete(`${BASE_API_URL}/images/delete/${imageId}`);
+    return axios.delete(`${BASE_API_URL}/images/delete/${imageId}`,{headers: authHeader(),});
 }
 export const uploadImageToFileSystem = (file) => {
     return axios.post(`${BASE_API_URL}/images/file`, file);

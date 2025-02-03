@@ -8,28 +8,28 @@ import { getImageById, uploadImage } from "../../../../../../api/service/image-s
 export const updateUserProfile = (formData) => async (dispatch) => {
   dispatch(updateRequest());
 
-  try {
+  // try {
 
-      const uploadedImage = await uploadImage(formData.imageFile);
-      const imageId=uploadedImage.data.id;
-      console.log("imageId..............",uploadedImage)
+  //     const uploadedImage = await uploadImage(formData.imageFile);
+  //     const imageId=uploadedImage.data.id;
+  //     console.log("imageId..............",uploadedImage)
      
 
-    const updatedUserData = await updateUser({...formData}, imageId);
-    console.log("updatedUserData:", updatedUserData.data);
+  //   const updatedUserData = await updateUser({...formData}, imageId);
+  //   console.log("updatedUserData:", updatedUserData.data);
 
-    toast("Update successful");
-    dispatch(updateSuccess(updatedUserData.data));
+  //   toast("Update successful");
+  //   dispatch(updateSuccess(updatedUserData.data));
 
-      const imageResponse = await getImageById(imageId);
-      const blob = new Blob([imageResponse.data], { type: "image/png" });
-      const imageUrl = URL.createObjectURL(blob);
-      dispatch(updateImageURL(imageUrl));
+  //     const imageResponse = await getImageById(imageId);
+  //     const blob = new Blob([imageResponse.data], { type: "image/png" });
+  //     const imageUrl = URL.createObjectURL(blob);
+  //     dispatch(updateImageURL(imageUrl));
 
-  } catch (error) {
-    const errorMessage = error.response?.data?.message || "Update failed...";
-    console.error("Update error message:", errorMessage);
-    dispatch(updateFailed(errorMessage));
-  }
+  // } catch (error) {
+  //   const errorMessage = error.response?.data?.message || "Update failed...";
+  //   console.error("Update error message:", errorMessage);
+  //   dispatch(updateFailed(errorMessage));
+  // }
 };
 

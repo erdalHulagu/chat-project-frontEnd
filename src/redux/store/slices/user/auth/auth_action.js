@@ -12,7 +12,6 @@ export const loginProfile = (values) => async (dispatch) => {
 
     try {
         const respAuth = await login(values);
-        console.log("respAuth", respAuth.data);
         encryptedLocalStorage.setItem("token", respAuth.data.token)
 
         const respUser = await getUser();
@@ -20,8 +19,6 @@ export const loginProfile = (values) => async (dispatch) => {
        
         
         const image= await  getImageById(respUser.data.profileImage)
-
-
         const blob = new Blob([image.data], { type: "image/png" });
         const imageUrl = URL.createObjectURL(blob);
         dispatch(setImageURL(imageUrl));

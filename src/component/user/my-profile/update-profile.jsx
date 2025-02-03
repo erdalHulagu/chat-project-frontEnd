@@ -11,6 +11,8 @@ import { useFormik } from "formik";
 import ReactInputMask from "react-input-mask-next";
 import { deleteImage, getImageById, uploadImage } from "../../../api/service/image-service";
 import { updateUser } from "../../../api/service/user-service";
+import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
+import authHeader from "../../../helper/auth-token/auth-header";
 
 
 let imageChanged = false;
@@ -21,7 +23,7 @@ const UpdateProfile = () => {
   const [update, setUpdate] = useState(false)
   const [updating, setUpdating] = useState(false);
   // const [profileImageUrl, setProfileImageUrl] = useState(imageUrl || "../../../assets/img/user.webp");
-  const [profileImageUrl, setProfileImageUrl] = useState("");
+  const [profileImageUrl, setProfileImageUrl] = useState(imageUrl);
   const [imageReturnId, setImageReturnId] = useState("")
   
 
@@ -36,50 +38,42 @@ const UpdateProfile = () => {
   const updateProfile = () => {
     setUpdate(!update);
   }
+// let auth =authHeader();
+//   //---------------------------
+  console.log("userProfileImage",imageReturnId)
+//   console.log("authHEader...",auth);
 
-  const [initialValues ,setInitialValues]= useState ({
-    firstName:  "",
-    lastName: "",
-    phone: "",
-    address:"",
-    postCode: "",
-    email:"",
-    profileImage: "",
-    // firstName: user.firstName || "",
-    // lastName: user.lastName || "",
-    // phone: user.phone || "",
-    // address: user.address || "",
-    // postCode: user.postCode || "",
-    // email: user.email || "",
-    // profileImage: null || "",
-  });
+  const initialValues ={
+  
+    firstName: user.firstName || "",
+    lastName: user.lastName || "",
+    phone: user.phone || "",
+    address: user.address || "",
+    postCode: user.postCode || "",
+    email: user.email || "",
+    profileImage: user.profileImage|| "",
+  };
   const validationSchema = Yup.object({
     firstName: Yup.string().required("First name is required"),
     lastName: Yup.string().required("Last name is required"),
     address: Yup.string().required("Address is required"),
-    profileImage: Yup.mixed().required("Profile image is required"),
+    profileImage: Yup.mixed(),
   });
-  setInitialValues({...user})
+  
   const onSubmit = async (values) => {
     setUpdating(true);
-
+  
     try {
-      let imageId = values.profileImage[0];
-      if (imageChanged) {
-
-        // Mevcut resmi siliyoruz
-        await deleteImage(imageId);
-        const formData = new FormData();
-        formData.append("imageFile", values.profileImage);
-
-        const resp = await uploadImage(formData);
-        imageId = resp.data.imageId;
-      }
-
-      delete values.profileImage;
-
-      await updateProfile(values, imageId);
-      toast("Vehicle was updated", "success");
+      let imageId = values.profileImage;
+      //   if (imageReturnId !== user.profileImage) {
+      //     await deleteImage(user.profileImage); // Eski resmi sil
+      //   }
+  
+      
+      const resp = await updateUser({ ...values, profileImage: imageReturnId || user.profileImage });
+      console.log("updateUser----",resp.data.token)
+      encryptedLocalStorage.setItem("token", resp.data.token);
+      toast("User was updated", "success");
       navigate(-1);
     } catch (err) {
       toast(err.response.data.message, "error");
@@ -88,87 +82,63 @@ const UpdateProfile = () => {
     }
   };
 
-
-  // const onSubmit = async (values) => {
-  //   setUpdating(true);
-    
-  //   const formData = new FormData();
- 
-  //   formData.append("imageFile", values.profileImage);
-    
-   
-
-
-
-
-  //   try {
-
-  //     const uploadedImage = await uploadImage(formData);
-  //     console.log("uploadImage.........",uploadImage)
-  //     const imageId = uploadedImage.data.id;
-  //     console.log("imageId..............", uploadedImage)
-  //     delete values.imageFile;
-
-  //     let newValues = {
-  //       firstName: values.firstName,
-  //       lastName: values.lastName,
-  //       phone: values.phone,
-  //       address: values.address,
-  //       postCode: values.postCode,
-  //       email: values.email,
-       
-  //   };
-
-  //     const updatedUserData = await updateUser(newValues,imageId);
-  //     console.log("updatedUserData:", updatedUserData.data);
-
-  //     toast("Update successful");
-
-
-  //     const imageResponse = await getImageById(imageId);
-  //     const blob = new Blob([imageResponse.data], { type: "image/png" });
-  //     const imageUrl = URL.createObjectURL(blob);
-  //     setImageReturnId(imageUrl);
-
-
-  //   } catch (error) {
-  //     toast.error("Failed to update profile. Try again!");
-  //   } finally {
-  //     setUpdating(false);
-  //   }
-
-  // }
   const formik = useFormik({
     initialValues,
     validationSchema,
     onSubmit,
   });
+  
+  
   const handleProfileImageChange = async (event) => {
     const file = event.target.files[0];
     if (!file) {
-      formik.setFieldValue("imageFile", file);
-
       toast.error("Please upload a valid image file!");
-
-      
+      return;
     }
+  
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
     if (!allowedTypes.includes(file.type)) {
       toast.error("Only JPG, JPEG, and PNG files are allowed!");
-      
+      return;
     }
-    
-
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () => setProfileImageUrl(reader.result);
-    
-    
-
-
-
-
+  
+    // FormData oluştur ve state güncelle
+    const formData = new FormData();
+    formData.append("imageFile", file);
+  
+    try {
+      const resp = await uploadImage(formData);
+      console.log("tokene bak",resp.data.token)
+      encryptedLocalStorage.setItem("token", resp.data.token);
+      setImageReturnId(resp.data.imageId);
+      formik.setFieldValue("profileImage....", resp.data.imageId);
+      imageChanged = true; // Resim değiştiğini belirtiyoruz
+  
+      // Önizleme için base64 dönüştür
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => setProfileImageUrl(reader.result);
+    } catch (error) {
+      toast.error("Image upload failed");
+    }
   };
+    
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //    uploadImage();
+  //   }, 3000);
+  //   return () => clearTimeout(timer);
+  // }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateProfile();
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [user]);
+
+
+  
   return (
     <div className="h-full w-full flex absolute">
       {/* Profil Görüntüleme */}

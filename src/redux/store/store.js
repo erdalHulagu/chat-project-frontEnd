@@ -24,7 +24,7 @@ export const store = configureStore({
     
 
     
-    // other reducers...
+    
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
 });

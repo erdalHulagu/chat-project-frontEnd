@@ -24,8 +24,8 @@ const UpdateProfile = () => {
   const [updating, setUpdating] = useState(false);
   // const [profileImageUrl, setProfileImageUrl] = useState(imageUrl || "../../../assets/img/user.webp");
   const [profileImageUrl, setProfileImageUrl] = useState(imageUrl);
-  const [imageReturnId, setImageReturnId] = useState("")
-  
+  const {  paramImageId } = useParams(); // URL'den imageId'yi al
+const [imageReturnId, setImageReturnId] = useState(paramImageId || "");
 
 
   useEffect(() => {
@@ -41,6 +41,7 @@ const UpdateProfile = () => {
 // let auth =authHeader();
 //   //---------------------------
   console.log("userProfileImage",imageReturnId)
+  console.log("imageIDIDIDID",paramImageId)
 //   console.log("authHEader...",auth);
 
   const initialValues ={
@@ -51,7 +52,7 @@ const UpdateProfile = () => {
     address: user.address || "",
     postCode: user.postCode || "",
     email: user.email || "",
-    profileImage: user.profileImage|| "",
+    profileImage: imageReturnId|| "",
   };
   const validationSchema = Yup.object({
     firstName: Yup.string().required("First name is required"),
@@ -59,20 +60,13 @@ const UpdateProfile = () => {
     address: Yup.string().required("Address is required"),
     profileImage: Yup.mixed(),
   });
-  
   const onSubmit = async (values) => {
     setUpdating(true);
   
     try {
-      let imageId = values.profileImage;
-      //   if (imageReturnId !== user.profileImage) {
-      //     await deleteImage(user.profileImage); // Eski resmi sil
-      //   }
-  
-      
-      const resp = await updateUser({ ...values, profileImage: imageReturnId || user.profileImage });
-      console.log("updateUser----",resp.data.token)
-      encryptedLocalStorage.setItem("token", resp.data.token);
+      let imageIdToSend = imageReturnId || paramImageId; // Eğer yeni yüklenen varsa onu kullan, yoksa URL'deki id'yi
+      const resp = await updateUser(values, imageIdToSend);
+      console.log("updateUser----", resp.data.token);
       toast("User was updated", "success");
       navigate(-1);
     } catch (err) {
@@ -95,26 +89,22 @@ const UpdateProfile = () => {
       toast.error("Please upload a valid image file!");
       return;
     }
-  
+
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
     if (!allowedTypes.includes(file.type)) {
       toast.error("Only JPG, JPEG, and PNG files are allowed!");
       return;
     }
-  
-    // FormData oluştur ve state güncelle
+
     const formData = new FormData();
     formData.append("imageFile", file);
-  
+
     try {
       const resp = await uploadImage(formData);
-      console.log("tokene bak",resp.data.token)
       encryptedLocalStorage.setItem("token", resp.data.token);
       setImageReturnId(resp.data.imageId);
-      formik.setFieldValue("profileImage....", resp.data.imageId);
-      imageChanged = true; // Resim değiştiğini belirtiyoruz
-  
-      // Önizleme için base64 dönüştür
+      formik.setFieldValue("profileImage", resp.data.imageId);
+      
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onloadend = () => setProfileImageUrl(reader.result);
@@ -130,12 +120,12 @@ const UpdateProfile = () => {
   //   return () => clearTimeout(timer);
   // }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      updateProfile();
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, [user]);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     updateProfile();
+  //   }, 4000);
+  //   return () => clearTimeout(timer);
+  // }, [user]);
 
 
   

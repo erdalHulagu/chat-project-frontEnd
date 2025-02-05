@@ -1,32 +1,26 @@
 
 import React, { useEffect, useState } from "react";
-import { Form, Spinner, Button } from "react-bootstrap";
+import { Form, Spinner } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import { toast } from "../../../helper/swal";
-import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
-import { updateUserProfile } from "../../../redux/store/slices/user/user/upDateUser/update-user-action";
+import {  useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { HiArrowLongRight } from "react-icons/hi2";
 import { useFormik } from "formik";
-import ReactInputMask from "react-input-mask-next";
-import { deleteImage, getImageById, uploadImage } from "../../../api/service/image-service";
+import { deleteImage,  uploadImage } from "../../../api/service/image-service";
 import { updateUser } from "../../../api/service/user-service";
 import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
-import authHeader from "../../../helper/auth-token/auth-header";
+import { updateProfileAction } from "../../../redux/store/slices/user/user/upDateUser/update-user-action";
 
 
-let imageChanged = false;
+
 const UpdateProfile = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { isUserLogin, user, imageUrl } = useAppSelector((state) => state.auth);
-  const [update, setUpdate] = useState(false)
+  const [update, setUpdate] = useState(false);
   const [updating, setUpdating] = useState(false);
-  // const [profileImageUrl, setProfileImageUrl] = useState(imageUrl || "../../../assets/img/user.webp");
-  const [profileImageUrl, setProfileImageUrl] = useState(imageUrl);
-  const {  paramImageId } = useParams(); // URL'den imageId'yi al
-const [imageReturnId, setImageReturnId] = useState(paramImageId || "");
-
+  const [profileImageUrl, setProfileImageUrl] = useState(user.profileImage  || "");
 
   useEffect(() => {
     if (!isUserLogin) {
@@ -35,60 +29,40 @@ const [imageReturnId, setImageReturnId] = useState(paramImageId || "");
     }
   }, [isUserLogin, navigate]);
 
-  const updateProfile = () => {
-    setUpdate(!update);
-  }
-// let auth =authHeader();
-//   //---------------------------
-  console.log("userProfileImage",imageReturnId)
-  console.log("imageIDIDIDID",paramImageId)
-//   console.log("authHEader...",auth);
-
-  const initialValues ={
-  
-    firstName: user.firstName || "",
-    lastName: user.lastName || "",
-    phone: user.phone || "",
-    address: user.address || "",
-    postCode: user.postCode || "",
-    email: user.email || "",
-    profileImage: imageReturnId|| "",
-  };
   const validationSchema = Yup.object({
     firstName: Yup.string().required("First name is required"),
     lastName: Yup.string().required("Last name is required"),
     address: Yup.string().required("Address is required"),
     profileImage: Yup.mixed(),
   });
-  const onSubmit = async (values) => {
-    setUpdating(true);
-  
-    try {
-      let imageIdToSend = imageReturnId || paramImageId; // Eğer yeni yüklenen varsa onu kullan, yoksa URL'deki id'yi
-      const resp = await updateUser(values, imageIdToSend);
-      console.log("updateUser----", resp.data.token);
-      toast("User was updated", "success");
-      navigate(-1);
-    } catch (err) {
-      toast(err.response.data.message, "error");
-    } finally {
-      setUpdating(false);
-    }
-  };
 
   const formik = useFormik({
-    initialValues,
+    initialValues: {
+      firstName: user.firstName || "",
+      lastName: user.lastName || "",
+      phone: user.phone || "",
+      address: user.address || "",
+      postCode: user.postCode || "",
+      email: user.email || "",
+      profileImage: null,
+    },
     validationSchema,
-    onSubmit,
+    onSubmit: async (values) => {
+      try {
+        const { profileImage, ...userData } = values;
+        await dispatch(updateProfileAction(userData, profileImage));
+        toast.success("User was updated");
+        navigate(-1);
+      } catch (err) {
+        toast.error(err.response?.data?.message || "Update failed");
+      }
+    },
+    enableReinitialize: true,
   });
-  
-  
-  const handleProfileImageChange = async (event) => {
+
+  const handleProfileImageChange = (event) => {
     const file = event.target.files[0];
-    if (!file) {
-      toast.error("Please upload a valid image file!");
-      return;
-    }
+    if (!file) return;
 
     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
     if (!allowedTypes.includes(file.type)) {
@@ -96,39 +70,15 @@ const [imageReturnId, setImageReturnId] = useState(paramImageId || "");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("imageFile", file);
-
-    try {
-      const resp = await uploadImage(formData);
-      encryptedLocalStorage.setItem("token", resp.data.token);
-      setImageReturnId(resp.data.imageId);
-      formik.setFieldValue("profileImage", resp.data.imageId);
-      
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = () => setProfileImageUrl(reader.result);
-    } catch (error) {
-      toast.error("Image upload failed");
-    }
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => setProfileImageUrl(reader.result);
+    formik.setFieldValue("profileImage", file);
   };
-    
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //    uploadImage();
-  //   }, 3000);
-  //   return () => clearTimeout(timer);
-  // }, []);
+  const updateProfile = () => {
+    setUpdate(!update);
+  };
 
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     updateProfile();
-  //   }, 4000);
-  //   return () => clearTimeout(timer);
-  // }, [user]);
-
-
-  
   return (
     <div className="h-full w-full flex absolute">
       {/* Profil Görüntüleme */}
@@ -137,7 +87,7 @@ const [imageReturnId, setImageReturnId] = useState(paramImageId || "");
           <div className="w-full max-w-md h-full relative flex flex-col items-center justify-center rounded-full">
             <div className="w-full h-[35%] max-w-md shadow-lg shadow-slate-800 flex items-center justify-center">
               <Form.Group
-              // onSubmit={formik.handleSubmit}
+                // onSubmit={formik.handleSubmit}
                 className="mt-5 flex flex-col items-center"
                 controlId="profileImageInput"
               >
@@ -160,8 +110,8 @@ const [imageReturnId, setImageReturnId] = useState(paramImageId || "");
                   accept="image/*"
                   className="hidden"
                   onChange={handleProfileImageChange}
-                  />
-                
+                />
+
                 {formik.touched.profileImage && formik.errors.profileImage && (
                   <Form.Control.Feedback type="invalid">
                     {formik.errors.profileImage}

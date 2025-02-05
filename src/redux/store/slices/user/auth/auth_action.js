@@ -20,6 +20,9 @@ export const loginProfile = (values) => async (dispatch) => {
         const respUser = await getUser();
         dispatch(loginSuccess(respUser.data));
 
+        if (respUser) {
+            toast("login successfull")
+        }
 
         const profileImageId = respUser.data.profileImage;
         if (profileImageId) {
@@ -33,9 +36,7 @@ export const loginProfile = (values) => async (dispatch) => {
             const defaultImage = require("../../../../../assets/img/user.webp"); // Dosya yolunu doğru ayarla
     dispatch(setImageURL(defaultImage));
         }
-        // if (respUser) {
-        //     toast("login successfull")
-        // }
+        
     } catch (err) {
         dispatch(loginFailed());
         error("incorrect email or password try again");

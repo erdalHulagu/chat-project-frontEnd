@@ -176,8 +176,17 @@ const MyProfile = () => {
                                     </div >
                                     <div >
                                         <Row >
-                                            {myPhotos && !friendsCard && [...Array(50)].map((photo) => <Col md={12} lg={6} xxl={4}  ><MyPhotos isEnlarged={isEnlarged} handleToggleSize={handleToggleSize} /> </Col>)}
-                                            {friendsCard && !myPhotos && friends.map((friend) => <Col key={friend.id} md={12} lg={6} xl={4}> <FriendsCard   {...friend} handleFriendProfile={handleFriendProfile(friend)} /></Col >)}
+                                            {myPhotos && !friendsCard &&
+                                                user.myImages?.map((photo, index) => (
+                                                    <Col key={index} md={12} lg={6} xxl={4}>
+                                                        <MyPhotos
+                                                            myImages={[photo]} // Tek resmi bileşene prop olarak gönderiyoruz
+                                                            isEnlarged={isEnlarged}
+                                                            handleToggleSize={handleToggleSize}
+                                                        />
+                                                    </Col>
+                                                ))
+                                            } {friendsCard && !myPhotos && friends.map((friend) => <Col key={friend.id} md={12} lg={6} xl={4}> <FriendsCard   {...friend} handleFriendProfile={handleFriendProfile(friend)} /></Col >)}
 
                                         </Row>
                                     </div>

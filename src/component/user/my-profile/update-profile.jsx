@@ -10,6 +10,7 @@ import { getUser, login, updateUser } from "../../../api/service/user-service";
 import { loginSuccess, setImageURL } from "../../../redux/store/slices/user/auth/auth-slice";
 import {  error, toast } from "../../../helper/swal";
 import { useFormik } from "formik";
+import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
 
 
 
@@ -49,17 +50,32 @@ const UpdateProfile = () => {
     setUpdating(true);
   
     try {
+      console.log("Submitting user update:", values);
   
-      const rep=await updateUser(values, values.profileImage); 
-      console.log("update profile------------",rep.data.user);
+      const rep = await updateUser(values, values.profileImage);
+      console.log("Update response:", rep.data);
+      
 
-      const loginValues = { email: rep.data.user.email, password: rep.data.user.password };
-      dispatch(loginSuccess(loginValues));
-     
+    
+
+      if (rep.data.token) {
+        encryptedLocalStorage.setItem("token", rep.data.token);
+        console.log("Updated token:", rep.data.token);
+      }
+  
+      // const loginValues = { email: rep.data.email, password: rep.data.password };
+      // dispatch(loginSuccess(loginValues));
+
+      const updatedUserResponse = await getUser();
+    console.log("Updated user:", updatedUserResponse.data);
+    dispatch(loginSuccess(updatedUserResponse.data));
+
+
       toast("User was updated");
       navigate(-1);
     } catch (err) {
-      error(err.response?.data?.message || "Update failed");
+      console.error("Update failed:", err.response?.data || err.message);
+      toast(err.response?.data?.message || "Update failed");
     } finally {
       setUpdating(false);
     }
@@ -73,7 +89,7 @@ const UpdateProfile = () => {
 
   useEffect(() => {
     if (!isUserLogin) {
-      toast.error("Please log in to update your profile!");
+      toast("Please log in to update your profile!");
       navigate("/login");
     }
   }, [isUserLogin, navigate,user]);
@@ -93,7 +109,11 @@ const UpdateProfile = () => {
       toast("Only JPG, JPEG, and PNG files are allowed!");
       return;
     }
-
+const reader = new FileReader();
+  reader.onloadend = () => {
+    setProfileImageUrl(reader.result); // Hemen ekrana yansıt
+  };
+  reader.readAsDataURL(file);
     const formData = new FormData();
     formData.append("imageFile", file);
 
@@ -104,9 +124,12 @@ const UpdateProfile = () => {
       // setImageReturnId(response.data.imageId);
       formik.setFieldValue("profileImage", response.data.imageId); // Profil resmi ID'sini ayarla
 
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = () => setProfileImageUrl(reader.result); // Önizleme için ayarla
+       // Yeni resmi doğrudan bileşene yansıt
+    const imageBlob = new Blob([response.data.imageData], { type: "image/png" });
+    const imageUrl = URL.createObjectURL(imageBlob);
+
+    setProfileImageUrl(imageUrl); // Önizlemeyi güncelle
+      
     } catch (error) {
       toast("Image upload failed");
     }
@@ -117,8 +140,26 @@ const UpdateProfile = () => {
   };
   
   useEffect(() => {
-    setProfileImageUrl(user?.profileImage || "");  // Güncellenmiş profile resmi varsa ata
-  }, [user]); 
+    if (user?.profileImage) {
+      // Eğer resim ID'si varsa, Redux'tan veya Backend'den resmi al
+      const fetchProfileImage = async () => {
+        try {
+          const imageResponse = await getImageById(user.profileImage);
+          const blob = new Blob([imageResponse.data], { type: "image/png" });
+          const imageUrl = URL.createObjectURL(blob);
+          setProfileImageUrl(imageUrl); // Önizlemeyi güncelle
+          dispatch(setImageURL(imageUrl)); // Redux'a da güncelle
+        } catch (error) {
+          console.error("Failed to fetch profile image:", error);
+        }
+      };
+  
+      fetchProfileImage();
+    } else {
+      // Eğer profil resmi yoksa, varsayılan resim ata
+      setProfileImageUrl(require("../../../assets/img/user.webp"));
+    }
+  }, [user.profileImage, dispatch]);
   return (
     <div className="h-full w-full flex absolute">
       {/* Profil Görüntüleme */}

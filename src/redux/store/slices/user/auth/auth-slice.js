@@ -14,7 +14,7 @@ export const authSlice = createSlice({
       loginSuccess: (state, action) => {
         state.isUserLogin = true;
         state.user = action.payload;
-        state.imageUrl = action.payload.profilImage; // Doğru şekilde al
+        state.imageUrl = action.payload.profilImage || null; // Doğru şekilde al
     },
       setImageURL: (state, action) => {
       state.imageUrl = action.payload; 

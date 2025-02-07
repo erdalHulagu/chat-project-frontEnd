@@ -51,14 +51,13 @@ const UpdateProfile = () => {
     try {
   
       const rep=await updateUser(values, values.profileImage); 
-      console.log("update profile------------",rep.date);
+      console.log("update profile------------",rep.data.user);
 
-      const loginValues = { email: user.email, password: user.password };
+      const loginValues = { email: rep.data.user.email, password: rep.data.user.password };
       dispatch(loginSuccess(loginValues));
-      
      
       toast("User was updated");
-      // navigate(-1);
+      navigate(-1);
     } catch (err) {
       error(err.response?.data?.message || "Update failed");
     } finally {
@@ -84,39 +83,32 @@ const UpdateProfile = () => {
 
   const handleProfileImageChange = async (event) => {
     const file = event.target.files[0];
-    if (!file) return;
-  
-    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-    if (!allowedTypes.includes(file.type)) {
-      // Show an error message if the file type is not allowed
-      error("Only JPG, JPEG, and PNG files are allowed!");
+    if (!file) {
+      toast("Please upload a valid image file!");
       return;
     }
-  
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+    if (!allowedTypes.includes(file.type)) {
+      toast("Only JPG, JPEG, and PNG files are allowed!");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("imageFile", file);
-  
+
     try {
-      const imageResponse = await uploadImage(formData);
-      console.log(imageResponse)
-      // const imageId = imageResponse.data.id;
-      // setImageIdDisplay(imageId);
-  
-      // const image = await getImageById(imageId);
-      // if (image) {
-      //   const blob = new Blob([image.data], { type: file.type });
-      //   const imageUrl = URL.createObjectURL(blob);
-      //   console.log("image data", image.data);
-      //   dispatch(setImageURL(imageUrl)); // Save the new URL to Redux state
-  
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => setProfileImageUrl(reader.result);
-        // formik.setFieldValue("profileImage", imageId);
-        toast("Image uploaded successfully");
-      // }
-    } catch (err) {
-      error(err.message || "Image update failed");
+      const response = await uploadImage(formData);
+      console.log("image display data",response.data.imageId)
+      dispatch(setImageURL(response.data.imageId));
+      // setImageReturnId(response.data.imageId);
+      formik.setFieldValue("profileImage", response.data.imageId); // Profil resmi ID'sini ayarla
+
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onloadend = () => setProfileImageUrl(reader.result); // Önizleme için ayarla
+    } catch (error) {
+      toast("Image upload failed");
     }
   };
   
@@ -124,6 +116,9 @@ const UpdateProfile = () => {
     setUpdate(!update);
   };
   
+  useEffect(() => {
+    setProfileImageUrl(user?.profileImage || "");  // Güncellenmiş profile resmi varsa ata
+  }, [user]); 
   return (
     <div className="h-full w-full flex absolute">
       {/* Profil Görüntüleme */}
@@ -131,23 +126,21 @@ const UpdateProfile = () => {
         {isUserLogin && (
           <div className="w-full max-w-md h-full relative flex flex-col items-center justify-center rounded-full">
             <div className="w-full h-[35%] max-w-md shadow-lg shadow-slate-800 flex items-center justify-center">
-              <Form.Group
+            <Form.Group
                 className="mt-5 flex flex-col items-center"
                 controlId="profileImageInput"
               >
-                {/* Profil Resmi */}
                 <label htmlFor="profileImageInput" className="relative cursor-pointer">
                   <img
-                    src={profileImageUrl} // Use profileImageUrl state here
+                    src={imageUrl}
                     alt="Uploaded Profile"
                     className="h-60 w-60 rounded-full p-3 mb-10 shadow-md"
                   />
                   <div className="absolute bottom-3 right-3 bg-white rounded-full p-2 shadow-md">
-                    <HiArrowLongRight className="text-gray-600 hover:text-blue-500" />
+                    <HiArrowLongRight className="text-gray-600 hover:text-slate-500" />
                   </div>
                 </label>
-  
-                {/* Gizli Dosya Input */}
+
                 <input
                   type="file"
                   id="profileImageInput"
@@ -155,7 +148,7 @@ const UpdateProfile = () => {
                   className="hidden"
                   onChange={handleProfileImageChange}
                 />
-  
+
                 {formik.touched.profileImage && formik.errors.profileImage && (
                   <Form.Control.Feedback type="invalid">
                     {formik.errors.profileImage}

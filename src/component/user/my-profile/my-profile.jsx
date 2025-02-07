@@ -20,8 +20,6 @@ const MyProfile = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { isUserLogin, user, imageUrl } = useAppSelector((state) => state.auth);
-    console.log("image url ,,,,,,,",imageUrl)
-    console.log("user.....",user)
     const { firstName, lastName, email, phone, address, postCode, profileImage, myImages } = user;
 
     const [friendsCard, setFriendsCard] = useState(false);

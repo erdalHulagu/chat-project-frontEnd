@@ -11,6 +11,7 @@ import { loginSuccess, setImageURL } from "../../../redux/store/slices/user/auth
 import {  error, toast } from "../../../helper/swal";
 import { useFormik } from "formik";
 import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
+import UpdateProfileImage from "./update_profile_image";
 
 
 
@@ -24,7 +25,7 @@ const UpdateProfile = () => {
   const [updating, setUpdating] = useState(false);
   const [imageIdDisplay, setImageIdDisplay] = useState("");
 
-  const [profileImageUrl, setProfileImageUrl] = useState("");
+  // const [profileImageUrl, setProfileImageUrl] = useState("");
 
 
  
@@ -36,7 +37,7 @@ const UpdateProfile = () => {
     address: user?.address || "",
     postCode: user?.postCode || "",
     email: user?.email || "",
-    profileImage: user?.profileImage || "",
+    // profileImage: user?.profileImage || "",
   };
 
   const validationSchema = Yup.object({
@@ -49,36 +50,36 @@ const UpdateProfile = () => {
   const onSubmit = async (values) => {
     setUpdating(true);
   
-    try {
-      console.log("Submitting user update:", values);
+    // try {
+    //   console.log("Submitting user update:", values);
   
-      const rep = await updateUser(values, values.profileImage);
-      console.log("Update response:", rep.data);
+    //   const rep = await updateUser(values, values.profileImage);
+    //   console.log("Update response:", rep.data);
       
 
     
 
-      if (rep.data.token) {
-        encryptedLocalStorage.setItem("token", rep.data.token);
-        console.log("Updated token:", rep.data.token);
-      }
+    //   if (rep.data.token) {
+    //     encryptedLocalStorage.setItem("token", rep.data.token);
+    //     console.log("Updated token:", rep.data.token);
+    //   }
   
-      // const loginValues = { email: rep.data.email, password: rep.data.password };
-      // dispatch(loginSuccess(loginValues));
+    //   // const loginValues = { email: rep.data.email, password: rep.data.password };
+    //   // dispatch(loginSuccess(loginValues));
 
-      const updatedUserResponse = await getUser();
-    console.log("Updated user:", updatedUserResponse.data);
-    dispatch(loginSuccess(updatedUserResponse.data));
+    //   const updatedUserResponse = await getUser();
+    // console.log("Updated user:", updatedUserResponse.data);
+    // dispatch(loginSuccess(updatedUserResponse.data));
 
 
-      toast("User was updated");
-      navigate(-1);
-    } catch (err) {
-      console.error("Update failed:", err.response?.data || err.message);
-      toast(err.response?.data?.message || "Update failed");
-    } finally {
-      setUpdating(false);
-    }
+    //   toast("User was updated");
+    //   navigate(-1);
+    // } catch (err) {
+    //   console.error("Update failed:", err.response?.data || err.message);
+    //   toast(err.response?.data?.message || "Update failed");
+    // } finally {
+    //   setUpdating(false);
+    // }
   };
 
   const formik = useFormik({
@@ -97,69 +98,50 @@ const UpdateProfile = () => {
 
   
 
-  const handleProfileImageChange = async (event) => {
-    const file = event.target.files[0];
-    if (!file) {
-      toast("Please upload a valid image file!");
-      return;
-    }
+//   const handleProfileImageChange = async (event) => {
+//     const file = event.target.files[0];
+//     if (!file) {
+//       toast("Please upload a valid image file!");
+//       return;
+//     }
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-    if (!allowedTypes.includes(file.type)) {
-      toast("Only JPG, JPEG, and PNG files are allowed!");
-      return;
-    }
-const reader = new FileReader();
-  reader.onloadend = () => {
-    setProfileImageUrl(reader.result); // Hemen ekrana yansıt
-  };
-  reader.readAsDataURL(file);
-    const formData = new FormData();
-    formData.append("imageFile", file);
+//     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+//     if (!allowedTypes.includes(file.type)) {
+//       toast("Only JPG, JPEG, and PNG files are allowed!");
+//       return;
+//     }
+// const reader = new FileReader();
+//   reader.onloadend = () => {
+//     setProfileImageUrl(reader.result); // Hemen ekrana yansıt
+//   };
+//   reader.readAsDataURL(file);
+//     const formData = new FormData();
+//     formData.append("imageFile", file);
 
-    try {
-      const response = await uploadImage(formData);
-      console.log("image display data",response.data.imageId)
-      dispatch(setImageURL(response.data.imageId));
-      // setImageReturnId(response.data.imageId);
-      formik.setFieldValue("profileImage", response.data.imageId); // Profil resmi ID'sini ayarla
+//     try {
+//       const response = await uploadImage(formData);
+//       console.log("image display data",response.data.imageId)
+//       dispatch(setImageURL(response.data.imageId));
+//       // setImageReturnId(response.data.imageId);
+//       formik.setFieldValue("profileImage", response.data.imageId); // Profil resmi ID'sini ayarla
 
-       // Yeni resmi doğrudan bileşene yansıt
-    const imageBlob = new Blob([response.data.imageData], { type: "image/png" });
-    const imageUrl = URL.createObjectURL(imageBlob);
+//        // Yeni resmi doğrudan bileşene yansıt
+//     const imageBlob = new Blob([response.data.imageData], { type: "image/png" });
+//     const imageUrl = URL.createObjectURL(imageBlob);
 
-    setProfileImageUrl(imageUrl); // Önizlemeyi güncelle
+//     setProfileImageUrl(imageUrl); // Önizlemeyi güncelle
       
-    } catch (error) {
-      toast("Image upload failed");
-    }
-  };
+//     } catch (error) {
+//       toast("Image upload failed");
+//     }
+//   };
   
   const updateProfile = () => {
     setUpdate(!update);
   };
   
-  useEffect(() => {
-    if (user?.profileImage) {
-      // Eğer resim ID'si varsa, Redux'tan veya Backend'den resmi al
-      const fetchProfileImage = async () => {
-        try {
-          const imageResponse = await getImageById(user.profileImage);
-          const blob = new Blob([imageResponse.data], { type: "image/png" });
-          const imageUrl = URL.createObjectURL(blob);
-          setProfileImageUrl(imageUrl); // Önizlemeyi güncelle
-          dispatch(setImageURL(imageUrl)); // Redux'a da güncelle
-        } catch (error) {
-          console.error("Failed to fetch profile image:", error);
-        }
-      };
-  
-      fetchProfileImage();
-    } else {
-      // Eğer profil resmi yoksa, varsayılan resim ata
-      setProfileImageUrl(require("../../../assets/img/user.webp"));
-    }
-  }, [user.profileImage, dispatch]);
+  // 
+
   return (
     <div className="h-full w-full flex absolute">
       {/* Profil Görüntüleme */}
@@ -167,7 +149,7 @@ const reader = new FileReader();
         {isUserLogin && (
           <div className="w-full max-w-md h-full relative flex flex-col items-center justify-center rounded-full">
             <div className="w-full h-[35%] max-w-md shadow-lg shadow-slate-800 flex items-center justify-center">
-            <Form.Group
+            {/* <Form.Group
                 className="mt-5 flex flex-col items-center"
                 controlId="profileImageInput"
               >
@@ -195,7 +177,8 @@ const reader = new FileReader();
                     {formik.errors.profileImage}
                   </Form.Control.Feedback>
                 )}
-              </Form.Group>
+              </Form.Group> */}
+              <UpdateProfileImage/>
           </div>
 
           {/* Kullanıcı Detayları */}

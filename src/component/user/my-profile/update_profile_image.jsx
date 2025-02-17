@@ -6,9 +6,10 @@ import { HiArrowLongRight } from "react-icons/hi2";
 import { error, toast } from "../../../helper/swal";
 import { uploadImage } from "../../../api/service/image-service";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
-import { setImageURL } from "../../../redux/store/slices/user/auth/auth-slice";
+import { loginSuccess, setImageURL } from "../../../redux/store/slices/user/auth/auth-slice";
 import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
 import { useNavigate } from "react-router-dom";
+import { getUser } from "../../../api/service/user-service";
 
 const UpdateProfileImage = () => {
     const dispatch = useAppDispatch();
@@ -16,7 +17,7 @@ const UpdateProfileImage = () => {
     const [updating, setUpdating] = useState(false);
     const { isUserLogin, imageUrl } = useAppSelector((state) => state.auth);
 
-    
+
 
     const formik = useFormik({
         initialValues: {
@@ -49,6 +50,12 @@ const UpdateProfileImage = () => {
                     encryptedLocalStorage.setItem("token", response.data.token);
                     console.log("Updated token:", response.data.token);
                 }
+
+
+
+                const updatedUserResponse = await getUser();
+                console.log("Updated user:", updatedUserResponse.data);
+                dispatch(loginSuccess(updatedUserResponse.data));
 
                 setUpdating(false);
                 toast("Profile image updated successfully!");
@@ -96,9 +103,12 @@ const UpdateProfileImage = () => {
                         alt="Uploaded Profile"
                         className="h-60 w-60 rounded-full p-3 mb-10 shadow-md"
                     />
+                    {/* {updating ? "Updating..." :  */}
                     <div className="absolute bottom-3 right-3 bg-white rounded-full p-2 shadow-md">
                         <HiArrowLongRight className="text-gray-600 hover:text-slate-500" />
                     </div>
+                    {/* } */}
+
                 </label>
 
                 <input

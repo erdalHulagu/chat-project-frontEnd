@@ -44,12 +44,44 @@ const UpdateProfile = () => {
     firstName: Yup.string().required("First name is required"),
     lastName: Yup.string().required("Last name is required"),
     address: Yup.string().required("Address is required"),
-    profileImage: Yup.mixed(),
+    // profileImage: Yup.mixed(),
   });
 
   const onSubmit = async (values) => {
     setUpdating(true);
   
+    try {
+      console.log("Submitting user update:", values);
+  
+      const rep = await updateUser(values);
+      console.log("Update response:", rep.data);
+      
+
+    
+
+      if (rep.data.token) {
+        encryptedLocalStorage.setItem("token", rep.data.token);
+        console.log("Updated token:", rep.data.token);
+      }
+  
+
+      const updatedUserResponse = await getUser();
+    console.log("Updated user:", updatedUserResponse.data);
+    dispatch(loginSuccess(updatedUserResponse.data));
+
+
+      toast("User was updated");
+      navigate(-1);
+    } catch (err) {
+      console.error("Update failed:", err.response?.data || err.message);
+      toast(err.response?.data?.message || "Update failed");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  // const onSubmit = async (values) => {
+  //   setUpdating(true);
     // try {
     //   console.log("Submitting user update:", values);
   
@@ -64,8 +96,6 @@ const UpdateProfile = () => {
     //     console.log("Updated token:", rep.data.token);
     //   }
   
-    //   // const loginValues = { email: rep.data.email, password: rep.data.password };
-    //   // dispatch(loginSuccess(loginValues));
 
     //   const updatedUserResponse = await getUser();
     // console.log("Updated user:", updatedUserResponse.data);
@@ -80,7 +110,7 @@ const UpdateProfile = () => {
     // } finally {
     //   setUpdating(false);
     // }
-  };
+  // };
 
   const formik = useFormik({
     initialValues,

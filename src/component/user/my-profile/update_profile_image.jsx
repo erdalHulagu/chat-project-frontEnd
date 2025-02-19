@@ -17,51 +17,37 @@ const UpdateProfileImage = () => {
     const [updating, setUpdating] = useState(false);
     const { isUserLogin, imageUrl } = useAppSelector((state) => state.auth);
 
-
-
     const formik = useFormik({
         initialValues: {
             profileImage: "",
         },
         validationSchema: Yup.object({
-            profileImage: Yup.mixed()
-                .test("fileType", "Only JPG, JPEG, and PNG files are allowed!", (value) => {
-                    if (!value) return true; // Eğer kullanıcı yeni bir resim seçmemişse hata döndürme
-                    return ["image/jpeg", "image/png", "image/jpg"].includes(value.type);
-                }),
+            profileImage: Yup.mixed().test("fileType", "Only JPG, JPEG, and PNG files are allowed!", (value) => {
+                if (!value) return true;
+                return ["image/jpeg", "image/png", "image/jpg"].includes(value.type);
+            }),
         }),
         onSubmit: async (values) => {
             if (!values.profileImage) {
                 toast("Please select an image first!");
                 return;
             }
-
             setUpdating(true);
             const formData = new FormData();
             formData.append("imageFile", values.profileImage);
-
             try {
                 const response = await uploadImage(formData);
-                console.log("Uploaded Image ID:", response.data.imageId);
-
                 dispatch(setImageURL(response.data.imageId));
-
                 if (response.data.token) {
                     encryptedLocalStorage.setItem("token", response.data.token);
-                    console.log("Updated token:", response.data.token);
                 }
-
-
-
                 const updatedUserResponse = await getUser();
-                console.log("Updated user:", updatedUserResponse.data);
                 dispatch(loginSuccess(updatedUserResponse.data));
-
-                setUpdating(false);
                 toast("Profile image updated successfully!");
             } catch (err) {
-                setUpdating(false);
                 error(err?.response?.data?.message || "Image upload failed");
+            } finally {
+                setUpdating(false);
             }
         },
     });
@@ -72,22 +58,19 @@ const UpdateProfileImage = () => {
             toast("Please upload a valid image file!");
             return;
         }
-
         if (!["image/jpeg", "image/png", "image/jpg"].includes(file.type)) {
             toast("Only JPG, JPEG, and PNG files are allowed!");
             return;
         }
-
-        // Dosyayı ekrana hemen önizleme olarak yansıt
         const reader = new FileReader();
         reader.onloadend = () => {
-            dispatch(setImageURL(reader.result)); // Redux store'da güncelle
+            dispatch(setImageURL(reader.result));
         };
         reader.readAsDataURL(file);
-
-        // Formik state'ini güncelle
         formik.setFieldValue("profileImage", file);
+        formik.submitForm(); // Resim seçildiğinde otomatik güncelleme başlat
     };
+
     useEffect(() => {
         if (!isUserLogin) {
             toast("Please log in to update your profile!");
@@ -126,13 +109,13 @@ const UpdateProfileImage = () => {
                 )}
             </Form.Group>
 
-            <button
+            {/* <button
                 type="submit"
                 className="btn btn-primary mt-4"
                 disabled={updating || !formik.values.profileImage}
             >
                 {updating ? "Updating..." : "Update Profile Image"}
-            </button>
+            </button> */}
         </Form>
     );
 };

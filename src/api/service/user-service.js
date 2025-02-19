@@ -42,7 +42,10 @@ export const updatePassword =async (credential) => {
 export const searchUser = (user) => {
   return axios.get(`${BASE_API_URL}/users/search?firstName=${user.firstName}`, { headers: authHeader() });
 };
-
+//delete users image
+export const deleteUsersImage=async(imageId)=>{
+  return axios.delete(`${BASE_API_URL}/users/deleteImage/${imageId}`,{headers:authHeader()});
+}
 
 
 

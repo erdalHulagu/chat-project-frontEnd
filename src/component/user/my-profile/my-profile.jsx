@@ -177,15 +177,17 @@ const MyProfile = () => {
                                     <div >
                                         <Row >
                                             {myPhotos && !friendsCard &&
-                                                user.myImages?.map((photo, index) => (
-                                                    <Col key={index} md={12} lg={6} xxl={4}>
+                                                // user.myImages?.map((photo, index) => (
+                                                    // <Col key={index} md={12} lg={6} xxl={4}>
+                                                    <Col md={12} lg={6} xxl={4}>
                                                         <MyPhotos
-                                                            myImages={[photo]} // Tek resmi bileşene prop olarak gönderiyoruz
+                                                            // myImages={[photo]} // Tek resmi bileşene prop olarak gönderiyoruz
+                                                            myImages={user.myImages} // Tek resmi bileşene prop olarak gönderiyoruz
                                                             isEnlarged={isEnlarged}
                                                             handleToggleSize={handleToggleSize}
                                                         />
                                                     </Col>
-                                                ))
+                                                // ))
                                             } {friendsCard && !myPhotos && friends.map((friend) => <Col key={friend.id} md={12} lg={6} xl={4}> <FriendsCard   {...friend} handleFriendProfile={handleFriendProfile(friend)} /></Col >)}
 
                                         </Row>

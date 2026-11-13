@@ -1,32 +1,57 @@
+
 import { toast } from "../../../../helper/swal";
-import { createMessage,allMessages } from "../../../../api/service/message-service";
+import {
+  createMessage,
+  allMessages as fetchMessages,
+} from "../../../../api/service/message-service";
 
-// create message
-export const createSingleMessage = async (values) => {
+// Mesaj gönder
+export const createSingleMessage = (values) => async (dispatch) => {
+  try {
+    const resp = await createMessage(values);
+    const data = resp.data;
 
-    try {
-        const resp = await createMessage(values);
-        console.log(resp.data)
-        const data = await resp.json();
-        console.log("create chat", data)
-        toast("created successfully")
-
-    } catch (err) {
-        toast("catch error", err);
+    if (!data) {
+      throw new Error("Message could not be created.");
     }
+
+    dispatch({
+      type: "message/createNewMessage",
+      payload: data,
+    });
+
+    toast("Message sent successfully");
+
+    return data;
+  } catch (err) {
+    console.error("Create message error:", err);
+    toast("Message could not be sent");
+    throw err;
+  }
 };
 
-// get all messages
-export const getAllMessage = async (values) => {
+// Sohbet mesajlarını getir
+export const getAllMessage = (chatId) => async (dispatch) => {
+  try {
+    const resp = await fetchMessages(chatId);
+    const responseData = resp.data;
 
-    try {
-        const resp = await allMessages(values);
-        console.log(resp.data)
-        const data = await resp.json();
-        console.log("create chat", data)
-        toast("created successfully")
+    // Backend Page<MessageDTO> veya doğrudan liste döndürebilir.
+    const messages = Array.isArray(responseData)
+      ? responseData
+      : Array.isArray(responseData?.content)
+        ? responseData.content
+        : [];
 
-    } catch (err) {
-        toast("catch error", err);
-    }
+    dispatch({
+      type: "message/allMessages",
+      payload: messages,
+    });
+
+    return messages;
+  } catch (err) {
+    console.error("Get messages error:", err);
+    toast("Messages could not be loaded");
+    throw err;
+  }
 };

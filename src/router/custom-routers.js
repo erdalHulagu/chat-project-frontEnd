@@ -4,6 +4,7 @@ import { Route, Routes, Navigate } from "react-router-dom";
 
 import RegisterPage from "../page/common/register-page";
 import LoginPage from "../page/common/login-page";
+
 import MainPages from "../page/user/main-page";
 import MyProfilePage from "../page/user/my-profile-page";
 import FriendProfilePage from "../page/user/friend-profile-page";
@@ -11,6 +12,7 @@ import StatusPage from "../page/user/status-page";
 import UpdateProfilePage from "../page/user/update-profile-page";
 import GroupPage from "../page/user/group-page";
 import UserHomePage from "../page/user/user-home-page";
+
 import UnauthorizedPage from "../page/common/unauthorized-page";
 import NotFoundPage from "../page/common/not-found-page";
 
@@ -23,19 +25,24 @@ const GuestRoute = ({ children }) => {
     (state) => state.auth.isUserLogin
   );
 
-  return isUserLogin
-    ? <Navigate to="/userHome" replace />
-    : children;
+  if (isUserLogin) {
+    return <Navigate to="/userHome" replace />;
+  }
+
+  return children;
 };
 
 const CustomRouters = () => {
   return (
     <Routes>
+
+      {/* DEFAULT PAGE */}
       <Route
         path="/"
-        element={<Navigate to="/userHome" replace />}
+        element={<Navigate to="/login" replace />}
       />
 
+      {/* GUEST PAGES */}
       <Route
         path="/login"
         element={
@@ -54,24 +61,46 @@ const CustomRouters = () => {
         }
       />
 
+      {/* PROTECTED PAGES */}
       <Route element={<ProtectedRoute />}>
+
         <Route element={<Main />}>
+
           <Route path="/main" element={<MainPages />} />
+
           <Route path="/userHome" element={<UserHomePage />} />
+
           <Route path="/profile" element={<MyProfilePage />} />
-          <Route path="/updateProfile" element={<UpdateProfilePage />} />
-          <Route path="/friendProfile" element={<FriendProfilePage />} />
+
+          <Route
+            path="/updateProfile"
+            element={<UpdateProfilePage />}
+          />
+
+          <Route
+            path="/friendProfile"
+            element={<FriendProfilePage />}
+          />
+
           <Route path="/status" element={<StatusPage />} />
+
           <Route path="/group" element={<GroupPage />} />
+
         </Route>
+
       </Route>
 
+      {/* OTHER PAGES */}
       <Route
         path="/unauthorized"
         element={<UnauthorizedPage />}
       />
 
-      <Route path="*" element={<NotFoundPage />} />
+      <Route
+        path="*"
+        element={<NotFoundPage />}
+      />
+
     </Routes>
   );
 };

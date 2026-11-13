@@ -1,18 +1,27 @@
+
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getAllChat } from "../../../../../api/service/chat-service";
-import { encryptedLocalStorage } from "../../../../../helper/auth-token/encrypt-storage";
-import { error, toast } from "../../../../../helper/swal";
 
-export const getAllUsersChats = createAsyncThunk( async (values, { rejectWithValue }) => {
+export const getAllUsersChats = createAsyncThunk(
+    "allUsersChat/getAllUsersChats",
+    async (_, { rejectWithValue }) => {
+        console.log("GET ALL CHATS: İstek başladı");
 
-    try {
-        const respAllUsersChat= await getAllChat(values);
-        encryptedLocalStorage.setItem("token : ", respAllUsersChat.data.token);
-        console.log(respAllUsersChat.data)
-        toast("chat's sent")
-        return respAllUsersChat.data;
+        try {
+            const response = await getAllChat();
 
-    } catch (err) {
-        return rejectWithValue(error("group chat error : ",err.response.data));
+            console.log("GET ALL CHATS STATUS:", response.status);
+            console.log("GET ALL CHATS DATA:", response.data);
+
+            return response.data;
+        } catch (err) {
+            console.error("GET ALL CHATS ERROR:", err);
+            console.error("ERROR RESPONSE:", err.response?.data);
+            console.error("ERROR STATUS:", err.response?.status);
+
+            return rejectWithValue(
+                err.response?.data || err.message
+            );
+        }
     }
-});
+);

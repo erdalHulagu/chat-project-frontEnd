@@ -5,6 +5,7 @@ const initialState = {
   isUserLogin: false,
   user: {},
   imageUrl: null,
+  authInitialized: false,
 };
 
 export const authSlice = createSlice({
@@ -15,6 +16,7 @@ export const authSlice = createSlice({
     loginSuccess: (state, action) => {
       state.isUserLogin = true;
       state.user = action.payload;
+      state.authInitialized = true;
       state.imageUrl = null;
     },
 
@@ -26,12 +28,18 @@ export const authSlice = createSlice({
       state.isUserLogin = false;
       state.user = {};
       state.imageUrl = null;
+      state.authInitialized = true;
     },
 
     logout: (state) => {
       state.isUserLogin = false;
       state.user = {};
       state.imageUrl = null;
+      state.authInitialized = true;
+    },
+
+    setAuthInitialized: (state, action) => {
+      state.authInitialized = action.payload;
     },
   },
 });
@@ -41,6 +49,7 @@ export const {
   loginFailed,
   logout,
   setImageURL,
+  setAuthInitialized,
 } = authSlice.actions;
 
 export default authSlice.reducer;

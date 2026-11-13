@@ -4,21 +4,32 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "../redux/store/hooks";
 
 const ProtectedRoute = ({ children, admin = false }) => {
-  const { isUserLogin, user } = useAppSelector(
-    (state) => state.auth
-  );
+    const { isUserLogin, user, authInitialized } = useAppSelector(
+        (state) => state.auth
+    );
 
-  if (!isUserLogin) {
-    return <Navigate to="/login" replace />;
-  }
+    // Oturum kontrolü henüz tamamlanmadıysa bekle.
+    if (!authInitialized) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-slate-950">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-200 border-t-indigo-600" />
+            </div>
+        );
+    }
 
-  const roles = Array.isArray(user?.roles) ? user.roles : [];
+    // Kullanıcı giriş yapmamışsa Login sayfasına yönlendir.
+    if (!isUserLogin) {
+        return <Navigate to="/login" replace />;
+    }
 
-  if (admin && !roles.includes("Administrator")) {
-    return <Navigate to="/unauthorized" replace />;
-  }
+    const roles = Array.isArray(user?.roles) ? user.roles : [];
 
-  return children ?? <Outlet />;
+    // Yönetici yetkisi kontrolü.
+    if (admin && !roles.includes("Administrator")) {
+        return <Navigate to="/unauthorized" replace />;
+    }
+
+    return children ?? <Outlet />;
 };
 
 export default ProtectedRoute;

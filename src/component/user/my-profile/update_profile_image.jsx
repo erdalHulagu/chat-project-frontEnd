@@ -15,11 +15,13 @@ const UpdateProfileImage = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [updating, setUpdating] = useState(false);
-    const { isUserLogin, imageUrl } = useAppSelector((state) => state.auth);
+    const { isUserLogin, imageUrl, user } = useAppSelector((state) => state.auth);
+    const [profileImageUrl, setProfileImageUrl] = useState({});
+    const [newFormData, setNewFormData] = useState("")
 
     const formik = useFormik({
         initialValues: {
-            profileImage: "",
+            profileImage: user?.profileImage || "",
         },
         validationSchema: Yup.object({
             profileImage: Yup.mixed().test("fileType", "Only JPG, JPEG, and PNG files are allowed!", (value) => {
@@ -32,27 +34,37 @@ const UpdateProfileImage = () => {
                 toast("Please select an image first!");
                 return;
             }
-            setUpdating(true);
-            const formData = new FormData();
-            formData.append("imageFile", values.profileImage);
+            // setUpdating(true);
+
             try {
-                const response = await uploadImage(formData);
+                const response = await uploadImage(newFormData);
                 dispatch(setImageURL(response.data.imageId));
-                if (response.data.token) {
+
+                formik.setFieldValue("profileImage", response.data.imageId); // Profil resmi ID'sini ayarla
+                //Yeni resmi doğrudan bileşene yansıt
+                const imageBlob = new Blob([response.data.imageData], { type: "image/**" });
+                const imageUrl = URL.createObjectURL(imageBlob);
+                setProfileImageUrl(imageUrl)
+
+
+                const updatedUserResponse = await getUser();
+                if (updatedUserResponse.data.token) {
                     encryptedLocalStorage.setItem("token", response.data.token);
                 }
-                const updatedUserResponse = await getUser();
+
+                console.log("updatedUserResponse :", updatedUserResponse)
                 dispatch(loginSuccess(updatedUserResponse.data));
                 toast("Profile image updated successfully!");
             } catch (err) {
                 error(err?.response?.data?.message || "Image upload failed");
             } finally {
-                setUpdating(false);
+                // setUpdating(false);
             }
-        },
+        }
+
     });
 
-    const handleProfileImageChange = (event) => {
+    const handleProfileImageChange = async (event) => {
         const file = event.target.files[0];
         if (!file) {
             toast("Please upload a valid image file!");
@@ -64,25 +76,30 @@ const UpdateProfileImage = () => {
         }
         const reader = new FileReader();
         reader.onloadend = () => {
-            dispatch(setImageURL(reader.result));
+            setProfileImageUrl(reader.result);
         };
-        reader.readAsDataURL(file);
-        formik.setFieldValue("profileImage", file);
-        formik.submitForm(); // Resim seçildiğinde otomatik güncelleme başlat
+        const formData = new FormData();
+        formData.append("imageFile", file);
+        setNewFormData(formData);
+        
+        // reader.readAsDataURL(file);
+        // formik.setFieldValue("profileImage", file);
+        // formik.submitForm(); // Resim seçildiğinde otomatik güncelleme başlat
     };
 
     useEffect(() => {
-        if (!isUserLogin) {
-            toast("Please log in to update your profile!");
-            navigate("/login");
+        if (isUserLogin) {
+            getUser().then(response => {
+                dispatch(loginSuccess(response.data));
+            });
         }
-    }, [isUserLogin, navigate]);
+    }, [isUserLogin, user]);
     return (
         <Form onSubmit={formik.handleSubmit}>
             <Form.Group className="mt-5 flex flex-col items-center" controlId="profileImageInput">
                 <label htmlFor="profileImageInput" className="relative cursor-pointer">
                     <img
-                        src={imageUrl || "/default-profile.png"}
+                        src={imageUrl || "../../../assets/img/user.webp"}
                         alt="Uploaded Profile"
                         className="h-60 w-60 rounded-full p-3 mb-10 shadow-md"
                     />

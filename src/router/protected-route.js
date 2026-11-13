@@ -1,15 +1,24 @@
+
 import React from "react";
-import { Navigate } from "react-router-dom";
-import AuthPage from "../pages/common/auth-page";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "../store/hooks";
 
-const ProtectedRoute = ({ children, admin }) => {
-  const { isUserLogin, user } = useAppSelector((state) => state.auth);
+const ProtectedRoute = ({ children, admin = false }) => {
+    const { isUserLogin, user } = useAppSelector(
+        (state) => state.auth
+    );
 
-  if (!isUserLogin) return <Navigate to="/auth"/>;
-  if(admin && !user.roles.includes("Administrator")) return <Navigate to="/unauthorized"/>
+    if (!isUserLogin) {
+        return <Navigate to="/login" replace />;
+    }
 
-  return children;
+    const roles = user?.roles ?? [];
+
+    if (admin && !roles.includes("Administrator")) {
+        return <Navigate to="/unauthorized" replace />;
+    }
+
+    return children ?? <Outlet />;
 };
 
 export default ProtectedRoute;

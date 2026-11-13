@@ -82,34 +82,34 @@ const UpdateProfile = () => {
 
   // const onSubmit = async (values) => {
   //   setUpdating(true);
-    // try {
-    //   console.log("Submitting user update:", values);
+  //   try {
+  //     console.log("Submitting user update:", values);
   
-    //   const rep = await updateUser(values, values.profileImage);
-    //   console.log("Update response:", rep.data);
+  //     const rep = await updateUser(values, values.profileImage);
+  //     console.log("Update response:", rep.data);
       
 
     
 
-    //   if (rep.data.token) {
-    //     encryptedLocalStorage.setItem("token", rep.data.token);
-    //     console.log("Updated token:", rep.data.token);
-    //   }
+  //     if (rep.data.token) {
+  //       encryptedLocalStorage.setItem("token", rep.data.token);
+  //       console.log("Updated token:", rep.data.token);
+  //     }
   
 
-    //   const updatedUserResponse = await getUser();
-    // console.log("Updated user:", updatedUserResponse.data);
-    // dispatch(loginSuccess(updatedUserResponse.data));
+  //     const updatedUserResponse = await getUser();
+  //   console.log("Updated user:", updatedUserResponse.data);
+  //   dispatch(loginSuccess(updatedUserResponse.data));
 
 
-    //   toast("User was updated");
-    //   navigate(-1);
-    // } catch (err) {
-    //   console.error("Update failed:", err.response?.data || err.message);
-    //   toast(err.response?.data?.message || "Update failed");
-    // } finally {
-    //   setUpdating(false);
-    // }
+  //     toast("User was updated");
+  //     navigate(-1);
+  //   } catch (err) {
+  //     console.error("Update failed:", err.response?.data || err.message);
+  //     toast(err.response?.data?.message || "Update failed");
+  //   } finally {
+  //     setUpdating(false);
+  //   }
   // };
 
   const formik = useFormik({

@@ -13,37 +13,67 @@ import GroupPage from "../page/user/group-page";
 import UserHomePage from "../page/user/user-home-page";
 import UnauthorizedPage from "../page/common/unauthorized-page";
 import NotFoundPage from "../page/common/not-found-page";
-import SignOutPage from "../page/common/sign-out-page";
 
+import Main from "../component/common/main/main";
 import ProtectedRoute from "./protected-route";
+import { useAppSelector } from "../redux/store/hooks";
+
+const GuestRoute = ({ children }) => {
+  const isUserLogin = useAppSelector(
+    (state) => state.auth.isUserLogin
+  );
+
+  return isUserLogin
+    ? <Navigate to="/userHome" replace />
+    : children;
+};
 
 const CustomRouters = () => {
-    return (
-        <Routes>
-            <Route path="/" element={<SignOutPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/login" element={<LoginPage />} />
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={<Navigate to="/userHome" replace />}
+      />
 
-            <Route element={<ProtectedRoute />}>
-                <Route path="/main" element={<MainPages />} />
-                <Route path="/profile" element={<MyProfilePage />} />
-                <Route path="/updateProfile" element={<UpdateProfilePage />} />
-                <Route path="/friendProfile" element={<FriendProfilePage />} />
-                <Route path="/status" element={<StatusPage />} />
-                <Route path="/group" element={<GroupPage />} />
-                <Route path="/userHome" element={<UserHomePage />} />
-            </Route>
+      <Route
+        path="/login"
+        element={
+          <GuestRoute>
+            <LoginPage />
+          </GuestRoute>
+        }
+      />
 
-            <Route path="/unauthorized" element={<UnauthorizedPage />} />
+      <Route
+        path="/register"
+        element={
+          <GuestRoute>
+            <RegisterPage />
+          </GuestRoute>
+        }
+      />
 
-            <Route
-                path="/notFound"
-                element={<NotFoundPage />}
-            />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<Main />}>
+          <Route path="/main" element={<MainPages />} />
+          <Route path="/userHome" element={<UserHomePage />} />
+          <Route path="/profile" element={<MyProfilePage />} />
+          <Route path="/updateProfile" element={<UpdateProfilePage />} />
+          <Route path="/friendProfile" element={<FriendProfilePage />} />
+          <Route path="/status" element={<StatusPage />} />
+          <Route path="/group" element={<GroupPage />} />
+        </Route>
+      </Route>
 
-            <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-    );
+      <Route
+        path="/unauthorized"
+        element={<UnauthorizedPage />}
+      />
+
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
 };
 
 export default CustomRouters;

@@ -27,8 +27,10 @@ const getDefaultImage = () =>
   require("../../../../../assets/img/user.webp");
 
 export const loginProfile = (values) => async (dispatch) => {
+  let imageUrl = null;
+
   try {
-    // 1. Authenticate user
+    // 1. Kullanıcı girişi
     const respAuth = await login(values);
     const token = respAuth.data?.token;
 
@@ -36,20 +38,20 @@ export const loginProfile = (values) => async (dispatch) => {
       throw new Error("Authentication token was not returned.");
     }
 
-    // 2. Store JWT
+    // 2. JWT kaydet
     encryptedLocalStorage.setItem("token", token);
 
-    // 3. Get authenticated user profile
+    // 3. Kullanıcı profilini getir
     const respUser = await getUser();
 
     if (!respUser.data) {
       throw new Error("User profile could not be loaded.");
     }
 
-    // 4. Update Redux authentication state
+    // 4. Redux kullanıcı bilgilerini güncelle
     dispatch(loginSuccess(respUser.data));
 
-    // 5. Load profile image separately
+    // 5. Profil fotoğrafını yükle
     const profileImageId = respUser.data.profileImage;
 
     if (profileImageId) {
@@ -57,31 +59,31 @@ export const loginProfile = (values) => async (dispatch) => {
         const image = await getImageById(profileImageId);
 
         const blob = new Blob([image.data], {
-          type: "image/png",
+          type: image.headers?.["content-type"] || "image/png",
         });
 
-        const imageUrl = URL.createObjectURL(blob);
+        imageUrl = URL.createObjectURL(blob);
 
         dispatch(setImageURL(imageUrl));
       } catch (imageError) {
-        console.error(
-          "Profile image could not be loaded:",
-          imageError
-        );
-
+        console.error("Profile image could not be loaded:", imageError);
         dispatch(setImageURL(getDefaultImage()));
       }
     } else {
       dispatch(setImageURL(getDefaultImage()));
     }
 
-    // 6. Notify successful login
+    // 6. Başarılı giriş
     toast("Login successful");
 
     return true;
 
   } catch (err) {
     console.error("Login failed:", err);
+
+    if (imageUrl) {
+      URL.revokeObjectURL(imageUrl);
+    }
 
     encryptedLocalStorage.removeItem("token");
 

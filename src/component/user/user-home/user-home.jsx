@@ -42,6 +42,9 @@ import {
 import {
     clearMessages,
 } from "../../../redux/store/slices/message/message-slice";
+import {
+    clearSearchResults,
+} from "../../../redux/store/slices/user/user/serachUser/user-search-slice";
 
 
 const UserHome = () => {
@@ -55,6 +58,14 @@ const UserHome = () => {
 
     const searchResults = useAppSelector(
         (state) => state.userSearch.searchResults
+    );
+
+    const searchLoading = useAppSelector(
+        (state) => state.userSearch.loading
+    );
+
+    const searchError = useAppSelector(
+        (state) => state.userSearch.error
     );
 
     const messages = useAppSelector(
@@ -96,8 +107,12 @@ const UserHome = () => {
     }, [isUserLogin, dispatch]);
 
     // Kullanıcı arama
+    // Kullanıcı arama
     useEffect(() => {
-        if (!isUserLogin || !search.trim()) return;
+        if (!isUserLogin || !search.trim()) {
+            dispatch(clearSearchResults());
+            return;
+        }
 
         const timer = setTimeout(() => {
             dispatch(
@@ -130,6 +145,12 @@ const UserHome = () => {
     const handleCreateChat = async (selected) => {
         if (!selected?.id) return;
 
+        // Giriş yapan kullanıcı kendisini seçemesin.
+        if (String(selected.id) === String(user?.id)) {
+            console.warn("Kendi kendinle sohbet başlatamazsın.");
+            return;
+        }
+
         try {
             setSelectedUser(selected);
             setSelectedChat(null);
@@ -156,14 +177,13 @@ const UserHome = () => {
 
             await loadChatMessages(currentChatId);
 
-            // Yeni sohbet oluşturulmuş olabilir.
+            // Sohbet listesini yenile.
             dispatch(getAllUsersChats());
 
         } catch (err) {
             console.error("Could not create/open chat:", err);
         }
     };
-
     // Mevcut bireysel veya grup sohbetini aç
     const handleOpenExistingChat = async (chat) => {
         if (!chat?.id) return;
@@ -233,6 +253,7 @@ const UserHome = () => {
     // Kullanıcı listesini göster
     const handleShowChatList = () => {
         setSearch("");
+        dispatch(clearSearchResults());
         setShowUserList((previous) => !previous);
     };
 
@@ -247,10 +268,13 @@ const UserHome = () => {
     const handleStatus = () => navigate("/status");
 
     // Arama sonuçları
-    const displayedUsers = search.trim() || showUserList
-        ? (Array.isArray(searchResults) ? searchResults : [])
-        : [];
-
+    const displayedUsers = (
+        search.trim() || showUserList
+            ? searchResults
+            : []
+    ).filter(
+        (item) => String(item.id) !== String(user?.id)
+    );
     const isSearching = Boolean(search.trim());
 
     // Aktif sohbet kontrolü
@@ -374,10 +398,9 @@ const UserHome = () => {
                             onClick={handleShowChatList}
                             className={`
                                 mt-3 flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition
-                                ${
-                                    showUserList
-                                        ? "bg-indigo-100 text-indigo-800"
-                                        : "text-slate-600 hover:bg-slate-100"
+                                ${showUserList
+                                    ? "bg-indigo-100 text-indigo-800"
+                                    : "text-slate-600 hover:bg-slate-100"
                                 }
                             `}
                         >
@@ -392,7 +415,23 @@ const UserHome = () => {
 
                         {isSearching || showUserList ? (
 
-                            displayedUsers.length > 0 ? (
+                            searchLoading ? (
+
+                                <div className="px-5 py-12 text-center">
+                                    <p className="text-sm text-indigo-600">
+                                        Kullanıcılar aranıyor...
+                                    </p>
+                                </div>
+
+                            ) : searchError ? (
+
+                                <div className="px-5 py-12 text-center">
+                                    <p className="text-sm font-medium text-red-500">
+                                        Kullanıcılar yüklenemedi.
+                                    </p>
+                                </div>
+
+                            ) : displayedUsers.length > 0 ? (
 
                                 displayedUsers.map((item) => (
 
@@ -422,12 +461,12 @@ const UserHome = () => {
 
                                     <p className="text-sm font-medium text-slate-600">
                                         {isSearching
-                                            ? "No users found"
-                                            : "No users available"}
+                                            ? "Kullanıcı bulunamadı."
+                                            : "Henüz kullanıcı bulunmuyor."}
                                     </p>
 
                                     <p className="mt-1 text-xs text-slate-400">
-                                        Try another search.
+                                        Farklı bir isim deneyebilirsin.
                                     </p>
 
                                 </div>

@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.1",
+    "@stomp/stompjs": "^7.5.0",
     "@sweetalert2/themes": "^5.0.15",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -26,6 +27,7 @@
     "react-scripts": "5.0.1",
     "react-secure-storage": "^1.0.22",
     "sass": "^1.57.1",
+    "sockjs-client": "^1.6.1",
     "sweetalert2": "^11.7.1",
     "swiper": "^8.4.6",
     "web-vitals": "^2.1.4",

@@ -74,14 +74,14 @@ export const updatePassword = (credential) => {
 };
 
 // İsme göre kullanıcı ara
-export const searchUser = (user) => {
-  return axios.get(`${BASE_API_URL}/users/search`, {
-    headers: authHeader(),
-    params: {
-      firstName: user.firstName,
-    },
-  });
-};
+export const searchUser = (user) =>
+    axios.get(`${BASE_API_URL}/users/search`, {
+        headers: authHeader(),
+        params: {
+            firstName: user.firstName,
+        },
+    });
+
 
 // Kullanıcı sil
 export const deleteUser = (userId) => {

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import { HiUserGroup } from "react-icons/hi";
 import { SiInstatus } from "react-icons/si";
@@ -41,10 +41,50 @@ import {
 
 import {
     clearMessages,
+    createNewMessage,
 } from "../../../redux/store/slices/message/message-slice";
+
+import {
+    connectWebSocket,
+    disconnectWebSocket,
+} from "../../../api/service/websocket-service";
+
 import {
     clearSearchResults,
 } from "../../../redux/store/slices/user/user/serachUser/user-search-slice";
+
+
+const DEFAULT_IMAGE = require("../../../assets/img/user.webp");
+
+// Sohbetin en son mesaj tarihini bulur.
+const getLatestChatTime = (chat) => {
+    const messages = Array.isArray(chat?.messages)
+        ? chat.messages
+        : [];
+
+    const messageTimes = messages
+        .map((message) => {
+            const date =
+                message?.createAt ||
+                message?.createdAt ||
+                message?.timestamp;
+
+            return date ? new Date(date).getTime() : 0;
+        })
+        .filter((time) => Number.isFinite(time));
+
+    if (messageTimes.length > 0) {
+        return Math.max(...messageTimes);
+    }
+
+    const chatDate =
+        chat?.lastMessageAt ||
+        chat?.updatedAt ||
+        chat?.createAt ||
+        chat?.createdAt;
+
+    return chatDate ? new Date(chatDate).getTime() || 0 : 0;
+};
 
 
 const UserHome = () => {
@@ -84,6 +124,12 @@ const UserHome = () => {
         ? allChatsState.data
         : [];
 
+    // En son mesajı olan sohbetleri listenin başına al.
+    const sortedChats = [...allChats].sort(
+        (chatA, chatB) =>
+            getLatestChatTime(chatB) - getLatestChatTime(chatA)
+    );
+
     // Local states
     const [search, setSearch] = useState("");
     const [showUserList, setShowUserList] = useState(false);
@@ -92,6 +138,7 @@ const UserHome = () => {
     const [selectedChat, setSelectedChat] = useState(null);
 
     const [activeChatId, setActiveChatId] = useState(null);
+    const activeChatIdRef = useRef(null);
 
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [messageText, setMessageText] = useState("");
@@ -106,7 +153,11 @@ const UserHome = () => {
         }
     }, [isUserLogin, dispatch]);
 
-    // Kullanıcı arama
+    // Aktif sohbet ID'sini WebSocket callback'i için güncel tut.
+    useEffect(() => {
+        activeChatIdRef.current = activeChatId;
+    }, [activeChatId]);
+
     // Kullanıcı arama
     useEffect(() => {
         if (!isUserLogin || !search.trim()) {
@@ -141,11 +192,35 @@ const UserHome = () => {
         }
     };
 
+    // WebSocket bağlantısı ve gelen mesajları dinleme
+    useEffect(() => {
+        if (!isUserLogin) {
+            disconnectWebSocket();
+            return;
+        }
+
+        connectWebSocket((receivedMessage) => {
+            const currentChatId = activeChatIdRef.current;
+
+            if (
+                currentChatId &&
+                String(receivedMessage.chatId) === String(currentChatId)
+            ) {
+                dispatch(createNewMessage(receivedMessage));
+            }
+
+            dispatch(getAllUsersChats());
+        });
+
+        return () => {
+            disconnectWebSocket();
+        };
+    }, [isUserLogin, dispatch]);
+
     // Arama sonucundan bireysel sohbet oluştur veya aç
     const handleCreateChat = async (selected) => {
         if (!selected?.id) return;
 
-        // Giriş yapan kullanıcı kendisini seçemesin.
         if (String(selected.id) === String(user?.id)) {
             console.warn("Kendi kendinle sohbet başlatamazsın.");
             return;
@@ -177,13 +252,12 @@ const UserHome = () => {
 
             await loadChatMessages(currentChatId);
 
-            // Sohbet listesini yenile.
             dispatch(getAllUsersChats());
-
         } catch (err) {
             console.error("Could not create/open chat:", err);
         }
     };
+
     // Mevcut bireysel veya grup sohbetini aç
     const handleOpenExistingChat = async (chat) => {
         if (!chat?.id) return;
@@ -229,9 +303,7 @@ const UserHome = () => {
 
             setMessageText("");
 
-            // Son mesajın kartta görünmesi için listeyi yenile.
             dispatch(getAllUsersChats());
-
         } catch (err) {
             console.error("Message sending failed:", err);
         } finally {
@@ -275,13 +347,14 @@ const UserHome = () => {
     ).filter(
         (item) => String(item.id) !== String(user?.id)
     );
+
     const isSearching = Boolean(search.trim());
 
     // Aktif sohbet kontrolü
     const hasActiveChat = Boolean(selectedChat || selectedUser);
 
     return (
-        <section className="flex h-[calc(100dvh-8rem)] min-h-[420px] w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+        <section className="flex h-full min-h-0 min-w-0 w-full flex-1 flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-200/60">
 
             {/* TOP BAR */}
             <header className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white px-3 py-3 sm:px-5">
@@ -289,16 +362,13 @@ const UserHome = () => {
                 <button
                     type="button"
                     onClick={handleProfile}
-                    className="flex min-w-0 items-center gap-3 rounded-xl p-1 text-left transition hover:bg-slate-100"
+                    className="flex min-w-0 items-center gap-3 rounded-xl p-1 text-left transition hover:bg-emerald-50"
                     aria-label="Open profile"
                 >
                     <img
-                        src={
-                            imageUrl ||
-                            require("../../../assets/img/user.webp")
-                        }
+                        src={imageUrl || DEFAULT_IMAGE}
                         alt="Profile"
-                        className="h-11 w-11 shrink-0 rounded-full border-2 border-indigo-100 object-cover sm:h-12 sm:w-12"
+                        className="h-11 w-11 shrink-0 rounded-full border-2 border-emerald-100 object-cover sm:h-12 sm:w-12"
                     />
 
                     <div className="min-w-0">
@@ -319,7 +389,7 @@ const UserHome = () => {
                         onClick={handleGroup}
                         title="Groups"
                         aria-label="Groups"
-                        className="flex h-10 w-10 items-center justify-center rounded-xl text-indigo-900 transition hover:bg-indigo-50 hover:text-indigo-600 sm:h-11 sm:w-11"
+                        className="flex h-10 w-10 items-center justify-center rounded-xl text-emerald-800 transition hover:bg-emerald-50 hover:text-emerald-600 sm:h-11 sm:w-11"
                     >
                         <HiUserGroup size={22} />
                     </button>
@@ -329,7 +399,7 @@ const UserHome = () => {
                         onClick={handleStatus}
                         title="Status"
                         aria-label="Status"
-                        className="flex h-10 w-10 items-center justify-center rounded-xl text-indigo-900 transition hover:bg-indigo-50 hover:text-indigo-600 sm:h-11 sm:w-11"
+                        className="flex h-10 w-10 items-center justify-center rounded-xl text-emerald-800 transition hover:bg-emerald-50 hover:text-emerald-600 sm:h-11 sm:w-11"
                     >
                         <SiInstatus size={20} />
                     </button>
@@ -339,7 +409,7 @@ const UserHome = () => {
                         onClick={() => setIsChatOpen(false)}
                         title="Chats"
                         aria-label="Chats"
-                        className="flex h-10 w-10 items-center justify-center rounded-xl text-indigo-900 transition hover:bg-indigo-50 hover:text-indigo-600 sm:h-11 sm:w-11"
+                        className="flex h-10 w-10 items-center justify-center rounded-xl text-emerald-800 transition hover:bg-emerald-50 hover:text-emerald-600 sm:h-11 sm:w-11"
                     >
                         <BsFillChatLeftDotsFill size={20} />
                     </button>
@@ -350,12 +420,12 @@ const UserHome = () => {
             </header>
 
             {/* CHAT BODY */}
-            <div className="flex min-h-0 flex-1 overflow-hidden">
+            <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden custom-scrollbar">
 
                 {/* CHAT SIDEBAR */}
                 <aside
                     className={`
-                        flex w-full shrink-0 flex-col border-r border-slate-200 bg-slate-50
+                        flex min-h-0 w-full shrink-0 flex-col overflow-hidden border-r border-slate-200 bg-slate-50
                         md:w-[320px] lg:w-[360px] xl:w-[390px]
                         ${isChatOpen ? "hidden md:flex" : "flex"}
                     `}
@@ -377,7 +447,7 @@ const UserHome = () => {
                                 onChange={handleSearchChange}
                                 placeholder="Search people..."
                                 aria-label="Search people"
-                                className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-10 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                                className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-10 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white focus:ring-2 focus:ring-emerald-100"
                             />
 
                             {search && (
@@ -385,7 +455,7 @@ const UserHome = () => {
                                     type="button"
                                     onClick={handleClearSearch}
                                     aria-label="Clear search"
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-emerald-700"
                                 >
                                     <IoClose size={18} />
                                 </button>
@@ -399,8 +469,8 @@ const UserHome = () => {
                             className={`
                                 mt-3 flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium transition
                                 ${showUserList
-                                    ? "bg-indigo-100 text-indigo-800"
-                                    : "text-slate-600 hover:bg-slate-100"
+                                    ? "bg-emerald-100 text-emerald-800"
+                                    : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-800"
                                 }
                             `}
                         >
@@ -411,14 +481,14 @@ const UserHome = () => {
                     </div>
 
                     {/* CONTACT / CHAT LIST */}
-                    <div className="min-h-0 flex-1 overflow-y-auto">
+                    <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain custom-scrollbar">
 
                         {isSearching || showUserList ? (
 
                             searchLoading ? (
 
                                 <div className="px-5 py-12 text-center">
-                                    <p className="text-sm text-indigo-600">
+                                    <p className="text-sm text-emerald-600">
                                         Kullanıcılar aranıyor...
                                     </p>
                                 </div>
@@ -483,9 +553,9 @@ const UserHome = () => {
                                     </p>
                                 </div>
 
-                            ) : allChats.length > 0 ? (
+                            ) : sortedChats.length > 0 ? (
 
-                                allChats.map((chat) => (
+                                sortedChats.map((chat) => (
 
                                     <ChatCard
                                         key={chat.id}
@@ -522,45 +592,42 @@ const UserHome = () => {
 
                 {/* CHAT CONTENT */}
                 <main
-                    className={`
-                        min-w-0 flex-1 flex-col bg-slate-100
-                        ${isChatOpen ? "flex" : "hidden md:flex"}
-                    `}
-                >
+    className={`
+        min-h-0 min-w-0 flex-1 flex flex-col overflow-hidden bg-[#F7FAF8]
+        ${isChatOpen ? "" : "hidden md:flex"}
+    `}
+>
 
                     {hasActiveChat ? (
 
                         <>
 
                             {/* CHAT HEADER */}
-                            <div className="flex shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-3 py-3 sm:px-5">
+                            <div className="relative z-10 flex shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-3 py-3 sm:px-5">
 
                                 <button
                                     type="button"
                                     onClick={handleBackToChats}
                                     aria-label="Back to chat list"
-                                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 md:hidden"
+                                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-600 transition hover:bg-emerald-50 hover:text-emerald-700 md:hidden"
                                 >
                                     <IoArrowBack size={21} />
                                 </button>
 
                                 <div className="min-w-0 flex-1">
-
                                     <ChatDetail
                                         selectedUser={selectedUser}
                                         selectedChat={selectedChat}
                                         currentUserId={user?.id}
                                     />
-
                                 </div>
                             </div>
 
                             {/* MESSAGES */}
-                            <div className="min-h-0 flex-1 overflow-y-auto px-3 py-5 sm:px-6">
+                          <div className="h-0 min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain custom-scrollbar px-3 py-5 sm:px-6">
+                            <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
 
-                                <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
-
-                                    {loadingMessages || chatState.loading ? (
+                                    {loadingMessages || chatState?.loading ? (
 
                                         <p className="py-8 text-center text-sm text-slate-500">
                                             Loading conversation...
@@ -573,8 +640,7 @@ const UserHome = () => {
                                             <MessageCard
                                                 key={message.id}
                                                 isRegUserMessage={
-                                                    String(message.userId) !==
-                                                    String(user?.id)
+                                                    String(message.userId) !== String(user?.id)
                                                 }
                                                 content={message.content}
                                                 createdAt={message.createAt}
@@ -585,7 +651,6 @@ const UserHome = () => {
                                     ) : (
 
                                         <div className="py-12 text-center">
-
                                             <BsFillChatLeftDotsFill className="mx-auto mb-3 text-3xl text-slate-300" />
 
                                             <p className="text-sm font-medium text-slate-600">
@@ -595,7 +660,6 @@ const UserHome = () => {
                                             <p className="mt-1 text-xs text-slate-400">
                                                 Send the first message.
                                             </p>
-
                                         </div>
 
                                     )}
@@ -606,13 +670,13 @@ const UserHome = () => {
                             {/* MESSAGE COMPOSER */}
                             <form
                                 onSubmit={handleSendMessage}
-                                className="flex shrink-0 items-center gap-2 border-t border-slate-200 bg-white px-2 py-3 sm:gap-3 sm:px-4"
+                                className="relative z-10 flex shrink-0 items-center gap-2 border-t border-slate-200 bg-white px-2 py-3 sm:gap-3 sm:px-4"
                             >
 
                                 <button
                                     type="button"
                                     aria-label="Emoji"
-                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-indigo-800 transition hover:bg-indigo-50"
+                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-emerald-700 transition hover:bg-emerald-50"
                                 >
                                     <RiEmojiStickerFill size={21} />
                                 </button>
@@ -626,7 +690,7 @@ const UserHome = () => {
                                     placeholder="Type a message..."
                                     aria-label="Type a message"
                                     maxLength={5000}
-                                    className="h-11 min-w-0 flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100"
+                                    className="h-12 min-w-0 flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white focus:ring-2 focus:ring-emerald-100"
                                 />
 
                                 <button
@@ -636,7 +700,7 @@ const UserHome = () => {
                                         !activeChatId ||
                                         sending
                                     }
-                                    className="flex h-10 shrink-0 items-center justify-center rounded-full bg-indigo-600 px-4 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50 sm:h-11 sm:px-5"
+                                    className="flex h-10 shrink-0 items-center justify-center rounded-full bg-emerald-700 px-4 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50 sm:h-11 sm:px-5"
                                 >
                                     {sending ? "Sending..." : "Send"}
                                 </button>
@@ -644,7 +708,7 @@ const UserHome = () => {
                                 <button
                                     type="button"
                                     aria-label="Voice message"
-                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-indigo-800 transition hover:bg-indigo-50"
+                                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-emerald-700 transition hover:bg-emerald-50"
                                 >
                                     <FaMicrophoneAlt size={19} />
                                 </button>
@@ -655,7 +719,7 @@ const UserHome = () => {
 
                     ) : (
 
-                        <div className="flex min-h-0 flex-1 items-center justify-center bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950 px-5 text-center">
+                        <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950 px-5 text-center">
 
                             <div className="max-w-md">
 

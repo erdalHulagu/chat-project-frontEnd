@@ -20,8 +20,6 @@ export const createSingleMessage = (values) => async (dispatch) => {
       payload: data,
     });
 
-    toast("Message sent successfully");
-
     return data;
   } catch (err) {
     console.error("Create message error:", err);
@@ -51,7 +49,6 @@ export const getAllMessage = (chatId) => async (dispatch) => {
     return messages;
   } catch (err) {
     console.error("Get messages error:", err);
-    toast("Messages could not be loaded");
     throw err;
   }
 };

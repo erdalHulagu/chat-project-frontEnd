@@ -1,374 +1,280 @@
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Form, Spinner } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import * as Yup from "yup";
-import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
-import { HiArrowLongRight } from "react-icons/hi2";
-import { deleteImage, getImageById, uploadImage } from "../../../api/service/image-service";
-import { getUser, login, updateUser } from "../../../api/service/user-service";
-import { loginSuccess, setImageURL } from "../../../redux/store/slices/user/auth/auth-slice";
-import {  error, toast } from "../../../helper/swal";
 import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+
+import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
+import { getUser, updateUser } from "../../../api/service/user-service";
 import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
+import { error, toast } from "../../../helper/swal";
+import {
+  loginSuccess,
+  setImageURL,
+} from "../../../redux/store/slices/user/auth/auth-slice";
 import UpdateProfileImage from "./update_profile_image";
-
-
-
-
 
 const UpdateProfile = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { isUserLogin, user, imageUrl } = useAppSelector((state) => state.auth);
-  const [update, setUpdate] = useState(false);
+
+  const { isUserLogin, user, imageUrl } = useAppSelector(
+    (state) => state.auth
+  );
+
   const [updating, setUpdating] = useState(false);
-  const [imageIdDisplay, setImageIdDisplay] = useState("");
 
-  // const [profileImageUrl, setProfileImageUrl] = useState("");
-
-
- 
-
-  const initialValues = {
+  const initialValues = useMemo(() => ({
     firstName: user?.firstName || "",
     lastName: user?.lastName || "",
     phone: user?.phone || "",
     address: user?.address || "",
     postCode: user?.postCode || "",
     email: user?.email || "",
-    // profileImage: user?.profileImage || "",
-  };
+  }), [user]);
 
   const validationSchema = Yup.object({
-    firstName: Yup.string().required("First name is required"),
-    lastName: Yup.string().required("Last name is required"),
-    address: Yup.string().required("Address is required"),
-    // profileImage: Yup.mixed(),
+    firstName: Yup.string()
+      .trim()
+      .required("First name is required"),
+    lastName: Yup.string()
+      .trim()
+      .required("Last name is required"),
+    phone: Yup.string()
+      .nullable(),
+    address: Yup.string()
+      .trim()
+      .required("Address is required"),
+    postCode: Yup.string()
+      .nullable(),
+    email: Yup.string()
+      .email("Enter a valid email address"),
   });
 
+  useEffect(() => {
+    if (!isUserLogin) {
+      toast("Please log in to update your profile.");
+      navigate("/login", { replace: true });
+    }
+  }, [isUserLogin, navigate]);
+
   const onSubmit = async (values) => {
-    setUpdating(true);
-  
     try {
-      console.log("Submitting user update:", values);
-  
-      const rep = await updateUser(values);
-      console.log("Update response:", rep.data);
-      
+      setUpdating(true);
 
-    
+      const response = await updateUser({
+        firstName: values.firstName.trim(),
+        lastName: values.lastName.trim(),
+        phone: values.phone,
+        address: values.address.trim(),
+        postCode: values.postCode,
+        email: values.email,
+      });
 
-      if (rep.data.token) {
-        encryptedLocalStorage.setItem("token", rep.data.token);
-        console.log("Updated token:", rep.data.token);
+      if (response?.data?.token) {
+        encryptedLocalStorage.setItem("token", response.data.token);
       }
-  
 
       const updatedUserResponse = await getUser();
-    console.log("Updated user:", updatedUserResponse.data);
-    dispatch(loginSuccess(updatedUserResponse.data));
+      const updatedUser = updatedUserResponse.data;
 
+      // Kullanıcı bilgilerini güncelle.
+      dispatch(loginSuccess(updatedUser));
 
-      toast("User was updated");
+      // loginSuccess sonrasında profil fotoğrafını koru.
+      const currentImage = imageUrl || updatedUser?.profileImage;
+
+      if (currentImage) {
+        dispatch(setImageURL(currentImage));
+      }
+
+      toast("Profile updated successfully.");
       navigate(-1);
     } catch (err) {
-      console.error("Update failed:", err.response?.data || err.message);
-      toast(err.response?.data?.message || "Update failed");
+      console.error("Profile update failed:", err);
+      error(
+        err?.response?.data?.message ||
+        "Profile could not be updated."
+      );
     } finally {
       setUpdating(false);
     }
   };
 
-  // const onSubmit = async (values) => {
-  //   setUpdating(true);
-  //   try {
-  //     console.log("Submitting user update:", values);
-  
-  //     const rep = await updateUser(values, values.profileImage);
-  //     console.log("Update response:", rep.data);
-      
-
-    
-
-  //     if (rep.data.token) {
-  //       encryptedLocalStorage.setItem("token", rep.data.token);
-  //       console.log("Updated token:", rep.data.token);
-  //     }
-  
-
-  //     const updatedUserResponse = await getUser();
-  //   console.log("Updated user:", updatedUserResponse.data);
-  //   dispatch(loginSuccess(updatedUserResponse.data));
-
-
-  //     toast("User was updated");
-  //     navigate(-1);
-  //   } catch (err) {
-  //     console.error("Update failed:", err.response?.data || err.message);
-  //     toast(err.response?.data?.message || "Update failed");
-  //   } finally {
-  //     setUpdating(false);
-  //   }
-  // };
-
   const formik = useFormik({
     initialValues,
+    enableReinitialize: true,
     validationSchema,
     onSubmit,
   });
 
-  useEffect(() => {
-    if (!isUserLogin) {
-      toast("Please log in to update your profile!");
-      navigate("/login");
-    }
-  }, [isUserLogin, navigate,user]);
-
-
-  
-
-//   const handleProfileImageChange = async (event) => {
-//     const file = event.target.files[0];
-//     if (!file) {
-//       toast("Please upload a valid image file!");
-//       return;
-//     }
-
-//     const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
-//     if (!allowedTypes.includes(file.type)) {
-//       toast("Only JPG, JPEG, and PNG files are allowed!");
-//       return;
-//     }
-// const reader = new FileReader();
-//   reader.onloadend = () => {
-//     setProfileImageUrl(reader.result); // Hemen ekrana yansıt
-//   };
-//   reader.readAsDataURL(file);
-//     const formData = new FormData();
-//     formData.append("imageFile", file);
-
-//     try {
-//       const response = await uploadImage(formData);
-//       console.log("image display data",response.data.imageId)
-//       dispatch(setImageURL(response.data.imageId));
-//       // setImageReturnId(response.data.imageId);
-//       formik.setFieldValue("profileImage", response.data.imageId); // Profil resmi ID'sini ayarla
-
-//        // Yeni resmi doğrudan bileşene yansıt
-//     const imageBlob = new Blob([response.data.imageData], { type: "image/png" });
-//     const imageUrl = URL.createObjectURL(imageBlob);
-
-//     setProfileImageUrl(imageUrl); // Önizlemeyi güncelle
-      
-//     } catch (error) {
-//       toast("Image upload failed");
-//     }
-//   };
-  
-  const updateProfile = () => {
-    setUpdate(!update);
+  const handleCancel = () => {
+    formik.resetForm();
+    navigate(-1);
   };
-  
-  // 
+
+  if (!isUserLogin || !user) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+  }
 
   return (
-    <div className="h-full w-full flex absolute">
-      {/* Profil Görüntüleme */}
-      <div className="rounded-l w-[40%] max-w-md h-full flex flex-col items-center justify-center bg-slate-200">
-        {isUserLogin && (
-          <div className="w-full max-w-md h-full relative flex flex-col items-center justify-center rounded-full">
-            <div className="w-full h-[35%] max-w-md shadow-lg shadow-slate-800 flex items-center justify-center">
-            {/* <Form.Group
-                className="mt-5 flex flex-col items-center"
-                controlId="profileImageInput"
-              >
-                <label htmlFor="profileImageInput" className="relative cursor-pointer">
-                  <img
-                    src={imageUrl}
-                    alt="Uploaded Profile"
-                    className="h-60 w-60 rounded-full p-3 mb-10 shadow-md"
-                  />
-                  <div className="absolute bottom-3 right-3 bg-white rounded-full p-2 shadow-md">
-                    <HiArrowLongRight className="text-gray-600 hover:text-slate-500" />
-                  </div>
-                </label>
+    <div className="h-full min-h-0 w-full overflow-y-auto bg-slate-100 p-3 sm:p-6">
 
-                <input
-                  type="file"
-                  id="profileImageInput"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleProfileImageChange}
+      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
+
+        {/* Profile image */}
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <h2 className="mb-5 text-lg font-bold text-slate-800">
+            Profile Photo
+          </h2>
+
+          <UpdateProfileImage />
+
+          <div className="mt-5 text-center">
+            <p className="text-lg font-bold text-slate-800">
+              {user.firstName} {user.lastName}
+            </p>
+            <p className="mt-1 break-all text-sm text-slate-500">
+              {user.email}
+            </p>
+          </div>
+        </section>
+
+        {/* Profile form */}
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
+          <div className="mb-7 border-b border-slate-100 pb-5">
+            <h1 className="text-2xl font-bold text-slate-900">
+              Edit Profile
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">
+              Update your personal information.
+            </p>
+          </div>
+
+          <Form noValidate onSubmit={formik.handleSubmit}>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+
+              <Form.Group>
+                <Form.Label className="font-semibold text-slate-700">
+                  First Name
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  {...formik.getFieldProps("firstName")}
+                  isInvalid={formik.touched.firstName && !!formik.errors.firstName}
+                  className="py-2.5"
                 />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.firstName}
+                </Form.Control.Feedback>
+              </Form.Group>
 
-                {formik.touched.profileImage && formik.errors.profileImage && (
-                  <Form.Control.Feedback type="invalid">
-                    {formik.errors.profileImage}
-                  </Form.Control.Feedback>
-                )}
-              </Form.Group> */}
-              <UpdateProfileImage/>
-          </div>
+              <Form.Group>
+                <Form.Label className="font-semibold text-slate-700">
+                  Last Name
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  {...formik.getFieldProps("lastName")}
+                  isInvalid={formik.touched.lastName && !!formik.errors.lastName}
+                  className="py-2.5"
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.lastName}
+                </Form.Control.Feedback>
+              </Form.Group>
 
-          {/* Kullanıcı Detayları */}
-          <div className="h-[80%] w-full flex flex-col">
-            <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
-              First Name <span className="text-slate-600">{user.firstName}</span>
-            </div>
-            <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
-              Last Name <span className="text-slate-600">{user.lastName}</span>
-            </div>
-            <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
-              Phone Number <span className="text-slate-600">{user.phone}</span>
-            </div>
-            <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
-              Email Address <span className="text-slate-600">{user.email}</span>
-            </div>
-            <div className="p-3 flex flex-col h-24 text-sm shadow-lg shadow-slate-800 text-gray-500">
-              Post Code <span className="text-slate-600">{user.postCode}</span>
-            </div>
-            <div className="p-3 flex flex-col h-full text-sm shadow-lg shadow-slate-800 text-gray-500">
-              Address <span className="text-slate-600">{user.address}</span>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+              <Form.Group>
+                <Form.Label className="font-semibold text-slate-700">
+                  Phone Number
+                </Form.Label>
+                <Form.Control
+                  type="tel"
+                  {...formik.getFieldProps("phone")}
+                  isInvalid={formik.touched.phone && !!formik.errors.phone}
+                  className="py-2.5"
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.phone}
+                </Form.Control.Feedback>
+              </Form.Group>
 
-    {/* Profil Güncelleme */}
-    <div className="h-full w-[70%] rounded">
-      <div className="opacity-80 w-full h-full rounded max-w-2xl flex justify-evenly item-center">
-        {!update ? (
-          <div className="h-30 w-full flex  justify-end items-start">
-            <div
-              onClick={updateProfile}
-              className="flex my-2 mr-4 h-10 w-auto gap-2 items-center cursor-pointer justify-evenly hover:text-red-600 text-gray-300"
-            >
-              <HiArrowLongRight />
-              Update Profile
+              <Form.Group>
+                <Form.Label className="font-semibold text-slate-700">
+                  Post Code
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  {...formik.getFieldProps("postCode")}
+                  isInvalid={formik.touched.postCode && !!formik.errors.postCode}
+                  className="py-2.5"
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.postCode}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group className="sm:col-span-2">
+                <Form.Label className="font-semibold text-slate-700">
+                  Address
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  {...formik.getFieldProps("address")}
+                  isInvalid={formik.touched.address && !!formik.errors.address}
+                  className="py-2.5"
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.address}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group className="sm:col-span-2">
+                <Form.Label className="font-semibold text-slate-700">
+                  Email Address
+                </Form.Label>
+                <Form.Control
+                  type="email"
+                  {...formik.getFieldProps("email")}
+                  disabled
+                  className="bg-slate-100 py-2.5"
+                />
+                <Form.Text className="text-slate-400">
+                  Email address cannot be changed here.
+                </Form.Text>
+              </Form.Group>
             </div>
-          </div>
-        ) : (
 
-          <Form
-            className="w-[70%] text-white "
-            noValidate
-            onSubmit={formik.handleSubmit}
-          >
-            {/* <fieldset disabled={builtIn}> */}
-            <Form.Group className="mb-3">
-              <Form.Label>First Name</Form.Label>
-              <Form.Control
-                type="text"
-                {...formik.getFieldProps("firstName")}
-                isInvalid={formik.touched.firstName && formik.errors.firstName}
-                isValid={formik.touched.firstName && !formik.errors.firstName}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.firstName}
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Last Name</Form.Label>
-              <Form.Control
-                type="text"
-                {...formik.getFieldProps("lastName")}
-                isInvalid={formik.touched.lastName && formik.errors.lastName}
-                isValid={formik.touched.lastName && !formik.errors.lastName}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.lastName}
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Phone Number</Form.Label>
-              <Form.Control
-                type="text"
-                // as={ReactInputMask}
-                // mask="(999) 999-9999"
-                {...formik.getFieldProps("phone")}
-                isInvalid={formik.touched.phone && formik.errors.phone}
-                isValid={formik.touched.phone && !formik.errors.phone}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.phoneNumber}
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Address</Form.Label>
-              <Form.Control
-                type="text"
-                {...formik.getFieldProps("address")}
-                isInvalid={formik.touched.address && formik.errors.address}
-                isValid={formik.touched.address && !formik.errors.address}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.address}
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Post Code</Form.Label>
-              <Form.Control
-                type="text"
-                {...formik.getFieldProps("postCode")}
-                isInvalid={formik.touched.postCode && formik.errors.postCode}
-                isValid={formik.touched.postCode && !formik.errors.postCode}
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.zipCode}
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Email address</Form.Label>
-              <Form.Control
-                type="email"
-                {...formik.getFieldProps("email")}
-                isInvalid={formik.touched.email && formik.errors.email}
-                isValid={formik.touched.email && !formik.errors.email}
-                disabled
-              />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.email}
-              </Form.Control.Feedback>
-            </Form.Group>
-
-
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                type="submit"
-                disabled={updating}
-                className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
-              >
-                {updating ? (
-                  <Spinner
-                    animation="border"
-                    size="sm"
-                    variant="light"
-                    className="mr-2"
-                  />
-                ) : (
-                  "Save Changes"
-                )}
-                
-              </button>
+            <div className="mt-8 flex flex-col-reverse justify-end gap-3 sm:flex-row">
               <button
                 type="button"
-                onClick={() => setUpdating(false)}
-                className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 transition"
+                onClick={handleCancel}
+                disabled={updating}
+                className="rounded-xl border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 disabled:opacity-50"
               >
                 Cancel
               </button>
 
-              <p></p>
+              <button
+                type="submit"
+                disabled={updating || !formik.dirty}
+                className="flex items-center justify-center gap-2 rounded-xl bg-indigo-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {updating && (
+                  <Spinner animation="border" size="sm" />
+                )}
+                {updating ? "Saving..." : "Save Changes"}
+              </button>
             </div>
           </Form>
-        )}
+        </section>
       </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default UpdateProfile;

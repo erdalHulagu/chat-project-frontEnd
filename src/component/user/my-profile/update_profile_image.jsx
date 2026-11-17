@@ -1,139 +1,169 @@
-import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import * as Yup from "yup";
-import { Form } from "react-bootstrap";
-import { HiArrowLongRight } from "react-icons/hi2";
-import { error, toast } from "../../../helper/swal";
-import { uploadImage } from "../../../api/service/image-service";
+import { Spinner } from "react-bootstrap";
+
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
-import { loginSuccess, setImageURL } from "../../../redux/store/slices/user/auth/auth-slice";
-import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
-import { useNavigate } from "react-router-dom";
+
+import {
+    loginSuccess,
+    setImageURL,
+} from "../../../redux/store/slices/user/auth/auth-slice";
+
+import { uploadImage } from "../../../api/service/image-service";
 import { getUser } from "../../../api/service/user-service";
+import { toast, error } from "../../../helper/swal";
+
+const DEFAULT_IMAGE = require("../../../assets/img/user.webp");
 
 const UpdateProfileImage = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-    const [updating, setUpdating] = useState(false);
-    const { isUserLogin, imageUrl, user } = useAppSelector((state) => state.auth);
-    const [profileImageUrl, setProfileImageUrl] = useState({});
-    const [newFormData, setNewFormData] = useState("")
 
-    const formik = useFormik({
-        initialValues: {
-            profileImage: user?.profileImage || "",
-        },
-        validationSchema: Yup.object({
-            profileImage: Yup.mixed().test("fileType", "Only JPG, JPEG, and PNG files are allowed!", (value) => {
-                if (!value) return true;
-                return ["image/jpeg", "image/png", "image/jpg"].includes(value.type);
-            }),
-        }),
-        onSubmit: async (values) => {
-            if (!values.profileImage) {
-                toast("Please select an image first!");
-                return;
-            }
-            // setUpdating(true);
+    const { imageUrl } = useAppSelector((state) => state.auth);
 
-            try {
-                const response = await uploadImage(newFormData);
-                dispatch(setImageURL(response.data.imageId));
-
-                formik.setFieldValue("profileImage", response.data.imageId); // Profil resmi ID'sini ayarla
-                //Yeni resmi doğrudan bileşene yansıt
-                const imageBlob = new Blob([response.data.imageData], { type: "image/**" });
-                const imageUrl = URL.createObjectURL(imageBlob);
-                setProfileImageUrl(imageUrl)
-
-
-                const updatedUserResponse = await getUser();
-                if (updatedUserResponse.data.token) {
-                    encryptedLocalStorage.setItem("token", response.data.token);
-                }
-
-                console.log("updatedUserResponse :", updatedUserResponse)
-                dispatch(loginSuccess(updatedUserResponse.data));
-                toast("Profile image updated successfully!");
-            } catch (err) {
-                error(err?.response?.data?.message || "Image upload failed");
-            } finally {
-                // setUpdating(false);
-            }
-        }
-
-    });
-
-    const handleProfileImageChange = async (event) => {
-        const file = event.target.files[0];
-        if (!file) {
-            toast("Please upload a valid image file!");
-            return;
-        }
-        if (!["image/jpeg", "image/png", "image/jpg"].includes(file.type)) {
-            toast("Only JPG, JPEG, and PNG files are allowed!");
-            return;
-        }
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setProfileImageUrl(reader.result);
-        };
-        const formData = new FormData();
-        formData.append("imageFile", file);
-        setNewFormData(formData);
-        
-        // reader.readAsDataURL(file);
-        // formik.setFieldValue("profileImage", file);
-        // formik.submitForm(); // Resim seçildiğinde otomatik güncelleme başlat
-    };
+    const [preview, setPreview] = useState("");
+    const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
-        if (isUserLogin) {
-            getUser().then(response => {
-                dispatch(loginSuccess(response.data));
-            });
+        return () => {
+            if (preview?.startsWith("blob:")) {
+                URL.revokeObjectURL(preview);
+            }
+        };
+    }, [preview]);
+
+    const handleProfileImageChange = async (event) => {
+        const input = event.target;
+        const file = input.files?.[0];
+
+        if (!file) return;
+
+        if (uploading) {
+            input.value = "";
+            return;
         }
-    }, [isUserLogin, user]);
+
+        const allowedTypes = ["image/jpeg", "image/png"];
+
+        if (!allowedTypes.includes(file.type)) {
+            error("Yalnızca JPG ve PNG dosyaları yükleyebilirsiniz.");
+            input.value = "";
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            error("Fotoğraf en fazla 5 MB olabilir.");
+            input.value = "";
+            return;
+        }
+
+        const newPreview = URL.createObjectURL(file);
+
+        try {
+            setUploading(true);
+            setPreview(newPreview);
+
+            // 1. Fotoğrafı yükle
+            const response = await uploadImage(file);
+
+            const imageId = response?.data?.imageId;
+
+            if (!imageId) {
+                throw new Error("Sunucudan fotoğraf ID bilgisi alınamadı.");
+            }
+
+            // 2. Redux fotoğraf bilgisini güncelle
+            dispatch(setImageURL(imageId));
+
+            // 3. Kullanıcı bilgilerini yenile
+            try {
+                const updatedUserResponse = await getUser();
+
+                if (updatedUserResponse?.data) {
+                    dispatch(loginSuccess(updatedUserResponse.data));
+                }
+            } catch (refreshError) {
+                console.error("User refresh failed:", refreshError);
+
+                // Fotoğraf yüklemesi başarılı olduğu için
+                // bu hata yükleme işlemini başarısız göstermemeli.
+            }
+
+            toast("Profil fotoğrafınız başarıyla güncellendi.");
+
+        } catch (err) {
+            console.error("Profile image upload failed:", {
+                status: err.response?.status,
+                data: err.response?.data,
+                message: err.message,
+            });
+
+            setPreview("");
+
+            error(
+                err.response?.data?.message ||
+                err.response?.data?.error ||
+                err.message ||
+                "Profil fotoğrafı yüklenemedi."
+            );
+
+        } finally {
+            setUploading(false);
+            input.value = "";
+        }
+    };
+
+    const displayedImage = preview || imageUrl || DEFAULT_IMAGE;
+
     return (
-        <Form onSubmit={formik.handleSubmit}>
-            <Form.Group className="mt-5 flex flex-col items-center" controlId="profileImageInput">
-                <label htmlFor="profileImageInput" className="relative cursor-pointer">
-                    <img
-                        src={imageUrl || "../../../assets/img/user.webp"}
-                        alt="Uploaded Profile"
-                        className="h-60 w-60 rounded-full p-3 mb-10 shadow-md"
-                    />
-                    {/* {updating ? "Updating..." :  */}
-                    <div className="absolute bottom-3 right-3 bg-white rounded-full p-2 shadow-md">
-                        <HiArrowLongRight className="text-gray-600 hover:text-slate-500" />
-                    </div>
-                    {/* } */}
+        <div className="flex w-full flex-col items-center justify-center px-4 py-5">
 
-                </label>
-
-                <input
-                    type="file"
-                    id="profileImageInput"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleProfileImageChange}
+            <label
+                htmlFor="profileImageInput"
+                className={`group relative cursor-pointer ${
+                    uploading ? "pointer-events-none" : ""
+                }`}
+            >
+                <img
+                    src={displayedImage}
+                    alt="Profil fotoğrafı"
+                    onError={(event) => {
+                        event.currentTarget.onerror = null;
+                        event.currentTarget.src = DEFAULT_IMAGE;
+                    }}
+                    className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-lg transition duration-300 group-hover:brightness-90 sm:h-40 sm:w-40"
                 />
 
-                {formik.touched.profileImage && formik.errors.profileImage && (
-                    <Form.Control.Feedback type="invalid">
-                        {formik.errors.profileImage}
-                    </Form.Control.Feedback>
-                )}
-            </Form.Group>
+                <div className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full border-4 border-white bg-emerald-600 text-white shadow-md transition group-hover:bg-emerald-700 sm:h-11 sm:w-11">
+                    <span className="text-lg">📷</span>
+                </div>
 
-            {/* <button
-                type="submit"
-                className="btn btn-primary mt-4"
-                disabled={updating || !formik.values.profileImage}
-            >
-                {updating ? "Updating..." : "Update Profile Image"}
-            </button> */}
-        </Form>
+                {uploading && (
+                    <div className="absolute inset-0 flex items-center justify-center rounded-full bg-slate-900/60">
+                        <Spinner animation="border" variant="light" />
+                    </div>
+                )}
+            </label>
+
+            <input
+                type="file"
+                id="profileImageInput"
+                accept="image/jpeg,image/png"
+                className="hidden"
+                onChange={handleProfileImageChange}
+                disabled={uploading}
+            />
+
+            <div className="mt-4 text-center">
+                <p className="text-sm font-semibold text-slate-800 sm:text-base">
+                    {uploading
+                        ? "Fotoğraf yükleniyor..."
+                        : "Profil fotoğrafını değiştir"}
+                </p>
+
+                <p className="mt-1 text-xs text-slate-500">
+                    JPG veya PNG · Maksimum 5 MB
+                </p>
+            </div>
+        </div>
     );
 };
 

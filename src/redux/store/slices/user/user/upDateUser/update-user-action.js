@@ -1,34 +1,56 @@
-import { useParams } from "react-router-dom";
-import { getImageById, uploadImage } from "../../../../../../api/service/image-service";
+import { uploadImage } from "../../../../../../api/service/image-service";
 import { getUser, updateUser } from "../../../../../../api/service/user-service";
-import {  toast } from "../../../../../../helper/swal";
-import { loginFailed, loginSuccess, setImageURL } from "../../auth/auth-slice";
+import { toast, error } from "../../../../../../helper/swal";
+import { loginSuccess, setImageURL } from "../../auth/auth-slice";
 
+export const updateProfileAction = (values, profileImageFile) => async (dispatch) => {
+  try {
+    let imageId = null;
 
+    // Yeni profil fotoğrafı seçilmişse önce fotoğrafı yükle
+    if (profileImageFile instanceof File) {
+      const imageResponse = await uploadImage(profileImageFile);
 
-export const updateProfileAction = (values, profileImageURL) => async (dispatch) => {
-  const{imageParamId}=useParams();
-    try {
-      
-      
-      let lastId=null
-      if (profileImageURL) {
-        const formData = new FormData();
-        formData.append("imageFile", profileImageURL);
-        const imageResponse = await uploadImage(formData);
-        console.log("imageResponse...................................... ",imageResponse.data.id)
-       let imageId = imageResponse.data.id;
-        lastId =imageParamId(imageId);
+      imageId =
+        imageResponse?.data?.imageId ??
+        imageResponse?.data?.id;
+
+      if (!imageId) {
+        throw new Error("Fotoğraf ID bilgisi alınamadı.");
       }
-  
-      const updatedUserData = { ...values,  lastId };
-      await updateUser(updatedUserData);
-  
-      // const respUser = await getUser();
-      // dispatch(loginSuccess(respUser.data));
-      toast("Profile updated successfully");
-    } catch (err) {
-      dispatch(loginFailed());
-      err("Failed to update profile. Please try again.");
     }
-  };
+
+    // Kullanıcı bilgilerini hazırla
+    const updatedUserData = {
+      ...values,
+      ...(imageId ? { lastId: imageId } : {}),
+    };
+
+    // Kullanıcı bilgilerini güncelle
+    await updateUser(updatedUserData);
+
+    // Güncel kullanıcı bilgilerini getir
+    const userResponse = await getUser();
+
+    // Redux kullanıcı bilgilerini güncelle
+    if (userResponse?.data) {
+      dispatch(loginSuccess(userResponse.data));
+    }
+
+    // Yeni profil fotoğrafını Redux'a kaydet
+    if (imageId) {
+      dispatch(setImageURL(imageId));
+    }
+
+    toast("Profil başarıyla güncellendi.");
+
+  } catch (err) {
+    console.error("Profile update error:", err);
+
+    error(
+      err.response?.data?.message ||
+      err.message ||
+      "Profil güncellenirken bir hata oluştu."
+    );
+  }
+};

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo, useState } from "react";
 import { Form, Spinner } from "react-bootstrap";
 import { useFormik } from "formik";
@@ -82,6 +83,7 @@ const UpdateProfile = () => {
       .max(20, "Posta kodu çok uzun."),
 
     email: Yup.string()
+      .trim()
       .email("Geçerli bir e-posta adresi girin.")
       .required("E-posta alanı zorunludur."),
   });
@@ -104,34 +106,38 @@ const UpdateProfile = () => {
           email: values.email.trim(),
         };
 
+        // 1. Kullanıcı bilgilerini güncelle.
         const response = await updateUser(request);
 
-        // Backend yeni token döndürüyorsa sakla.
-        const token = response.data?.token;
-
-        if (token) {
-          encryptedLocalStorage.setItem("token", token);
+        // 2. Backend yeni token döndürdüyse kaydet.
+        if (response.data?.token) {
+          encryptedLocalStorage.setItem(
+            "token",
+            response.data.token
+          );
         }
 
-        // Güncel kullanıcı profilini backend'den tekrar getir.
+        // 3. Güncel kullanıcı bilgilerini yeniden getir.
         const updatedUserResponse = await getUser();
 
         if (!updatedUserResponse.data) {
-          throw new Error("Güncel profil bilgileri alınamadı.");
+          throw new Error("Kullanıcı bilgileri alınamadı.");
         }
 
+        // 4. Redux kullanıcı bilgilerini güncelle.
+        // loginSuccess imageUrl değerini değiştirmemelidir.
         dispatch(loginSuccess(updatedUserResponse.data));
 
         toast("Profil bilgileriniz başarıyla güncellendi.");
 
         navigate(-1);
       } catch (err) {
-        console.error("Profile update error:", err);
+        console.error("Profil güncelleme hatası:", err);
 
         error(
           err.response?.data?.message ||
-          err.message ||
-          "Profil bilgileri güncellenemedi."
+            err.message ||
+            "Profil bilgileri güncellenemedi."
         );
       } finally {
         setLoading(false);
@@ -140,13 +146,24 @@ const UpdateProfile = () => {
   });
 
   const inputClass =
-    "w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-800 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100";
+    "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-[#1E293B] outline-none transition placeholder:text-slate-400 focus:border-[#075E45] focus:ring-4 focus:ring-[#075E45]/10 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500";
 
   const labelClass =
-    "mb-2 block text-sm font-semibold text-gray-700";
+    "mb-2 block text-sm font-semibold text-slate-700";
+
+  const getInputClass = (name) => {
+    const hasError =
+      formik.touched[name] && formik.errors[name];
+
+    return `${inputClass} ${
+      hasError
+        ? "border-red-500 focus:border-red-500 focus:ring-red-100"
+        : ""
+    }`;
+  };
 
   const renderField = (name, label, type = "text") => (
-    <div>
+    <div key={name}>
       <label htmlFor={name} className={labelClass}>
         {label}
       </label>
@@ -155,19 +172,16 @@ const UpdateProfile = () => {
         id={name}
         name={name}
         type={type}
-        className={`${inputClass} ${
-          formik.touched[name] && formik.errors[name]
-            ? "border-red-500"
-            : ""
-        }`}
+        className={getInputClass(name)}
         value={formik.values[name]}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         disabled={loading || name === "email"}
+        placeholder={`${label} girin`}
       />
 
       {formik.touched[name] && formik.errors[name] && (
-        <p className="mt-1 text-xs text-red-600">
+        <p className="mt-2 text-xs font-medium text-red-600">
           {formik.errors[name]}
         </p>
       )}
@@ -177,95 +191,127 @@ const UpdateProfile = () => {
   if (!isUserLogin) return null;
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[#F1F5F9] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-6">
+        {/* Sayfa başlığı */}
+        <div className="mb-8">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="mb-4 text-sm font-medium text-indigo-600 hover:text-indigo-800"
+            className="mb-5 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-[#075E45] transition hover:bg-[#075E45]/10"
           >
-            ← Geri dön
+            <span aria-hidden="true">←</span>
+            Geri dön
           </button>
 
-          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-            Profili düzenle
-          </h1>
+          <div className="rounded-2xl bg-gradient-to-r from-[#043D30] via-[#075E45] to-[#0B7657] p-6 shadow-md sm:p-8">
+            <p className="mb-2 text-sm font-semibold text-white/70">
+              HESAP AYARLARI
+            </p>
 
-          <p className="mt-2 text-sm text-gray-500">
-            Kişisel bilgilerinizi ve profil fotoğrafınızı buradan güncelleyebilirsiniz.
-          </p>
+            <h1 className="text-2xl font-bold text-white sm:text-3xl">
+              Profili düzenle
+            </h1>
+
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-white/80">
+              Kişisel bilgilerinizi ve profil fotoğrafınızı
+              buradan kolayca güncelleyebilirsiniz.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-6">
+          {/* Profil fotoğrafı */}
           <UpdateProfileImage />
 
-          <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
-            <h2 className="mb-6 text-lg font-semibold text-gray-800">
-              Kişisel bilgiler
-            </h2>
+          {/* Kişisel bilgiler */}
+          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="border-b border-slate-100 px-5 py-5 sm:px-8">
+              <h2 className="text-lg font-bold text-[#1E293B]">
+                Kişisel bilgiler
+              </h2>
 
-            <Form onSubmit={formik.handleSubmit}>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                {renderField("firstName", "Ad")}
-                {renderField("lastName", "Soyad")}
-                {renderField("phone", "Telefon", "tel")}
-                {renderField("email", "E-posta", "email")}
+              <p className="mt-1 text-sm text-slate-500">
+                Hesabınıza ait bilgileri bu bölümden düzenleyebilirsiniz.
+              </p>
+            </div>
 
-                <div className="sm:col-span-2">
-                  <label htmlFor="address" className={labelClass}>
-                    Adres
-                  </label>
+            <div className="p-5 sm:p-8">
+              <Form onSubmit={formik.handleSubmit}>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                  {renderField("firstName", "Ad")}
 
-                  <textarea
-                    id="address"
-                    name="address"
-                    rows={3}
-                    className={inputClass}
-                    value={formik.values.address}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    disabled={loading}
-                  />
+                  {renderField("lastName", "Soyad")}
 
-                  {formik.touched.address &&
-                    formik.errors.address && (
-                      <p className="mt-1 text-xs text-red-600">
-                        {formik.errors.address}
-                      </p>
-                    )}
+                  {renderField("phone", "Telefon", "tel")}
+
+                  {renderField("email", "E-posta", "email")}
+
+                  {/* Adres */}
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="address"
+                      className={labelClass}
+                    >
+                      Adres
+                    </label>
+
+                    <textarea
+                      id="address"
+                      name="address"
+                      rows={4}
+                      className={`${getInputClass("address")} resize-y`}
+                      value={formik.values.address}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      disabled={loading}
+                      placeholder="Adresinizi girin"
+                    />
+
+                    {formik.touched.address &&
+                      formik.errors.address && (
+                        <p className="mt-2 text-xs font-medium text-red-600">
+                          {formik.errors.address}
+                        </p>
+                      )}
+                  </div>
+
+                  {renderField("postCode", "Posta kodu")}
                 </div>
 
-                {renderField("postCode", "Posta kodu")}
-              </div>
+                {/* Form butonları */}
+                <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
+                  <button
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    disabled={loading}
+                    className="rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-600 transition hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    İptal
+                  </button>
 
-              <div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                <button
-                  type="button"
-                  onClick={() => navigate(-1)}
-                  disabled={loading}
-                  className="rounded-lg border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:opacity-50"
-                >
-                  İptal
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={loading || !formik.dirty}
-                  className="rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <Spinner animation="border" size="sm" />
-                      Kaydediliyor...
-                    </span>
-                  ) : (
-                    "Değişiklikleri kaydet"
-                  )}
-                </button>
-              </div>
-            </Form>
+                  <button
+                    type="submit"
+                    disabled={loading || !formik.dirty}
+                    className="inline-flex items-center justify-center rounded-xl bg-[#075E45] px-7 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#043D30] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {loading ? (
+                      <span className="flex items-center gap-2">
+                        <Spinner animation="border" size="sm" />
+                        Kaydediliyor...
+                      </span>
+                    ) : (
+                      "Değişiklikleri kaydet"
+                    )}
+                  </button>
+                </div>
+              </Form>
+            </div>
           </section>
+
+          <p className="pb-4 text-center text-xs text-slate-400">
+            Hesap bilgileriniz güvenli şekilde güncellenir.
+          </p>
         </div>
       </div>
     </main>

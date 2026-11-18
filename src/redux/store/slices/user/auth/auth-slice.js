@@ -1,3 +1,4 @@
+
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
@@ -17,10 +18,8 @@ export const authSlice = createSlice({
       state.user = action.payload;
       state.authInitialized = true;
 
-      // Mevcut fotoğraf bilgisini koru
-      state.imageUrl =
-        action.payload?.profileImage ||
-        state.imageUrl;
+      // imageUrl burada değiştirilmez.
+      // Profil fotoğrafı yalnızca setImageURL ile güncellenir.
     },
 
     setImageURL: (state, action) => {

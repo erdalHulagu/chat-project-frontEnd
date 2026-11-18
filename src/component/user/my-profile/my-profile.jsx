@@ -1,332 +1,443 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
-
-import { setFriendProfile } from "../../../redux/store/slices/friend/friendsProfileSlices";
+import {
+    useAppDispatch,
+    useAppSelector,
+} from "../../../redux/store/hooks";
 
 import {
-    FaUserFriends,
-    FaImages,
-    FaCamera,
-    FaEnvelope,
-    FaPhone,
-    FaMapMarkerAlt,
-    FaIdCard,
-} from "react-icons/fa";
+    setImageURL,
+} from "../../../redux/store/slices/user/auth/auth-slice";
 
-import { MdPhotoLibrary } from "react-icons/md";
+import {
+    getImageById,
+} from "../../../api/service/image-service";
 
-import FriendsCard from "../friends/friends-card";
-import MyPhotos from "../my-photos/my-photos-card";
-import friends from "../my-photos/friends.json";
+import {
+    DEFAULT_IMAGE,
+    getImageId,
+    revokeImageObjectUrl,
+} from "../../../helper/profile-image-utils";
+
 import ProfileSettingDropdownMenu from "./profile-setting-dropdown-menu";
 
-const DEFAULT_IMAGE = require("../../../assets/img/user.webp");
-
 const MyProfile = () => {
-    const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
 
-    const { isUserLogin, user, imageUrl } = useAppSelector(
-        (state) => state.auth
-    );
+    const {
+        isUserLogin,
+        user,
+        imageUrl,
+    } = useAppSelector((state) => state.auth);
 
     const [activeTab, setActiveTab] = useState("photos");
     const [searchFriends, setSearchFriends] = useState("");
-    const [isEnlarged, setIsEnlarged] = useState(false);
+    const [selectedPhoto, setSelectedPhoto] = useState(null);
+    const [galleryUrls, setGalleryUrls] = useState([]);
 
-    // Kullanıcı oturum kontrolü
-    if (!isUserLogin || !user) {
+    const friends = useMemo(() => {
+        const list = Array.isArray(user?.friends)
+            ? user.friends
+            : [];
+
+        return list.filter((friend) => {
+            const fullName = [
+                friend.firstName || "",
+                friend.lastName || "",
+            ].join(" ");
+
+            return fullName
+                .toLowerCase()
+                .includes(searchFriends.toLowerCase());
+        });
+    }, [user?.friends, searchFriends]);
+
+    const photos = useMemo(() => {
+        return Array.isArray(user?.myImages)
+            ? user.myImages
+            : [];
+    }, [user?.myImages]);
+
+    // Profil fotoğrafı Redux'ta henüz URL değilse backend'den çöz.
+    useEffect(() => {
+        let cancelled = false;
+        let createdUrl = null;
+
+        const loadProfileImage = async () => {
+            if (imageUrl || !user?.profileImage) return;
+
+            const imageId = getImageId(user.profileImage);
+
+            if (!imageId) return;
+
+            try {
+                const response = await getImageById(imageId);
+
+                const blob = new Blob([response.data], {
+                    type:
+                        response.headers?.["content-type"] ||
+                        "image/jpeg",
+                });
+
+                createdUrl = URL.createObjectURL(blob);
+
+                if (!cancelled) {
+                    dispatch(setImageURL(createdUrl));
+                } else {
+                    revokeImageObjectUrl(createdUrl);
+                }
+            } catch (err) {
+                console.error("Profile image loading error:", err);
+            }
+        };
+
+        loadProfileImage();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [user?.profileImage, imageUrl, dispatch]);
+
+    // Galeri görsellerini ID üzerinden indirip Blob URL oluştur.
+    useEffect(() => {
+        let cancelled = false;
+        const createdUrls = [];
+
+        const loadGallery = async () => {
+            const resolved = await Promise.all(
+                photos.map(async (photo) => {
+                    const imageId = getImageId(photo);
+
+                    if (!imageId) {
+                        if (
+                            typeof photo === "string" &&
+                            (
+                                photo.startsWith("http://") ||
+                                photo.startsWith("https://") ||
+                                photo.startsWith("blob:") ||
+                                photo.startsWith("data:")
+                            )
+                        ) {
+                            return {
+                                id: photo,
+                                url: photo,
+                            };
+                        }
+
+                        return null;
+                    }
+
+                    try {
+                        const response = await getImageById(imageId);
+
+                        const blob = new Blob([response.data], {
+                            type:
+                                response.headers?.["content-type"] ||
+                                "image/jpeg",
+                        });
+
+                        const url = URL.createObjectURL(blob);
+                        createdUrls.push(url);
+
+                        return {
+                            id: imageId,
+                            url,
+                        };
+                    } catch (err) {
+                        console.error(
+                            `Gallery image could not be loaded: ${imageId}`,
+                            err
+                        );
+
+                        return null;
+                    }
+                })
+            );
+
+            if (!cancelled) {
+                setGalleryUrls(resolved.filter(Boolean));
+            } else {
+                createdUrls.forEach(revokeImageObjectUrl);
+            }
+        };
+
+        setGalleryUrls([]);
+        loadGallery();
+
+        return () => {
+            cancelled = true;
+            createdUrls.forEach(revokeImageObjectUrl);
+        };
+    }, [photos]);
+
+    if (!isUserLogin || !user || !user.id && !user._id) {
         return (
-            <div className="flex h-full min-h-0 items-center justify-center bg-slate-50 p-6">
-                <p className="text-slate-500">
-                    Please log in to view your profile.
-                </p>
+            <div className="flex min-h-[60vh] items-center justify-center px-4">
+                <div className="text-center">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                        Profil bilgileri bulunamadı
+                    </h2>
+
+                    <button
+                        type="button"
+                        onClick={() => navigate("/login")}
+                        className="mt-4 rounded-lg bg-indigo-600 px-5 py-2 text-white hover:bg-indigo-700"
+                    >
+                        Giriş yap
+                    </button>
+                </div>
             </div>
         );
     }
 
-    // Profil fotoğrafı: Önce Redux imageUrl, sonra user.profileImage.
-    const profileImage =
-        imageUrl ||
-        user?.profileImage ||
-        DEFAULT_IMAGE;
+    const displayName = [
+        user.firstName,
+        user.lastName,
+    ].filter(Boolean).join(" ");
 
-    // Kullanıcı fotoğrafları
-    const myImages = Array.isArray(user?.myImages)
-        ? user.myImages
-        : [];
+    const profileImage =imageUrl || DEFAULT_IMAGE;
 
-    // Arkadaş arama
-    const filteredFriends = friends.filter((friend) => {
-        const name = `${friend.firstName || ""} ${friend.lastName || ""}`;
-        return name.toLowerCase().includes(searchFriends.toLowerCase());
-    });
-
-    // Arkadaş profiline git
-    const handleFriendProfile = (friend) => {
-        dispatch(setFriendProfile(friend));
-        navigate("/friendProfile");
-    };
-
-    // Fotoğraf büyütme
-    const handleToggleSize = () => {
-        setIsEnlarged((previous) => !previous);
-    };
-
-    // Büyük fotoğraf görünümü
-    if (isEnlarged) {
-        return (
-            <div className="h-full min-h-0 w-full overflow-y-auto bg-slate-950 p-3 sm:p-5">
-                <MyPhotos
-                    myImages={myImages}
-                    isEnlarged={isEnlarged}
-                    handleToggleSize={handleToggleSize}
-                />
-            </div>
-        );
-    }
+    const tabs = [
+        { id: "photos", label: "Fotoğraflar" },
+        { id: "friends", label: "Arkadaşlar" },
+    ];
 
     return (
-        <div className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl bg-slate-100 shadow-xl">
+        <main className="min-h-screen bg-gray-50 px-3 py-6 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-6xl">
+                <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+                    <div className="h-36 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 sm:h-52" />
 
-            {/* Header */}
-            <header className="flex shrink-0 items-center justify-between gap-3 bg-gradient-to-r from-slate-950 via-indigo-950 to-blue-950 px-4 py-4 text-white sm:px-6">
-                <div className="min-w-0">
-                    <h1 className="truncate text-lg font-bold sm:text-2xl">
-                        My Profile
-                    </h1>
+                    <div className="px-5 pb-6 sm:px-8">
+                        <div className="-mt-14 flex flex-col gap-5 sm:-mt-16 sm:flex-row sm:items-end sm:justify-between">
+                            <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-end">
+                                <img
+                                    src={profileImage}
+                                    alt="Profil fotoğrafı"
+                                    className="h-28 w-28 rounded-full border-4 border-white object-cover shadow-lg sm:h-36 sm:w-36"
+                                    onError={(event) => {
+                                        event.currentTarget.src = DEFAULT_IMAGE;
+                                    }}
+                                />
 
-                    <p className="mt-1 text-xs text-indigo-200 sm:text-sm">
-                        Manage your personal information
-                    </p>
-                </div>
+                                <div className="pb-1 text-center sm:text-left">
+                                    <h1 className="text-2xl font-bold text-gray-900">
+                                        {displayName || "Kullanıcı"}
+                                    </h1>
 
-                <ProfileSettingDropdownMenu />
-            </header>
-
-            {/* Main content */}
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
-
-                {/* Profile information */}
-                <aside className="flex w-full shrink-0 flex-col border-b border-slate-200 bg-white lg:w-[340px] lg:overflow-y-auto lg:border-b-0 lg:border-r xl:w-[380px]">
-
-                    {/* Profile photo */}
-                    <div className="flex flex-col items-center bg-gradient-to-b from-indigo-50 to-white px-5 py-8">
-
-                        <div className="relative">
-                            <img
-                                src={profileImage}
-                                alt="Profil fotoğrafı"
-                                onError={(e) => {
-                                    e.currentTarget.onerror = null;
-                                    e.currentTarget.src = DEFAULT_IMAGE;
-                                }}
-                            />
-
-                            <button
-                                type="button"
-                                onClick={() => navigate("/updateProfile")}
-                                title="Change profile"
-                                aria-label="Change profile photo"
-                                className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-emerald-600 text-white shadow-md transition hover:bg-emerald-700"
-                            >
-                                <FaCamera />
-                            </button>
-                        </div>
-
-                        <h2 className="mt-4 text-xl font-bold text-slate-800">
-                            {user.firstName} {user.lastName}
-                        </h2>
-
-                        <p className="mt-1 break-all text-center text-sm text-slate-500">
-                            {user.email}
-                        </p>
-
-                        <button
-                            type="button"
-                            onClick={() => navigate("/updateProfile")}
-                            className="mt-5 rounded-xl bg-indigo-950 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-indigo-800"
-                        >
-                            Edit Profile
-                        </button>
-                    </div>
-
-                    {/* Personal information */}
-                    <div className="space-y-1 px-5 pb-6">
-                        <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-slate-400">
-                            Personal Information
-                        </h3>
-
-                        <div className="flex items-center gap-3 rounded-xl p-3 hover:bg-slate-50">
-                            <FaUserFriends className="shrink-0 text-indigo-600" />
-
-                            <div className="min-w-0">
-                                <p className="text-xs text-slate-400">
-                                    First name / Last name
-                                </p>
-
-                                <p className="break-words text-sm font-medium text-slate-700">
-                                    {user.firstName} {user.lastName}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-3 rounded-xl p-3 hover:bg-slate-50">
-                            <FaEnvelope className="shrink-0 text-indigo-600" />
-
-                            <div className="min-w-0">
-                                <p className="text-xs text-slate-400">
-                                    Email
-                                </p>
-
-                                <p className="break-all text-sm font-medium text-slate-700">
-                                    {user.email || "Not provided"}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-3 rounded-xl p-3 hover:bg-slate-50">
-                            <FaPhone className="shrink-0 text-indigo-600" />
-
-                            <div className="min-w-0">
-                                <p className="text-xs text-slate-400">
-                                    Phone
-                                </p>
-
-                                <p className="break-words text-sm font-medium text-slate-700">
-                                    {user.phone || "Not provided"}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-3 rounded-xl p-3 hover:bg-slate-50">
-                            <FaMapMarkerAlt className="shrink-0 text-indigo-600" />
-
-                            <div className="min-w-0">
-                                <p className="text-xs text-slate-400">
-                                    Address
-                                </p>
-
-                                <p className="break-words text-sm font-medium text-slate-700">
-                                    {user.address || "Not provided"}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-3 rounded-xl p-3 hover:bg-slate-50">
-                            <FaIdCard className="shrink-0 text-indigo-600" />
-
-                            <div className="min-w-0">
-                                <p className="text-xs text-slate-400">
-                                    Post code
-                                </p>
-
-                                <p className="text-sm font-medium text-slate-700">
-                                    {user.postCode || "Not provided"}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </aside>
-
-                {/* Photos and friends */}
-                <section className="flex min-h-[420px] min-w-0 flex-1 flex-col bg-slate-50 lg:min-h-0 lg:overflow-hidden">
-
-                    {/* Tabs */}
-                    <div className="flex shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-4 py-3 sm:px-6">
-
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab("photos")}
-                            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${activeTab === "photos"
-                                ? "bg-indigo-950 text-white shadow"
-                                : "text-slate-600 hover:bg-slate-100"
-                                }`}
-                        >
-                            <MdPhotoLibrary size={19} />
-                            Photos
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab("friends")}
-                            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${activeTab === "friends"
-                                ? "bg-indigo-950 text-white shadow"
-                                : "text-slate-600 hover:bg-slate-100"
-                                }`}
-                        >
-                            <FaUserFriends size={17} />
-                            Friends
-                        </button>
-                    </div>
-
-                    {/* Friend search */}
-                    {activeTab === "friends" && (
-                        <div className="shrink-0 border-b border-slate-200 bg-white p-4">
-                            <input
-                                type="search"
-                                value={searchFriends}
-                                onChange={(event) =>
-                                    setSearchFriends(event.target.value)
-                                }
-                                placeholder="Search friends..."
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-                            />
-                        </div>
-                    )}
-
-                    {/* Tab content */}
-                    <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-5">
-
-                        {activeTab === "photos" ? (
-                            myImages.length > 0 ? (
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                                    {myImages.map((photo, index) => (
-                                        <div key={photo.id || photo.imageId || index}>
-                                            <MyPhotos
-                                                myImages={[photo]}
-                                                isEnlarged={isEnlarged}
-                                                handleToggleSize={handleToggleSize}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="flex min-h-64 flex-col items-center justify-center text-center">
-                                    <FaImages className="mb-4 text-5xl text-slate-300" />
-
-                                    <h3 className="font-semibold text-slate-700">
-                                        No photos yet
-                                    </h3>
-
-                                    <p className="mt-1 text-sm text-slate-400">
-                                        Your photos will appear here.
+                                    <p className="mt-1 text-sm text-gray-500">
+                                        {user.email || ""}
                                     </p>
+
+                                    {user.address && (
+                                        <p className="mt-1 text-sm text-gray-500">
+                                            {user.address}
+                                        </p>
+                                    )}
                                 </div>
-                            )
-                        ) : filteredFriends.length > 0 ? (
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                                {filteredFriends.map((friend, index) => (
-                                    <FriendsCard
-                                        key={friend.id || index}
-                                        {...friend}
-                                        handleFriendProfile={() =>
-                                            handleFriendProfile(friend)
+                            </div>
+
+                            <div className="flex justify-center gap-2 sm:pb-2">
+                                <button
+                                    type="button"
+                                    onClick={() => navigate("/updateProfile")}
+                                    className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700"
+                                >
+                                    Profili düzenle
+                                </button>
+
+                                <ProfileSettingDropdownMenu />
+                            </div>
+                        </div>
+
+                        <div className="mt-7 grid grid-cols-2 gap-3 border-t border-gray-100 pt-5 sm:max-w-md">
+                            <div className="rounded-xl bg-gray-50 p-4 text-center">
+                                <p className="text-2xl font-bold text-gray-900">
+                                    {photos.length}
+                                </p>
+                                <p className="mt-1 text-xs text-gray-500">
+                                    Fotoğraf
+                                </p>
+                            </div>
+
+                            <div className="rounded-xl bg-gray-50 p-4 text-center">
+                                <p className="text-2xl font-bold text-gray-900">
+                                    {Array.isArray(user.friends)
+                                        ? user.friends.length
+                                        : 0}
+                                </p>
+                                <p className="mt-1 text-xs text-gray-500">
+                                    Arkadaş
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section className="mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm">
+                    <div className="flex border-b border-gray-100 px-4 sm:px-6">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                type="button"
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`border-b-2 px-5 py-4 text-sm font-semibold transition ${activeTab === tab.id
+                                        ? "border-indigo-600 text-indigo-600"
+                                        : "border-transparent text-gray-500 hover:text-gray-800"
+                                    }`}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="p-4 sm:p-6">
+                        {activeTab === "photos" && (
+                            <>
+                                <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        <h2 className="text-lg font-bold text-gray-900">
+                                            Fotoğraflarım
+                                        </h2>
+                                        <p className="mt-1 text-sm text-gray-500">
+                                            Profilinize eklediğiniz fotoğraflar.
+                                        </p>
+                                    </div>
+
+                                    <span className="text-sm text-gray-500">
+                                        {galleryUrls.length} fotoğraf
+                                    </span>
+                                </div>
+
+                                {galleryUrls.length === 0 ? (
+                                    <div className="rounded-xl bg-gray-50 px-4 py-12 text-center">
+                                        <p className="font-medium text-gray-700">
+                                            Henüz fotoğrafınız bulunmuyor.
+                                        </p>
+                                        <p className="mt-1 text-sm text-gray-500">
+                                            Profil düzenleme bölümünden fotoğraf ekleyebilirsiniz.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                                        {galleryUrls.map((photo) => (
+                                            <button
+                                                key={photo.id}
+                                                type="button"
+                                                onClick={() => setSelectedPhoto(photo.url)}
+                                                className="group aspect-square overflow-hidden rounded-xl bg-gray-100"
+                                            >
+                                                <img
+                                                    src={photo.url}
+                                                    alt="Profil galerisi fotoğrafı"
+                                                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                                                    onError={(event) => {
+                                                        event.currentTarget.src = DEFAULT_IMAGE;
+                                                    }}
+                                                />
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {activeTab === "friends" && (
+                            <>
+                                <div className="mb-5">
+                                    <h2 className="text-lg font-bold text-gray-900">
+                                        Arkadaşlarım
+                                    </h2>
+
+                                    <input
+                                        type="search"
+                                        value={searchFriends}
+                                        onChange={(event) =>
+                                            setSearchFriends(event.target.value)
                                         }
+                                        placeholder="Arkadaş ara..."
+                                        className="mt-4 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 sm:max-w-sm"
                                     />
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="flex min-h-64 items-center justify-center text-sm text-slate-500">
-                                No friends found.
-                            </div>
+                                </div>
+
+                                {friends.length === 0 ? (
+                                    <div className="rounded-xl bg-gray-50 px-4 py-12 text-center">
+                                        <p className="font-medium text-gray-700">
+                                            Arkadaş bulunamadı.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                        {friends.map((friend, index) => (
+                                            <div
+                                                key={
+                                                    friend.id ||
+                                                    friend._id ||
+                                                    index
+                                                }
+                                                className="flex items-center gap-3 rounded-xl border border-gray-100 p-4"
+                                            >
+                                                <img
+                                                    src={DEFAULT_IMAGE}
+                                                    alt=""
+                                                    className="h-12 w-12 rounded-full object-cover"
+                                                />
+
+                                                <div className="min-w-0">
+                                                    <p className="truncate font-semibold text-gray-800">
+                                                        {[
+                                                            friend.firstName,
+                                                            friend.lastName,
+                                                        ].filter(Boolean).join(" ") ||
+                                                            friend.username ||
+                                                            "Kullanıcı"}
+                                                    </p>
+
+                                                    <p className="truncate text-xs text-gray-500">
+                                                        {friend.email || ""}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
                 </section>
             </div>
-        </div>
+
+            {selectedPhoto && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+                    onClick={() => setSelectedPhoto(null)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(event) => {
+                        if (event.key === "Escape") {
+                            setSelectedPhoto(null);
+                        }
+                    }}
+                >
+                    <button
+                        type="button"
+                        onClick={() => setSelectedPhoto(null)}
+                        className="absolute right-5 top-5 rounded-full bg-white/20 px-4 py-2 text-white hover:bg-white/30"
+                    >
+                        Kapat
+                    </button>
+
+                    <img
+                        src={selectedPhoto}
+                        alt="Büyük fotoğraf"
+                        className="max-h-[85vh] max-w-full rounded-xl object-contain"
+                        onClick={(event) => event.stopPropagation()}
+                    />
+                </div>
+            )}
+        </main>
     );
 };
 

@@ -55,7 +55,6 @@ export const updateUser = (updateUserRequest) => {
   );
 };
 
-// Profil fotoğrafını güncelle
 export const updateUserImage = (imageId) => {
   return axios.put(
     `${BASE_API_URL}/users/userImages/${imageId}`,
@@ -63,6 +62,8 @@ export const updateUserImage = (imageId) => {
     { headers: authHeader() }
   );
 };
+
+// Profil fotoğrafını güncelle
 
 // Şifre güncelle
 export const updatePassword = (credential) => {

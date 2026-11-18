@@ -1,66 +1,74 @@
-import React, { useState } from "react";
-import { RiUserSettingsFill } from "react-icons/ri";
+import React from "react";
+import { Dropdown } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
+import {
+  useAppDispatch,
+} from "../../../redux/store/hooks";
+
+import {
+  logout,
+} from "../../../redux/store/slices/user/auth/auth-slice";
+
+import {
+  encryptedLocalStorage,
+} from "../../../helper/auth-token/encrypt-storage";
+
 const ProfileSettingDropdownMenu = () => {
-    const navigate = useNavigate();
-    const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-    const handleNavigate = (path) => {
-        setIsOpen(false);
-        navigate(path);
-    };
+  const handleEditProfile = () => {
+    navigate("/updateProfile");
+  };
 
-    return (
-        <div className="relative z-30">
-            <button
-                type="button"
-                onClick={() => setIsOpen((previous) => !previous)}
-                aria-label="Profile settings"
-                aria-expanded={isOpen}
-                className="flex h-11 w-11 items-center justify-center rounded-xl text-white transition hover:bg-white/15"
-            >
-                <RiUserSettingsFill size={25} />
-            </button>
+  const handleHome = () => {
+    navigate("/");
+  };
 
-            {isOpen && (
-                <>
-                    <button
-                        type="button"
-                        aria-label="Close menu"
-                        onClick={() => setIsOpen(false)}
-                        className="fixed inset-0 z-10 cursor-default"
-                    />
+  const handleLogout = () => {
+    encryptedLocalStorage.removeItem("token");
+    dispatch(logout());
+    navigate("/login", { replace: true });
+  };
 
-                    <div className="absolute right-0 top-14 z-20 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white py-2 shadow-2xl">
-                        <button
-                            type="button"
-                            onClick={() => handleNavigate("/updateProfile")}
-                            className="w-full px-4 py-3 text-left text-sm font-medium text-slate-700 transition hover:bg-indigo-50 hover:text-indigo-800"
-                        >
-                            Edit Profile
-                        </button>
+  return (
+    <Dropdown align="end">
+      <Dropdown.Toggle
+        variant="light"
+        id="profile-settings-dropdown"
+        className="flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+      >
+        <span className="mr-2">⚙</span>
+        Ayarlar
+      </Dropdown.Toggle>
 
-                        <button
-                            type="button"
-                            onClick={() => handleNavigate("/userHome")}
-                            className="w-full px-4 py-3 text-left text-sm font-medium text-slate-700 transition hover:bg-indigo-50 hover:text-indigo-800"
-                        >
-                            Home
-                        </button>
+      <Dropdown.Menu className="mt-2 min-w-[190px] rounded-xl border border-gray-100 p-2 shadow-lg">
+        <Dropdown.Item
+          onClick={handleEditProfile}
+          className="rounded-lg px-3 py-2 text-sm"
+        >
+          Profili düzenle
+        </Dropdown.Item>
 
-                        <button
-                            type="button"
-                            onClick={() => handleNavigate("/")}
-                            className="w-full px-4 py-3 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
-                        >
-                            Log Out
-                        </button>
-                    </div>
-                </>
-            )}
-        </div>
-    );
+        <Dropdown.Item
+          onClick={handleHome}
+          className="rounded-lg px-3 py-2 text-sm"
+        >
+          Ana sayfa
+        </Dropdown.Item>
+
+        <Dropdown.Divider />
+
+        <Dropdown.Item
+          onClick={handleLogout}
+          className="rounded-lg px-3 py-2 text-sm font-semibold text-red-600"
+        >
+          Çıkış yap
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
+  );
 };
 
 export default ProfileSettingDropdownMenu;

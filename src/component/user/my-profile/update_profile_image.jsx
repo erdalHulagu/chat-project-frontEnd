@@ -4,167 +4,209 @@ import { Spinner } from "react-bootstrap";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 
 import {
-    loginSuccess,
-    setImageURL,
+  loginSuccess,
+  setImageURL,
 } from "../../../redux/store/slices/user/auth/auth-slice";
 
-import { uploadImage } from "../../../api/service/image-service";
-import { getUser } from "../../../api/service/user-service";
-import { toast, error } from "../../../helper/swal";
+import {
+  uploadImage,
+  getImageById,
+} from "../../../api/service/image-service";
 
-const DEFAULT_IMAGE = require("../../../assets/img/user.webp");
+import {
+  updateUserImage,
+  getUser,
+} from "../../../api/service/user-service";
+
+import { DEFAULT_IMAGE, revokeImageObjectUrl } from "../../../helper/profile-image-utils";
+import { error, toast } from "../../../helper/swal";
 
 const UpdateProfileImage = () => {
-    const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
 
-    const { imageUrl } = useAppSelector((state) => state.auth);
+  const { imageUrl } = useAppSelector((state) => state.auth);
 
-    const [preview, setPreview] = useState("");
-    const [uploading, setUploading] = useState(false);
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        return () => {
-            if (preview?.startsWith("blob:")) {
-                URL.revokeObjectURL(preview);
-            }
-        };
-    }, [preview]);
-
-    const handleProfileImageChange = async (event) => {
-        const input = event.target;
-        const file = input.files?.[0];
-
-        if (!file) return;
-
-        if (uploading) {
-            input.value = "";
-            return;
-        }
-
-        const allowedTypes = ["image/jpeg", "image/png"];
-
-        if (!allowedTypes.includes(file.type)) {
-            error("Yalnızca JPG ve PNG dosyaları yükleyebilirsiniz.");
-            input.value = "";
-            return;
-        }
-
-        if (file.size > 5 * 1024 * 1024) {
-            error("Fotoğraf en fazla 5 MB olabilir.");
-            input.value = "";
-            return;
-        }
-
-        const newPreview = URL.createObjectURL(file);
-
-        try {
-            setUploading(true);
-            setPreview(newPreview);
-
-            // 1. Fotoğrafı yükle
-            const response = await uploadImage(file);
-
-            const imageId = response?.data?.imageId;
-
-            if (!imageId) {
-                throw new Error("Sunucudan fotoğraf ID bilgisi alınamadı.");
-            }
-
-            // 2. Redux fotoğraf bilgisini güncelle
-            dispatch(setImageURL(imageId));
-
-            // 3. Kullanıcı bilgilerini yenile
-            try {
-                const updatedUserResponse = await getUser();
-
-                if (updatedUserResponse?.data) {
-                    dispatch(loginSuccess(updatedUserResponse.data));
-                }
-            } catch (refreshError) {
-                console.error("User refresh failed:", refreshError);
-
-                // Fotoğraf yüklemesi başarılı olduğu için
-                // bu hata yükleme işlemini başarısız göstermemeli.
-            }
-
-            toast("Profil fotoğrafınız başarıyla güncellendi.");
-
-        } catch (err) {
-            console.error("Profile image upload failed:", {
-                status: err.response?.status,
-                data: err.response?.data,
-                message: err.message,
-            });
-
-            setPreview("");
-
-            error(
-                err.response?.data?.message ||
-                err.response?.data?.error ||
-                err.message ||
-                "Profil fotoğrafı yüklenemedi."
-            );
-
-        } finally {
-            setUploading(false);
-            input.value = "";
-        }
+  useEffect(() => {
+    return () => {
+      if (preview?.startsWith("blob:")) {
+        revokeImageObjectUrl(preview);
+      }
     };
+  }, [preview]);
 
-    const displayedImage = preview || imageUrl || DEFAULT_IMAGE;
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files?.[0];
 
-    return (
-        <div className="flex w-full flex-col items-center justify-center px-4 py-5">
+    if (!selectedFile) return;
 
-            <label
-                htmlFor="profileImageInput"
-                className={`group relative cursor-pointer ${
-                    uploading ? "pointer-events-none" : ""
-                }`}
-            >
-                <img
-                    src={displayedImage}
-                    alt="Profil fotoğrafı"
-                    onError={(event) => {
-                        event.currentTarget.onerror = null;
-                        event.currentTarget.src = DEFAULT_IMAGE;
-                    }}
-                    className="h-32 w-32 rounded-full border-4 border-white object-cover shadow-lg transition duration-300 group-hover:brightness-90 sm:h-40 sm:w-40"
-                />
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
 
-                <div className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full border-4 border-white bg-emerald-600 text-white shadow-md transition group-hover:bg-emerald-700 sm:h-11 sm:w-11">
-                    <span className="text-lg">📷</span>
-                </div>
+    if (!allowedTypes.includes(selectedFile.type)) {
+      error("JPG, PNG veya WEBP formatında bir görsel seçin.");
+      return;
+    }
 
-                {uploading && (
-                    <div className="absolute inset-0 flex items-center justify-center rounded-full bg-slate-900/60">
-                        <Spinner animation="border" variant="light" />
-                    </div>
-                )}
+    if (selectedFile.size > 5 * 1024 * 1024) {
+      error("Fotoğraf en fazla 5 MB olabilir.");
+      return;
+    }
+
+    if (preview) {
+      revokeImageObjectUrl(preview);
+    }
+
+    setFile(selectedFile);
+    setPreview(URL.createObjectURL(selectedFile));
+  };
+
+  const handleUpload = async () => {
+    if (!file) {
+      error("Lütfen önce fotoğraf seçin.");
+      return;
+    }
+
+    setLoading(true);
+
+    let newUrl = null;
+
+    try {
+      // 1. Fotoğrafı yükle
+      const uploadResponse = await uploadImage(file);
+
+      const imageId =
+        uploadResponse.data?.imageId ||
+        uploadResponse.data?.id;
+
+      if (!imageId) {
+        throw new Error("Fotoğraf ID bilgisi alınamadı.");
+      }
+
+      // 2. Fotoğrafı kullanıcı profiline bağla
+      await updateUserImage(imageId);
+
+      // 3. Güncel kullanıcıyı getir
+      const userResponse = await getUser();
+      const updatedUser = userResponse.data;
+
+      if (!updatedUser) {
+        throw new Error("Kullanıcı bilgileri alınamadı.");
+      }
+
+      // 4. Backend'deki profil fotoğrafı ID'sini al
+      const savedImageId =
+        typeof updatedUser.profileImage === "string"
+          ? updatedUser.profileImage
+          : updatedUser.profileImage?.imageId ||
+            updatedUser.profileImage?.id ||
+            updatedUser.profileImage?._id;
+
+      if (!savedImageId) {
+        throw new Error("Güncel profil fotoğrafı ID'si bulunamadı.");
+      }
+
+      // 5. Fotoğrafı tekrar backend'den indir
+      const imageResponse = await getImageById(savedImageId);
+
+      const blob = new Blob([imageResponse.data], {
+        type:
+          imageResponse.headers?.["content-type"] ||
+          file.type ||
+          "image/jpeg",
+      });
+
+      newUrl = URL.createObjectURL(blob);
+
+      // 6. Redux'u güncelle
+      dispatch(loginSuccess(updatedUser));
+      dispatch(setImageURL(newUrl));
+
+      // 7. Eski URL'yi temizle
+      if (imageUrl?.startsWith("blob:")) {
+        revokeImageObjectUrl(imageUrl);
+      }
+
+      setFile(null);
+      setPreview(null);
+
+      toast("Profil fotoğrafı güncellendi.");
+    } catch (err) {
+      console.error("Fotoğraf güncelleme hatası:", err);
+
+      if (newUrl?.startsWith("blob:")) {
+        revokeImageObjectUrl(newUrl);
+      }
+
+      error(
+        err.response?.data?.message ||
+        err.message ||
+        "Profil fotoğrafı görüntülenemedi."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border bg-white p-5 shadow-sm">
+      <div className="flex flex-col items-center gap-5 sm:flex-row">
+        <img
+          src={preview || imageUrl || DEFAULT_IMAGE}
+          alt="Profil fotoğrafı"
+          className="h-28 w-28 rounded-full border-4 border-white object-cover shadow-lg"
+          onError={(event) => {
+            event.currentTarget.src = DEFAULT_IMAGE;
+          }}
+        />
+
+        <div className="flex-1 text-center sm:text-left">
+          <h3 className="font-semibold text-gray-800">
+            Profil fotoğrafını değiştir
+          </h3>
+
+          <p className="mt-1 text-sm text-gray-500">
+            JPG, PNG veya WEBP - Maksimum 5 MB
+          </p>
+
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+            <label className="cursor-pointer rounded-lg border px-4 py-2 text-center text-sm font-medium hover:bg-gray-50">
+              Fotoğraf seç
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleFileChange}
+                disabled={loading}
+              />
             </label>
 
-            <input
-                type="file"
-                id="profileImageInput"
-                accept="image/jpeg,image/png"
-                className="hidden"
-                onChange={handleProfileImageChange}
-                disabled={uploading}
-            />
-
-            <div className="mt-4 text-center">
-                <p className="text-sm font-semibold text-slate-800 sm:text-base">
-                    {uploading
-                        ? "Fotoğraf yükleniyor..."
-                        : "Profil fotoğrafını değiştir"}
-                </p>
-
-                <p className="mt-1 text-xs text-slate-500">
-                    JPG veya PNG · Maksimum 5 MB
-                </p>
-            </div>
+            <button
+              type="button"
+              onClick={handleUpload}
+              disabled={!file || loading}
+              className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <Spinner size="sm" animation="border" />
+                  Yükleniyor...
+                </span>
+              ) : (
+                "Fotoğrafı kaydet"
+              )}
+            </button>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default UpdateProfileImage;

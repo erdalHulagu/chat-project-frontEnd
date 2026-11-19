@@ -1,83 +1,236 @@
-import React, { useState } from 'react'
-import { BiSolidPencil } from 'react-icons/bi'
-import { MdPhotoCamera } from 'react-icons/md'
-import { TfiCommentsSmiley } from 'react-icons/tfi'
-import img from '../../../../../assets/img/user.webp'
-import { BsFillSave2Fill } from 'react-icons/bs'
 
-const CreateGroupCard = () => {
+import React, { useRef, useState } from "react";
 
-    const [isVisible, setIsVisible] = useState(true);
-    const [isActive, setIsActive] = useState(false);
-    const [createGroupChat, setCreateGroupChat] = useState(false);
+import { BiSolidPencil } from "react-icons/bi";
+import { MdPhotoCamera } from "react-icons/md";
+import { TfiCommentsSmiley } from "react-icons/tfi";
+import { BsFillSave2Fill } from "react-icons/bs";
 
-    const handleToggleVisibility = () => {
-        setIsVisible(!isVisible);
+import defaultImage from "../../../../../assets/img/user.webp";
+import { useAppDispatch } from "../../../../../redux/store/hooks";
+import { createUserGroupChat } from "../../../../../redux/store/slices/chat/chat-thunks/create-user-group-chat";
+import { error, toast } from "../../../../../helper/swal";
+
+const CreateGroupCard = ({ onSave }) => {
+  const fileInputRef = useRef(null);
+
+  const [groupName, setGroupName] = useState("");
+  const [description, setDescription] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [preview, setPreview] = useState(defaultImage);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingDescription, setIsEditingDescription] =
+    useState(false);
+  const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+
+  // Fotoğraf seçimi
+  const handleImageChange = (event) => {
+    const selectedFile = event.target.files?.[0];
+
+    if (!selectedFile) return;
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("JPG, PNG veya WEBP formatında bir fotoğraf seçin.");
+      event.target.value = "";
+      return;
     }
-    const handleInputVisible = () => {
-        setIsActive(!isActive)
+
+    if (selectedFile.size > 5 * 1024 * 1024) {
+      alert("Fotoğraf en fazla 5 MB olabilir.");
+      event.target.value = "";
+      return;
     }
-    const handleCreateGroupChat = () => {
-        setCreateGroupChat(true);
 
-    }
+    setImageFile(selectedFile);
+    setPreview(URL.createObjectURL(selectedFile));
+  };
 
-    return (
-        <div className=' w-full h-full  rounded-b-lg overflow-hidden'>
-            <div className='w-full h-full flex flex-col items-center'>
-                <div className='flex items-center justify-center w-full h-[40%] '>
-                    <label htmlFor="imgInput">
-                        <div className='rounded-full w-36 h-36 flex items-center justify-center'>
-                            <img className='rounded-full cursor-pointer w-36 h-36 my-5 ' src={img} alt="" />
-                            <MdPhotoCamera className='absolute ml-20 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
-                        </div>
+  // Kaydetme
+  
+const handleSubmit = async (event) => {
+  event.preventDefault();
 
-                    </label>
-                    <input type="file" id='imgInput' className='hidden' />
-                </div>
+  if (!groupName.trim()) {
+    error("Lütfen grup adını girin.");
+    return;
+  }
 
-                <div className='w-full h-[20%] rounded-bl-lg  '>
-                    <div className='w-[94%] flex   border-slate-400 border-b mx-[3%] '>
-                        <div className='w-full flex flex-col  '>
+  const groupData = {
+    groupName: groupName.trim(),
+    description: description.trim(),
+  };
 
-                            <div className='flex  w-full h-12'>
-                                {isActive ? (<input id='imgInput' className=' ml-3  text-slate-800 bottom-0 w-[90%] bg-slate-200  focus:outline-none ' type="text" alt='' autoFocus />) : <h5 className="ml-3 text-sm text-slate-500 w-[90%]" > Type in group name (optional) </h5>}
-                                <div className='w-[10] flex justify-end'>
-                                    <BiSolidPencil onClick={handleInputVisible} id='imgInput' className={'rounded-full hover:opacity-50 hover:bg-white p-2 w-10 h-10 text-lg text-slate-500 hover:text-red-800 cursor-pointer '} />
+  try {
+    setLoading(true);
 
-                                </div>
+    const result = await dispatch(
+      createUserGroupChat(groupData)
+    ).unwrap();
 
-                            </div>
-                        </div>
+    toast("Grup başarıyla oluşturuldu.");
 
+    console.log("Oluşturulan grup:", result);
 
-                    </div>
-                    <div className='w-[94%] h-[90%] bg-slate-300 flex mt-20 mx-[3%]  '>
-                    <div className='w-full h-full flex flex-col '>
-                        <p className=" text-gray-600 ml-3 text-sm mt-3" > Group Description </p>
-                        {isVisible &&
-                            <p onClick={handleToggleVisibility} id="textarea" className=" text-gray-600  pl-2 text-sm" > ! click on and write something...  You can add rules for your group member to see</p>
-                        }
-                        {!isVisible && <textarea id="textarea" className='w-full h-[30%] resize-none overflow-hidden pl-2  pb-28 bg-slate-300 text-gray-600 mb-2 bottom-0 focus:outline-none' type="text" alt='' />}
+  } catch (err) {
+    console.error("Grup oluşturma hatası:", err);
 
-                    </div>
-
-                    <div className='flex justify-end '>
-
-                        <TfiCommentsSmiley className='mt-2 mr-2 text-gray-600 w-10 h-10 p-2 hover:opacity-60 hover:bg-slate-100 rounded-full hover:text-red-800 cursor-pointer' />
-                    </div>
-
-                </div>
-                    <div className='mt-3  w-full flex items-center justify-center '>
-
-                        <button className='flex items-center bg-blue-900 py-2 px-3 text-gray-300 rounded'> <BsFillSave2Fill className='bg-blue-900 text-gray-300 pl-1 mr-2' />Save</button>
-                    </div>
-                </div>
-            </div>
+    error(
+      typeof err === "string"
+        ? err
+        : "Grup oluşturulamadı."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
 
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-y-auto overflow-x-hidden rounded-2xl border border-border bg-surface shadow-lg"
+    >
+      {/* Yeşil başlık */}
+      <div className="shrink-0 bg-gradient-to-r from-primary-dark via-primary to-primary-light px-5 py-5 sm:px-7">
+        <p className="text-xs font-semibold tracking-widest text-white/70">
+          GRUP YÖNETİMİ
+        </p>
+
+        <h2 className="mt-1 text-xl font-bold text-white">
+          Yeni grup oluştur
+        </h2>
+
+        <p className="mt-1 text-sm text-white/80">
+          Grubunuzun fotoğrafını ve bilgilerini belirleyin.
+        </p>
+      </div>
+
+      {/* Form içeriği */}
+      <div className="flex min-h-0 w-full flex-1 flex-col gap-6 p-5 sm:p-7">
+
+        {/* Fotoğraf alanı */}
+        <div className="flex flex-col items-center">
+          <div className="relative">
+            <img
+              src={preview}
+              alt="Grup fotoğrafı"
+              className="h-32 w-32 rounded-full border-4 border-white bg-background object-cover shadow-md ring-2 ring-primary/20 sm:h-36 sm:w-36"
+            />
+
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-primary text-white shadow-md transition hover:bg-primary-dark"
+              aria-label="Grup fotoğrafı seç"
+            >
+              <MdPhotoCamera className="h-5 w-5" />
+            </button>
+          </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleImageChange}
+          />
+
+          <p className="mt-3 text-xs text-text-secondary">
+            Grup fotoğrafı seçin (JPG, PNG veya WEBP - Maks. 5 MB)
+          </p>
+
+          {imageFile && (
+            <p className="mt-2 max-w-full truncate text-xs font-medium text-primary">
+              {imageFile.name}
+            </p>
+          )}
         </div>
-    )
-}
 
-export default CreateGroupCard
+        {/* Grup adı */}
+        <div className="w-full min-w-0">
+          <label
+            htmlFor="groupName"
+            className="mb-2 block text-sm font-semibold text-text"
+          >
+            Grup adı
+            <span className="ml-1 font-normal text-text-muted">
+              (Zorunlu)
+            </span>
+          </label>
+
+          <div className="flex min-w-0 items-center gap-2 rounded-xl border border-border bg-white px-3 transition focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10">
+            <input
+              id="groupName"
+              type="text"
+              value={groupName}
+              onChange={(event) => setGroupName(event.target.value)}
+              placeholder="Grup adını girin"
+              maxLength={80}
+              className="w-full min-w-0 bg-transparent py-3 text-sm text-text outline-none placeholder:text-text-muted"
+            />
+
+            <BiSolidPencil className="h-5 w-5 shrink-0 text-text-muted" />
+          </div>
+
+          <p className="mt-1 text-right text-xs text-text-muted">
+            {groupName.length}/80
+          </p>
+        </div>
+
+        {/* Grup açıklaması */}
+        <div className="w-full min-w-0">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <label
+              htmlFor="groupDescription"
+              className="text-sm font-semibold text-text"
+            >
+              Grup açıklaması
+            </label>
+
+            <TfiCommentsSmiley className="h-5 w-5 text-primary" />
+          </div>
+
+          <textarea
+            id="groupDescription"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            placeholder="Grubunuzun amacını, kurallarını veya üyeler için önemli bilgileri yazın..."
+            rows={5}
+            maxLength={500}
+            className="w-full resize-y rounded-xl border border-border bg-white px-4 py-3 text-sm text-text outline-none transition placeholder:text-text-muted focus:border-primary focus:ring-4 focus:ring-primary/10"
+          />
+
+          <p className="mt-1 text-right text-xs text-text-muted">
+            {description.length}/500
+          </p>
+        </div>
+      </div>
+
+      {/* Alt buton alanı */}
+      <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-border bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+        <p className="text-xs text-text-secondary">
+          Grup bilgilerini istediğiniz zaman güncelleyebilirsiniz.
+        </p>
+
+        <button
+          type="submit"
+          disabled={loading || !groupName.trim()}
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <BsFillSave2Fill className="h-4 w-4" />
+
+          {loading ? "Oluşturuluyor..." : "Grup oluştur"}
+        </button>
+      </div>
+    </form>
+  );
+};
+
+export default CreateGroupCard;

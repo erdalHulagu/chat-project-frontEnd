@@ -1,109 +1,174 @@
-import React, { useState } from 'react';
-import { IoIosArrowDropdownCircle } from 'react-icons/io';
 
-const DropdownMenu = ({ handleCreateGroup, handleCreateCominityGroup, handleAddExistingComminity }) => {
+import React, { useEffect, useRef, useState } from "react";
+import { IoIosArrowDropdownCircle } from "react-icons/io";
 
-    const [dropdown1, setDropdown1] = useState(false)
-    const [dropdown2, setDropdown2] = useState(false)
-    const [dropdown3, setDropdown3] = useState(false)
+const DropdownMenu = ({
+  handleCreateGroup,
+  handleCreateCominityGroup,
+  handleAddExistingComminity,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeSubmenu, setActiveSubmenu] = useState(null);
 
+  const menuRef = useRef(null);
 
-    const handleHover1 = () => {
-        setDropdown1(true);
+  // Menü dışına tıklanınca kapat.
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+        setActiveSubmenu(null);
+      }
     };
 
-    const handleLeave1 = () => {
-        setDropdown1(false);
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      );
     };
+  }, []);
 
-    const handleHover2 = () => {
-        setDropdown2(true);
-    };
+  const toggleMenu = () => {
+    setIsOpen((prev) => !prev);
+    setActiveSubmenu(null);
+  };
 
-    const handleLeave2 = () => {
-        setDropdown2(false);
-    };
-    const handleHover3 = () => {
-        setDropdown3(true);
-    };
+  const handleAction = (callback) => {
+    setIsOpen(false);
+    setActiveSubmenu(null);
+    callback?.();
+  };
 
-    const handleLeave3 = () => {
-        setDropdown3(false);
-    };
+  return (
+    <div
+      ref={menuRef}
+      className="relative z-50 flex h-full items-center justify-end"
+    >
+      {/* Ana menü butonu */}
+      <button
+        type="button"
+        onClick={toggleMenu}
+        aria-label="Grup menüsünü aç"
+        aria-expanded={isOpen}
+        className="flex h-11 w-11 items-center justify-center rounded-full text-primary transition duration-200 hover:bg-primary-soft hover:text-primary-dark focus:outline-none focus:ring-4 focus:ring-primary/15"
+      >
+        <IoIosArrowDropdownCircle className="h-8 w-8" />
+      </button>
 
+      {/* Ana dropdown */}
+      {isOpen && (
+        <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-visible rounded-xl border border-border bg-white p-2 shadow-xl shadow-slate-900/10">
 
+          {/* All Groups */}
+          <button
+            type="button"
+            onClick={() => handleAction(() => {})}
+            className="flex w-full items-center rounded-lg px-3 py-3 text-left text-sm font-medium text-text-secondary transition hover:bg-primary-soft hover:text-primary-dark"
+          >
+            All Groups
+          </button>
 
+          {/* Create Community */}
+          <div
+            className="relative"
+            onMouseEnter={() => setActiveSubmenu("community")}
+            onMouseLeave={() => setActiveSubmenu(null)}
+          >
+            <button
+              type="button"
+              onClick={() =>
+                setActiveSubmenu((prev) =>
+                  prev === "community" ? null : "community"
+                )
+              }
+              className={`flex w-full items-center justify-between rounded-lg px-3 py-3 text-left text-sm font-medium transition ${
+                activeSubmenu === "community"
+                  ? "bg-primary-soft text-primary-dark"
+                  : "text-text-secondary hover:bg-primary-soft hover:text-primary-dark"
+              }`}
+            >
+              Create Community
 
-    return (
-        <div className=' relative flex  h-full justify-end cursor-pointer z-5'>
+              <span className="text-xs">›</span>
+            </button>
 
-            <IoIosArrowDropdownCircle
-                onClick={handleHover1}
-                onMouseLeave={handleLeave1} className='m-1  text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
-            {dropdown1 &&
-                <div className='w-20 absolute -bottom-24 right-22 bg-slate-200'>
-                    <div
-                        onMouseEnter={handleHover1}
-                        onMouseLeave={handleLeave1}
-                        className="shadow-xl shadow-slate-900 border border-2xl border-slate-600 py-1 rounded absolute  bg-slate-200 -bottom-2 left-6 flex-col items-center justify-center w-40 h-84">
+            {/* Community alt menüsü */}
+            {activeSubmenu === "community" && (
+              <div className="absolute left-full top-0 z-50 ml-1 w-52 rounded-xl border border-border bg-white p-2 shadow-xl shadow-slate-900/10">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleAction(handleCreateCominityGroup)
+                  }
+                  className="flex w-full items-center rounded-lg px-3 py-3 text-left text-sm text-text-secondary transition hover:bg-primary-soft hover:text-primary-dark"
+                >
+                  Create New Community
+                </button>
 
-                        <div className='text-gray-600 hover:text-slate-100 hover:shadow-md hover:shadow-slate-700 flex items-center  w-full h-14 px-2 hover:bg-gray-400 '>
-                            All Groups
-                        </div>
-                        <div
-                            onMouseEnter={handleHover2}
-                            onMouseLeave={handleLeave2}
-                            className=' text-gray-600 hover:text-slate-100  hover:shadow-md hover:shadow-slate-700 flex items-center  w-full h-14 px-2 hover:bg-gray-400 '>
-                            Create Comminity
-                        </div>
-                        {dropdown2 &&
-                        <div className='w-20 absolute -bottom-5  right-18 '>
-                            <div
-                                onMouseEnter={handleHover2}
-                                onMouseLeave={handleLeave2}
-                                className='shadow-xl shadow-slate-900 py-1 rounded absolute  bg-slate-200 -bottom-1 left-36 flex-col items-center justify-center w-48 h-32'>
+                <div className="my-1 border-t border-border" />
 
-                                <div
-                                    onClick={handleCreateCominityGroup}
-                                    className=' text-gray-600 hover:text-slate-100 bg-slate-200 hover:shadow-md hover:shadow-slate-700 flex items-center  w-full h-14 px-2 hover:bg-gray-400 '>
-                                    Create New Comminity
-                                </div>
-                                <div
-                                    onClick={handleAddExistingComminity}
-                                    className=' text-gray-600 hover:text-slate-100 hover:shadow-md hover:shadow-slate-700 flex items-center  border-b w-full h-14 px-2 hover:bg-gray-400 '>
-                                    Add Existing Comminity
-                                </div>
-                            </div>
-                            </div>
-                        }
-                        <div
-                            onMouseEnter={handleHover3}
-                            onMouseLeave={handleLeave3}>
-                            <div className=' text-gray-600 hover:text-slate-100 hover:shadow-md hover:shadow-slate-700 w-full h-14 px-2 hover:bg-gray-400 flex items-center '>
-                                Add Groups
-                            </div>
-                            {dropdown3 &&
-                                <div
-                                    onMouseEnter={handleHover3}
-                                    onMouseLeave={handleLeave3}
-                                    className='shadow-xl shadow-slate-900 py-1 rounded absolute  bg-slate-200 -bottom-1 left-36 flex-col items-center justify-center w-40 h-14'>
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleAction(handleAddExistingComminity)
+                  }
+                  className="flex w-full items-center rounded-lg px-3 py-3 text-left text-sm text-text-secondary transition hover:bg-primary-soft hover:text-primary-dark"
+                >
+                  Add Existing Community
+                </button>
+              </div>
+            )}
+          </div>
 
-                                    <div onClick={handleCreateGroup} className='text-gray-600 hover:text-slate-100 hover:shadow-md hover:shadow-slate-700 flex items-center  w-full h-14 px-2 hover:bg-gray-400 '>
-                                        Create New Group
-                                    </div>
+          {/* Add Groups */}
+          <div
+            className="relative"
+            onMouseEnter={() => setActiveSubmenu("groups")}
+            onMouseLeave={() => setActiveSubmenu(null)}
+          >
+            <button
+              type="button"
+              onClick={() =>
+                setActiveSubmenu((prev) =>
+                  prev === "groups" ? null : "groups"
+                )
+              }
+              className={`flex w-full items-center justify-between rounded-lg px-3 py-3 text-left text-sm font-medium transition ${
+                activeSubmenu === "groups"
+                  ? "bg-primary-soft text-primary-dark"
+                  : "text-text-secondary hover:bg-primary-soft hover:text-primary-dark"
+              }`}
+            >
+              Add Groups
 
-                                </div>
-                            }
-                        </div>
+              <span className="text-xs">›</span>
+            </button>
 
-
-                    </div>
-                </div>
-
-            }
-
+            {/* Groups alt menüsü */}
+            {activeSubmenu === "groups" && (
+              <div className="absolute left-full top-0 z-50 ml-1 w-48 rounded-xl border border-border bg-white p-2 shadow-xl shadow-slate-900/10">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleAction(handleCreateGroup)
+                  }
+                  className="flex w-full items-center rounded-lg px-3 py-3 text-left text-sm text-text-secondary transition hover:bg-primary-soft hover:text-primary-dark"
+                >
+                  Create New Group
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export default DropdownMenu;

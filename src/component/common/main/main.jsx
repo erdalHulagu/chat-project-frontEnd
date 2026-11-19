@@ -9,7 +9,6 @@ import { useAppDispatch } from "../../../redux/store/hooks";
 import { logout } from "../../../redux/store/slices/user/auth/auth-slice";
 import { encryptedLocalStorage } from "../../../helper/auth-token/encrypt-storage";
 import { question } from "../../../helper/swal";
-import HomePages from "../../../page/user/main-page";
 
 const Main = () => {
     const navigate = useNavigate();
@@ -37,17 +36,16 @@ const Main = () => {
     const isActive = (path) => location.pathname === path;
 
     const navClass = (path) =>
-        `flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 sm:px-4 ${
-            isActive(path)
-                ? "bg-white/20 text-white shadow-inner"
-                : "text-indigo-100 hover:bg-white/10 hover:text-white"
+        `flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 sm:px-4 ${isActive(path)
+            ? "bg-white/20 text-white shadow-inner ring-1 ring-white/20"
+            : "text-white/75 hover:bg-white/10 hover:text-white"
         }`;
 
     return (
-        <div className="flex h-dvh min-h-0 w-full flex-col overflow-hidden bg-white">
+        <div className="flex h-dvh min-h-0 w-full flex-col overflow-hidden bg-background">
 
             {/* HEADER */}
-            <header className="relative z-20 shrink-0 border-b border-white/10 bg-gradient-to-r from-blue-950 via-indigo-950 to-purple-950 shadow-xl">
+            <header className="relative z-20 shrink-0 border-b border-white/10 bg-gradient-to-r from-primary-dark via-primary to-primary-light shadow-lg shadow-primary-dark/10">
                 <div className="flex min-h-20 w-full items-center justify-between gap-3 px-3 py-3 sm:px-5 md:min-h-24 md:px-8 lg:px-10">
 
                     {/* LOGO */}
@@ -57,7 +55,7 @@ const Main = () => {
                         className="flex min-w-0 items-center gap-2.5 text-left sm:gap-3"
                         aria-label="Go to home"
                     >
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-white/20 bg-white/10 shadow-lg sm:h-14 sm:w-14">
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-white/30 bg-white/10 shadow-lg sm:h-14 sm:w-14">
                             <img
                                 className="h-full w-full rounded-full object-cover"
                                 src={require("../../../assets/img/logo.png")}
@@ -70,7 +68,7 @@ const Main = () => {
                                 Furqan Worldwide
                             </span>
 
-                            <span className="hidden text-xs tracking-[0.18em] text-indigo-200 sm:block">
+                            <span className="hidden text-xs tracking-[0.18em] text-white/65 sm:block">
                                 CONNECTION
                             </span>
                         </div>
@@ -106,7 +104,7 @@ const Main = () => {
                         <button
                             type="button"
                             onClick={handleSignOut}
-                            className="flex items-center justify-center gap-2 rounded-xl border border-red-400/30 bg-red-600/90 px-3 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-red-700 hover:shadow-lg sm:px-4"
+                            className="flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-danger px-3 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-200 hover:bg-danger-dark hover:shadow-lg sm:px-4"
                             aria-label="Sign out"
                             title="Sign out"
                         >
@@ -118,13 +116,10 @@ const Main = () => {
             </header>
 
             {/* PAGE CONTENT */}
-            <main className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden bg-white">
-
-               <div className="relative z-10 flex h-0 min-h-0 w-full flex-1 flex-col overflow-hidden p-2 sm:p-3 md:p-4 lg:p-5">
-                 <Outlet/>
-                
+            <main className="relative flex min-h-0 w-full flex-1 flex-col  bg-background">
+                <div className="relative z-10 flex min-h-0 w-full flex-1 flex-colp-2 sm:p-3 md:p-4 lg:p-5">
+                    <Outlet />
                 </div>
-
             </main>
         </div>
     );

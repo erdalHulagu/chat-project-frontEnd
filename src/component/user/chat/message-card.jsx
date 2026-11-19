@@ -1,4 +1,3 @@
-
 import React from "react";
 import { BsCheck2All } from "react-icons/bs";
 
@@ -19,41 +18,52 @@ const MessageCard = ({
 
     return (
         <div
-            className={`flex w-full px-2 ${
+            className={`flex w-full min-w-0 overflow-hidden px-2 py-1 ${
                 isReceived ? "justify-start" : "justify-end"
             }`}
         >
             <div
-                className={`max-w-[88%] overflow-hidden px-4 py-3 shadow-sm sm:max-w-[75%] md:max-w-[65%] ${
+                className={`w-fit min-w-0 max-w-[88%] overflow-hidden px-3 py-2.5 shadow-sm sm:max-w-[75%] sm:px-4 sm:py-3 md:max-w-[65%] ${
                     isReceived
-                        ? "rounded-2xl rounded-bl-md border border-slate-100 bg-white text-slate-700"
-                        : "rounded-2xl rounded-br-md bg-emerald-700 text-white"
+                        ? "rounded-2xl rounded-bl-md border border-border bg-surface text-text"
+                        : "rounded-2xl rounded-br-md bg-primary text-white"
                 }`}
             >
+                {/* IMAGE ATTACHMENT */}
                 {img && (
-                    <img
-                        src={img}
-                        alt="Message attachment"
-                        className="mb-2 max-h-72 w-full rounded-xl object-cover"
-                    />
-                )}{/* CHAT CONTENT */}
+                    <div className="mb-2 max-w-full overflow-hidden rounded-xl">
+                        <img
+                            src={img}
+                            alt="Message attachment"
+                            className="max-h-72 w-full max-w-full rounded-xl object-cover"
+                            loading="lazy"
+                        />
+                    </div>
+                )}
 
+                {/* MESSAGE CONTENT */}
                 {content && (
-                    <p className="whitespace-pre-wrap break-words text-sm leading-6">
+                    <p className="max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-sm leading-6">
                         {content}
                     </p>
                 )}
 
+                {/* MESSAGE TIME */}
                 {formattedTime && (
                     <div
-                        className={`mt-1.5 flex items-center justify-end gap-1 text-[10px] ${
-                            isReceived ? "text-slate-400" : "text-emerald-100"
+                        className={`mt-1.5 flex items-center justify-end gap-1 whitespace-nowrap text-[10px] ${
+                            isReceived
+                                ? "text-text-muted"
+                                : "text-white/70"
                         }`}
                     >
                         <span>{formattedTime}</span>
 
                         {!isReceived && (
-                            <BsCheck2All size={13} />
+                            <BsCheck2All
+                                size={13}
+                                className="shrink-0 text-white/80"
+                            />
                         )}
                     </div>
                 )}

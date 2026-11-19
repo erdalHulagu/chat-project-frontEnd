@@ -1,4 +1,3 @@
-
 import React from "react";
 import { HiUserGroup } from "react-icons/hi";
 
@@ -31,12 +30,14 @@ const ChatDetail = ({
     if (!selectedUser && !selectedChat) return null;
 
     return (
-        <div className="flex min-w-0 shrink-0 items-center gap-3 overflow-hidden py-1">
+        <div className="flex w-full min-w-0 max-w-full shrink-0 items-center gap-2 overflow-hidden py-1 sm:gap-3">
+
+            {/* PROFILE IMAGE */}
             <div className="relative shrink-0">
                 <img
                     src={image}
                     alt={`${displayName} profile`}
-                    className="h-11 w-11 rounded-full object-cover ring-2 ring-emerald-100 sm:h-12 sm:w-12"
+                    className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-sm ring-2 ring-primary-soft sm:h-12 sm:w-12"
                     onError={(event) => {
                         event.currentTarget.onerror = null;
                         event.currentTarget.src = DEFAULT_IMAGE;
@@ -44,28 +45,42 @@ const ChatDetail = ({
                 />
 
                 {isGroup && (
-                    <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-emerald-600 text-white">
+                    <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-primary text-white shadow-sm">
                         <HiUserGroup size={11} />
                     </span>
                 )}
             </div>
 
-            <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-bold text-slate-800 sm:text-base">
+            {/* USER INFORMATION */}
+            <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+                <p
+                    title={displayName}
+                    className="truncate text-sm font-bold leading-5 text-text sm:text-base"
+                >
                     {displayName}
                 </p>
 
-                <p className="mt-1 truncate text-xs text-slate-500">
+                <p
+                    title={
+                        isGroup
+                            ? `${users.length} katılımcı`
+                            : otherUser.phone || "Bireysel sohbet"
+                    }
+                    className="mt-1 truncate text-xs text-text-secondary"
+                >
                     {isGroup
                         ? `${users.length} katılımcı`
                         : otherUser.phone || "Bireysel sohbet"}
                 </p>
             </div>
 
-            <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold text-emerald-700 sm:text-xs">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                {isGroup ? "Grup" : "Sohbet"}
-            </span>
+            {/* CHAT TYPE BADGE */}
+            <div className="hidden shrink-0 items-center sm:flex">
+                <span className="flex items-center gap-1.5 rounded-full border border-primary/10 bg-primary-soft px-2.5 py-1 text-[10px] font-semibold text-primary-dark sm:text-xs">
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                    {isGroup ? "Grup" : "Sohbet"}
+                </span>
+            </div>
         </div>
     );
 };

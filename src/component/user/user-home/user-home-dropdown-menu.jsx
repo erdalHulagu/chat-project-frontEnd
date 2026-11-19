@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -28,7 +27,6 @@ const UserHomeDropDownMenu = () => {
     navigate(path);
   };
 
-  // Escape tuşuyla menüyü kapat
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
@@ -93,8 +91,8 @@ const UserHomeDropDownMenu = () => {
         aria-haspopup="true"
         className={`flex h-10 w-10 items-center justify-center rounded-xl border transition-all duration-200 sm:h-11 sm:w-11 ${
           isOpen
-            ? "border-indigo-200 bg-indigo-100 text-indigo-800 shadow-inner"
-            : "border-transparent bg-transparent text-indigo-950 hover:border-indigo-100 hover:bg-indigo-50 hover:text-indigo-600"
+            ? "border-primary/20 bg-primary-soft text-primary shadow-inner"
+            : "border-transparent bg-transparent text-primary-dark hover:border-primary/10 hover:bg-primary-soft"
         }`}
       >
         <BsArrowDownSquareFill size={21} />
@@ -110,10 +108,11 @@ const UserHomeDropDownMenu = () => {
           />
 
           <div
-            className="absolute right-0 top-14 z-50 w-60 overflow-hidden rounded-2xl border border-indigo-100 bg-white shadow-2xl shadow-indigo-950/20"
+            className="absolute right-0 top-14 z-50 w-60 overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl shadow-slate-900/10"
             role="menu"
           >
-            <div className="bg-gradient-to-r from-indigo-950 via-indigo-900 to-purple-900 px-4 py-4">
+            {/* Menu header */}
+            <div className="bg-gradient-to-r from-primary-dark via-primary to-primary-light px-4 py-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-white">
                   <FiSettings size={20} />
@@ -123,13 +122,14 @@ const UserHomeDropDownMenu = () => {
                   <p className="text-sm font-bold text-white">
                     Account settings
                   </p>
-                  <p className="mt-0.5 text-xs text-indigo-200">
+                  <p className="mt-0.5 text-xs text-white/70">
                     Manage your account
                   </p>
                 </div>
               </div>
             </div>
 
+            {/* Navigation items */}
             <div className="p-2">
               {menuItems.map((item) => (
                 <button
@@ -137,9 +137,9 @@ const UserHomeDropDownMenu = () => {
                   type="button"
                   role="menuitem"
                   onClick={() => handleNavigate(item.path)}
-                  className="group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-indigo-50 hover:text-indigo-800"
+                  className="group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-text-secondary transition-all duration-200 hover:bg-primary-soft hover:text-primary-dark"
                 >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-700 transition group-hover:bg-indigo-100">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-soft text-primary transition-colors group-hover:bg-primary group-hover:text-white">
                     {item.icon}
                   </span>
 
@@ -148,15 +148,16 @@ const UserHomeDropDownMenu = () => {
               ))}
             </div>
 
-            <div className="border-t border-indigo-100 bg-slate-50 p-2">
+            {/* Logout */}
+            <div className="border-t border-border bg-background/70 p-2">
               <button
                 type="button"
                 role="menuitem"
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-danger transition-all duration-200 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-600 transition group-hover:bg-red-100">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-danger transition-colors group-hover:bg-danger group-hover:text-white">
                   <FiLogOut size={18} />
                 </span>
 

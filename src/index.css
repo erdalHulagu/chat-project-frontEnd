@@ -1,26 +1,52 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Temel sayfa ayarları */
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
 
+/* Uygulamanın ana yüksekliği */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/* İnce yeşil scrollbar */
 .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: #10b981 transparent;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #075E45 transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-    width: 5px;
+  width: 5px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
+  background: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #10b981;
-    border-radius: 20px;
+  background: #075E45;
+  border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #047857;
+  background: #043D30;
+}
+
+/* Giriş ve kayıt sayfaları */
+.auth-page {
+  height: 100dvh;
+  overflow: hidden;
 }

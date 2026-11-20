@@ -10,31 +10,34 @@ import { ImSearch } from "react-icons/im";
 import { FaUserFriends } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { Col, Row } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import FriendsCard from "../friends/friends-card";
 import FriendPhotos from "./friend-photos-card";
 import users from "../my-photos/friends.json";
+import { addUserAsFriend } from "../../../api/service/user-service";
 
-// Bu import yollarını kendi dosya konumlarına göre düzenle.
-import { addUserAsFriend } from "API_DOSYANIN_YOLU";
-import {
-  addFriendToList,
-  setFriendProfile,
-} from "PROFILE_SLICE_DOSYANIN_YOLU";
+// addUserAsFriend fonksiyonunun gerçek dosya yolunu buraya ekle.
+// Örnek: import { addUserAsFriend } from "../../../api/service/user-service";
 
 const FriendProfile = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const profile = useSelector((state) => state.profile.friendProfile);
-  const friendList = useSelector((state) => state.profile.friendList);
+  const reduxFriendList = useSelector(
+    (state) => state.auth.user?.friends
+  );
+
+  const friendList = Array.isArray(reduxFriendList)
+    ? reduxFriendList
+    : [];
 
   const [friendsCard, setFriendsCard] = useState(true);
   const [searchFriends, setSearchFriends] = useState("");
   const [friendPhotos, setFriendPhotos] = useState(false);
   const [isEnlarged, setIsEnlarged] = useState(false);
   const [addingFriendId, setAddingFriendId] = useState(null);
+  const [addedFriendIds, setAddedFriendIds] = useState([]);
 
   const filteredUsers = useMemo(() => {
     const search = searchFriends.toLowerCase().trim();
@@ -53,18 +56,24 @@ const FriendProfile = () => {
   const handleAddFriend = async (friend) => {
     if (!friend?.id || addingFriendId) return;
 
-    const alreadyAdded = friendList.some(
-      (item) => String(item.id) === String(friend.id)
-    );
+    const alreadyAdded =
+      friendList.some(
+        (item) =>
+          String(item.id || item._id) === String(friend.id)
+      ) ||
+      addedFriendIds.some(
+        (id) => String(id) === String(friend.id)
+      );
 
     if (alreadyAdded) return;
 
     try {
       setAddingFriendId(friend.id);
 
+      // API çağrısı: gerçek import yolunu eklemelisin.
       await addUserAsFriend(friend.id);
 
-      dispatch(addFriendToList(friend));
+      setAddedFriendIds((previous) => [...previous, friend.id]);
 
       alert(`${friend.name} arkadaş listene eklendi.`);
     } catch (err) {
@@ -80,7 +89,11 @@ const FriendProfile = () => {
   };
 
   const handleViewProfile = (friend) => {
-    dispatch(setFriendProfile(friend));
+    navigate("/friendProfile", {
+      state: {
+        friend,
+      },
+    });
   };
 
   const handleFriendPhotos = () => {
@@ -104,6 +117,7 @@ const FriendProfile = () => {
           <p className="mb-4 text-text-secondary">
             Görüntülenecek arkadaş profili bulunamadı.
           </p>
+
           <button
             onClick={handleNavigate}
             className="rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary-dark"
@@ -117,7 +131,6 @@ const FriendProfile = () => {
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background">
-      {/* Üst başlık */}
       <header className="flex h-16 shrink-0 items-center gap-4 bg-primary px-4 text-white shadow-md">
         <button
           type="button"
@@ -134,7 +147,6 @@ const FriendProfile = () => {
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-        {/* Sol profil alanı */}
         <aside className="w-full shrink-0 border-b border-border bg-surface p-5 md:w-[300px] md:border-b-0 md:border-r">
           <div className="flex flex-col items-center">
             <img
@@ -186,7 +198,6 @@ const FriendProfile = () => {
           </div>
         </aside>
 
-        {/* Sağ içerik alanı */}
         <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <div className="flex min-h-16 shrink-0 items-center justify-between gap-3 bg-primary px-4 text-white">
             <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -204,6 +215,7 @@ const FriendProfile = () => {
               {friendsCard && (
                 <div className="relative min-w-0 flex-1">
                   <ImSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+
                   <input
                     type="text"
                     value={searchFriends}
@@ -231,9 +243,15 @@ const FriendProfile = () => {
             {friendsCard && (
               <Row className="g-3">
                 {filteredUsers.map((friend) => {
-                  const isAdded = friendList.some(
-                    (item) => String(item.id) === String(friend.id)
-                  );
+                  const isAdded =
+                    friendList.some(
+                      (item) =>
+                        String(item.id || item._id) ===
+                        String(friend.id)
+                    ) ||
+                    addedFriendIds.some(
+                      (id) => String(id) === String(friend.id)
+                    );
 
                   return (
                     <Col
@@ -247,7 +265,7 @@ const FriendProfile = () => {
                         {...friend}
                         isAdded={isAdded}
                         loading={addingFriendId === friend.id}
-                        onAddFriend={handleAddFriend}
+                        onAddFriend={() => handleAddFriend(friend)}
                         onViewProfile={() => handleViewProfile(friend)}
                       />
                     </Col>

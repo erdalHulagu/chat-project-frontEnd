@@ -1,498 +1,646 @@
-
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  FiCamera,
+  FiUsers,
+  FiSearch,
+  FiEdit3,
+  FiMapPin,
+  FiMail,
+  FiImage,
+  FiX,
+  FiArrowUpRight,
+} from "react-icons/fi";
 
 import {
-    useAppDispatch,
-    useAppSelector,
+  useAppDispatch,
+  useAppSelector,
 } from "../../../redux/store/hooks";
 
 import {
-    setImageURL,
+  setImageURL,
 } from "../../../redux/store/slices/user/auth/auth-slice";
 
 import {
-    setFriendProfile,
-} from "../../../redux/store/slices/profile/profile-slice";
+  setFriendProfile,
+} from "../../../redux/store/slices/friend/friendsProfileSlices";
 
 import {
-    getImageById,
+  getImageById,
 } from "../../../api/service/image-service";
 
 import {
-    DEFAULT_IMAGE,
-    getImageId,
-    revokeImageObjectUrl,
+  DEFAULT_IMAGE,
+  getImageId,
+  revokeImageObjectUrl,
 } from "../../../helper/profile-image-utils";
 
 import ProfileSettingDropdownMenu from "./profile-setting-dropdown-menu";
 
+const isDirectImageUrl = (value) =>
+  typeof value === "string" &&
+  /^(https?:\/\/|blob:|data:)/i.test(value);
+
 const MyProfile = () => {
-    const dispatch = useAppDispatch();
-    const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-    const { isUserLogin, user, imageUrl } = useAppSelector(
-        (state) => state.auth
-    );
+  const { isUserLogin, user, imageUrl } = useAppSelector(
+    (state) => state.auth
+  );
 
-    const [activeTab, setActiveTab] = useState("photos");
-    const [searchFriends, setSearchFriends] = useState("");
-    const [selectedPhoto, setSelectedPhoto] = useState(null);
-    const [galleryUrls, setGalleryUrls] = useState([]);
+  const [activeTab, setActiveTab] = useState("photos");
+  const [searchFriends, setSearchFriends] = useState("");
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [galleryUrls, setGalleryUrls] = useState([]);
+  const [friendImageUrls, setFriendImageUrls] = useState({});
 
-    // Arkadaşları filtrele
-    const friends = useMemo(() => {
-        const list = Array.isArray(user?.friends) ? user.friends : [];
+  const photos = useMemo(
+    () => (Array.isArray(user?.myImages) ? user.myImages : []),
+    [user?.myImages]
+  );
 
-        return list.filter((friend) => {
-            const fullName = [
-                friend.firstName || friend.name || friend.username || "",
-                friend.lastName || friend.lastname || "",
-            ].join(" ");
+  const allFriends = useMemo(
+    () => (Array.isArray(user?.friends) ? user.friends : []),
+    [user?.friends]
+  );
 
-            return fullName
-                .toLowerCase()
-                .includes(searchFriends.toLowerCase().trim());
+  const friends = useMemo(() => {
+    const search = searchFriends.toLowerCase().trim();
+
+    if (!search) return allFriends;
+
+    return allFriends.filter((friend) => {
+      const name = [
+        friend.firstName || friend.name || friend.username || "",
+        friend.lastName || friend.lastname || "",
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      const email = (friend.email || "").toLowerCase();
+
+      return name.includes(search) || email.includes(search);
+    });
+  }, [allFriends, searchFriends]);
+
+  const displayName =
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    user?.username ||
+    "Kullanıcı";
+
+  // Kullanıcının profil fotoğrafını ID üzerinden getir.
+  useEffect(() => {
+    let cancelled = false;
+    let createdUrl = null;
+
+    const loadProfileImage = async () => {
+      if (imageUrl) return;
+
+      const imageId = getImageId(user?.profileImage);
+      if (!imageId || isDirectImageUrl(user?.profileImage)) return;
+
+      try {
+        const response = await getImageById(imageId);
+
+        const blob = new Blob([response.data], {
+          type: response.headers?.["content-type"] || "image/jpeg",
         });
-    }, [user?.friends, searchFriends]);
 
-    // Galeri fotoğrafları
-    const photos = useMemo(() => {
-        return Array.isArray(user?.myImages) ? user.myImages : [];
-    }, [user?.myImages]);
+        createdUrl = URL.createObjectURL(blob);
 
-    // Arkadaş profiline git
-    const handleOpenFriendProfile = (friend) => {
-        const selectedFriend = {
-            ...friend,
-            id: friend.id || friend._id,
-            name:
-                friend.firstName ||
-                friend.name ||
-                friend.username ||
-                "Kullanıcı",
-            lastname: friend.lastName || friend.lastname || "",
-            image:
-                friend.image ||
-                friend.profileImage ||
-                DEFAULT_IMAGE,
-        };
-
-        dispatch(setFriendProfile(selectedFriend));
-        navigate("/friendProfile");
+        if (!cancelled) {
+          dispatch(setImageURL(createdUrl));
+          createdUrl = null;
+        }
+      } catch (err) {
+        console.error("Profil fotoğrafı yüklenemedi:", err);
+      }
     };
 
-    // Profil fotoğrafını yükle
-    useEffect(() => {
-        let cancelled = false;
-        let createdUrl = null;
+    loadProfileImage();
 
-        const loadProfileImage = async () => {
-            if (imageUrl) return;
+    return () => {
+      cancelled = true;
+      if (createdUrl) revokeImageObjectUrl(createdUrl);
+    };
+  }, [user?.profileImage, imageUrl, dispatch]);
 
-            const imageId = getImageId(user?.profileImage);
-            if (!imageId) return;
+  // Galeri fotoğraflarını yükle.
+  useEffect(() => {
+    let cancelled = false;
+    const createdUrls = [];
 
-            try {
-                const response = await getImageById(imageId);
+    const loadGallery = async () => {
+      const resolved = await Promise.all(
+        photos.map(async (photo, index) => {
+          const imageId = getImageId(photo);
 
-                const blob = new Blob([response.data], {
-                    type:
-                        response.headers?.["content-type"] ||
-                        "image/jpeg",
-                });
-
-                createdUrl = URL.createObjectURL(blob);
-
-                if (!cancelled) {
-                    dispatch(setImageURL(createdUrl));
-                } else {
-                    revokeImageObjectUrl(createdUrl);
-                }
-            } catch (err) {
-                console.error("Profil fotoğrafı yüklenemedi:", err);
+          if (!imageId) {
+            if (isDirectImageUrl(photo)) {
+              return { id: `${photo}-${index}`, url: photo };
             }
-        };
 
-        loadProfileImage();
+            return null;
+          }
 
-        return () => {
-            cancelled = true;
-        };
-    }, [user?.profileImage, imageUrl, dispatch]);
+          try {
+            const response = await getImageById(imageId);
+            const blob = new Blob([response.data], {
+              type: response.headers?.["content-type"] || "image/jpeg",
+            });
 
-    // Galeri fotoğraflarını yükle
-    useEffect(() => {
-        let cancelled = false;
-        const createdUrls = [];
+            const url = URL.createObjectURL(blob);
+            createdUrls.push(url);
 
-        const loadGallery = async () => {
-            const resolved = await Promise.all(
-                photos.map(async (photo) => {
-                    const imageId = getImageId(photo);
+            return { id: imageId, url };
+          } catch (err) {
+            console.error("Galeri fotoğrafı yüklenemedi:", imageId, err);
+            return null;
+          }
+        })
+      );
 
-                    if (!imageId) {
-                        if (
-                            typeof photo === "string" &&
-                            (
-                                photo.startsWith("http://") ||
-                                photo.startsWith("https://") ||
-                                photo.startsWith("blob:") ||
-                                photo.startsWith("data:")
-                            )
-                        ) {
-                            return { id: photo, url: photo };
-                        }
+      if (!cancelled) {
+        setGalleryUrls(resolved.filter(Boolean));
+      } else {
+        createdUrls.forEach(revokeImageObjectUrl);
+      }
+    };
 
-                        return null;
-                    }
+    setGalleryUrls([]);
+    loadGallery();
 
-                    try {
-                        const response = await getImageById(imageId);
+    return () => {
+      cancelled = true;
+      createdUrls.forEach(revokeImageObjectUrl);
+    };
+  }, [photos]);
 
-                        const blob = new Blob([response.data], {
-                            type:
-                                response.headers?.["content-type"] ||
-                                "image/jpeg",
-                        });
+  // Arkadaş fotoğraflarını URL veya görsel ID üzerinden çöz.
+  useEffect(() => {
+    let cancelled = false;
+    const createdUrls = [];
 
-                        const url = URL.createObjectURL(blob);
-                        createdUrls.push(url);
+    const loadFriendImages = async () => {
+      const entries = await Promise.all(
+        allFriends.map(async (friend, index) => {
+          const friendId = friend.id || friend._id || index;
+          const rawImage =
+            friend.image ||
+            friend.profileImage ||
+            friend.profilePicture ||
+            friend.imageUrl;
 
-                        return { id: imageId, url };
-                    } catch (err) {
-                        console.error(
-                            `Galeri fotoğrafı yüklenemedi: ${imageId}`,
-                            err
-                        );
-                        return null;
-                    }
-                })
-            );
+          if (isDirectImageUrl(rawImage)) {
+            return [friendId, rawImage];
+          }
 
-            if (!cancelled) {
-                setGalleryUrls(resolved.filter(Boolean));
-            } else {
-                createdUrls.forEach(revokeImageObjectUrl);
-            }
-        };
+          const imageId = getImageId(rawImage);
+          if (!imageId) return [friendId, DEFAULT_IMAGE];
 
-        setGalleryUrls([]);
-        loadGallery();
+          try {
+            const response = await getImageById(imageId);
+            const blob = new Blob([response.data], {
+              type: response.headers?.["content-type"] || "image/jpeg",
+            });
 
-        return () => {
-            cancelled = true;
-            createdUrls.forEach(revokeImageObjectUrl);
-        };
-    }, [photos]);
+            const url = URL.createObjectURL(blob);
+            createdUrls.push(url);
 
-    // Giriş kontrolü
-    if (!isUserLogin || !user || (!user.id && !user._id)) {
-        return (
-            <div className="flex min-h-[60vh] items-center justify-center bg-slate-100 px-4">
-                <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-lg">
-                    <h2 className="text-xl font-semibold text-slate-800">
-                        Profil bilgileri bulunamadı
-                    </h2>
+            return [friendId, url];
+          } catch (err) {
+            console.error("Arkadaş fotoğrafı yüklenemedi:", err);
+            return [friendId, DEFAULT_IMAGE];
+          }
+        })
+      );
 
-                    <button
-                        type="button"
-                        onClick={() => navigate("/login")}
-                        className="mt-4 rounded-xl bg-[#075E45] px-5 py-2.5 font-semibold text-white transition hover:bg-[#043D30]"
-                    >
-                        Giriş yap
-                    </button>
-                </div>
-            </div>
-        );
-    }
+      if (!cancelled) {
+        setFriendImageUrls(Object.fromEntries(entries));
+      } else {
+        createdUrls.forEach(revokeImageObjectUrl);
+      }
+    };
 
-    const displayName = [
-        user.firstName,
-        user.lastName,
-    ]
-        .filter(Boolean)
-        .join(" ");
+    setFriendImageUrls({});
+    loadFriendImages();
 
-    const profileImage = imageUrl || DEFAULT_IMAGE;
+    return () => {
+      cancelled = true;
+      createdUrls.forEach(revokeImageObjectUrl);
+    };
+  }, [allFriends]);
 
-    const tabs = [
-        { id: "photos", label: "Fotoğraflar" },
-        { id: "friends", label: "Arkadaşlar" },
-    ];
+  const handleOpenFriendProfile = (friend) => {
+    const selectedFriend = {
+      ...friend,
+      id: friend.id || friend._id,
+      name:
+        friend.firstName ||
+        friend.name ||
+        friend.username ||
+        "Kullanıcı",
+      lastname: friend.lastName || friend.lastname || "",
+      image:
+        friendImageUrls[friend.id || friend._id] ||
+        friend.image ||
+        friend.profileImage ||
+        DEFAULT_IMAGE,
+    };
 
+    dispatch(setFriendProfile(selectedFriend));
+    navigate("/friendProfile");
+  };
+
+  if (!isUserLogin || !user || (!user.id && !user._id)) {
     return (
-        <main className="min-h-screen bg-[#F1F5F9] px-3 py-6 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-6xl">
+      <main className="flex min-h-[60vh] items-center justify-center bg-background p-5">
+        <div className="w-full max-w-md rounded-3xl border border-border bg-surface p-8 text-center shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+            <FiUsers size={25} />
+          </div>
+          <h2 className="mt-4 text-xl font-bold text-text">
+            Profil bilgileri bulunamadı
+          </h2>
+          <p className="mt-2 text-sm text-text-secondary">
+            Profilinizi görüntülemek için giriş yapmanız gerekiyor.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate("/login")}
+            className="mt-6 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
+          >
+            Giriş yap
+          </button>
+        </div>
+      </main>
+    );
+  }
 
-                {/* Profil kartı */}
-                <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-900/5">
+  const profileImage = imageUrl || DEFAULT_IMAGE;
 
-                    <div className="h-36 bg-gradient-to-r from-[#043D30] via-[#075E45] to-[#0B7657] sm:h-52" />
+  const tabs = [
+    { id: "photos", label: "Fotoğraflar", icon: FiImage, count: photos.length },
+    { id: "friends", label: "Arkadaşlar", icon: FiUsers, count: allFriends.length },
+  ];
 
-                    <div className="px-5 pb-6 sm:px-8">
-                        <div className="-mt-14 flex flex-col gap-5 sm:-mt-16 sm:flex-row sm:items-end sm:justify-between">
+  return (
+    <main className="h-full min-h-0 w-full min-w-0 overflow-y-auto bg-background p-3 sm:p-5 lg:overflow-hidden">
+      <div className="mx-auto flex min-h-full w-full max-w-[1500px] flex-col lg:h-full lg:min-h-0">
+        <div className="mb-4 flex shrink-0 items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+              Hesabım
+            </p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-text">
+              Profilim
+            </h1>
+          </div>
 
-                            <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-end">
-                                <img
-                                    src={profileImage}
-                                    alt="Profil fotoğrafı"
-                                    className="h-28 w-28 rounded-full border-4 border-white bg-slate-100 object-cover shadow-xl sm:h-36 sm:w-36"
-                                    onError={(event) => {
-                                        event.currentTarget.src = DEFAULT_IMAGE;
-                                    }}
-                                />
+          <button
+            type="button"
+            onClick={() => navigate("/updateProfile")}
+            className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-dark"
+          >
+            <FiEdit3 size={16} />
+            <span className="hidden sm:inline">Profili düzenle</span>
+            <span className="sm:hidden">Düzenle</span>
+          </button>
+        </div>
 
-                                <div className="pb-1 text-center sm:text-left">
-                                    <h1 className="text-2xl font-bold text-[#043D30]">
-                                        {displayName || "Kullanıcı"}
-                                    </h1>
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
+          {/* SOL: PROFİL KARTI */}
+          <aside className="flex min-w-0 flex-col gap-4">
+            <section className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+              <div className="h-24 bg-gradient-to-br from-primary-dark via-primary to-primary-light" />
 
-                                    <p className="mt-1 text-sm text-slate-500">
-                                        {user.email || ""}
-                                    </p>
+              <div className="px-5 pb-5">
+                <div className="-mt-12 flex items-end justify-between">
+                  <img
+                    src={profileImage}
+                    alt="Profil fotoğrafı"
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = DEFAULT_IMAGE;
+                    }}
+                    className="h-24 w-24 rounded-2xl border-4 border-surface bg-background object-cover shadow-md"
+                  />
+                  <div className="mb-1">
+                    <ProfileSettingDropdownMenu />
+                  </div>
+                </div>
 
-                                    {user.address && (
-                                        <p className="mt-1 text-sm text-slate-500">
-                                            {user.address}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
+                <div className="mt-4">
+                  <h2 className="break-words text-xl font-bold text-text">
+                    {displayName}
+                  </h2>
+                  {user.username && (
+                    <p className="mt-1 text-sm text-text-muted">
+                      @{user.username}
+                    </p>
+                  )}
+                </div>
 
-                            <div className="flex justify-center gap-2 sm:pb-2">
-                                <button
-                                    type="button"
-                                    onClick={() => navigate("/updateProfile")}
-                                    className="rounded-xl bg-[#075E45] px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-[#075E45]/20 transition hover:bg-[#043D30] hover:shadow-lg"
-                                >
-                                    Profili düzenle
-                                </button>
-
-                                <ProfileSettingDropdownMenu />
-                            </div>
-                        </div>
-
-                        {/* İstatistikler */}
-                        <div className="mt-7 grid grid-cols-2 gap-3 border-t border-slate-200 pt-5 sm:max-w-md">
-                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center transition hover:border-emerald-200 hover:bg-emerald-50">
-                                <p className="text-2xl font-bold text-[#075E45]">
-                                    {photos.length}
-                                </p>
-                                <p className="mt-1 text-xs font-medium text-slate-500">
-                                    Fotoğraf
-                                </p>
-                            </div>
-
-                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center transition hover:border-emerald-200 hover:bg-emerald-50">
-                                <p className="text-2xl font-bold text-[#075E45]">
-                                    {Array.isArray(user.friends)
-                                        ? user.friends.length
-                                        : 0}
-                                </p>
-                                <p className="mt-1 text-xs font-medium text-slate-500">
-                                    Arkadaş
-                                </p>
-                            </div>
-                        </div>
+                <div className="mt-5 space-y-3 border-t border-border pt-4">
+                  {user.email && (
+                    <div className="flex min-w-0 items-center gap-3 text-sm text-text-secondary">
+                      <FiMail className="shrink-0 text-primary" />
+                      <span className="min-w-0 break-all">{user.email}</span>
                     </div>
-                </section>
+                  )}
 
-                {/* Sekmeler */}
-                <section className="mt-6 rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-900/5">
-
-                    <div className="flex border-b border-slate-200 px-4 sm:px-6">
-                        {tabs.map((tab) => (
-                            <button
-                                key={tab.id}
-                                type="button"
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`border-b-[3px] px-5 py-4 text-sm font-semibold transition ${
-                                    activeTab === tab.id
-                                        ? "border-[#075E45] text-[#075E45]"
-                                        : "border-transparent text-slate-500 hover:text-[#075E45]"
-                                }`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
+                  {user.address && (
+                    <div className="flex min-w-0 items-start gap-3 text-sm text-text-secondary">
+                      <FiMapPin className="mt-0.5 shrink-0 text-primary" />
+                      <span className="min-w-0 break-words">{user.address}</span>
                     </div>
+                  )}
+                </div>
 
-                    <div className="p-4 sm:p-6">
+                <button
+                  type="button"
+                  onClick={() => navigate("/updateProfile")}
+                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-primary/20 bg-primary-soft px-4 py-3 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
+                >
+                  <FiEdit3 size={16} />
+                  Profil bilgilerini düzenle
+                </button>
+              </div>
+            </section>
 
-                        {/* Fotoğraflar */}
-                        {activeTab === "photos" && (
-                            <>
-                                <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                                    <div>
-                                        <h2 className="text-lg font-bold text-[#043D30]">
-                                            Fotoğraflarım
-                                        </h2>
-                                        <p className="mt-1 text-sm text-slate-500">
-                                            Profilinize eklediğiniz fotoğraflar.
-                                        </p>
-                                    </div>
+            <section className="grid grid-cols-2 gap-3">
+              <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                  <FiCamera size={18} />
+                </div>
+                <p className="mt-3 text-2xl font-bold tabular-nums text-text">
+                  {photos.length}
+                </p>
+                <p className="mt-1 text-xs font-medium text-text-secondary">
+                  Fotoğraf
+                </p>
+              </div>
 
-                                    <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-[#075E45]">
-                                        {galleryUrls.length} fotoğraf
-                                    </span>
-                                </div>
+              <div className="rounded-2xl border border-border bg-surface p-4 shadow-sm">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                  <FiUsers size={18} />
+                </div>
+                <p className="mt-3 text-2xl font-bold tabular-nums text-text">
+                  {allFriends.length}
+                </p>
+                <p className="mt-1 text-xs font-medium text-text-secondary">
+                  Arkadaş
+                </p>
+              </div>
+            </section>
+          </aside>
 
-                                {galleryUrls.length === 0 ? (
-                                    <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-12 text-center">
-                                        <p className="font-semibold text-slate-700">
-                                            Henüz fotoğrafınız bulunmuyor.
-                                        </p>
-                                        <p className="mt-1 text-sm text-slate-500">
-                                            Profil düzenleme bölümünden fotoğraf ekleyebilirsiniz.
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                                        {galleryUrls.map((photo) => (
-                                            <button
-                                                key={photo.id}
-                                                type="button"
-                                                onClick={() => setSelectedPhoto(photo.url)}
-                                                className="group aspect-square overflow-hidden rounded-xl border-2 border-slate-200 bg-slate-100 transition hover:border-[#075E45] hover:shadow-lg"
-                                            >
-                                                <img
-                                                    src={photo.url}
-                                                    alt="Profil galerisi fotoğrafı"
-                                                    className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                                                    onError={(event) => {
-                                                        event.currentTarget.src = DEFAULT_IMAGE;
-                                                    }}
-                                                />
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </>
-                        )}
+          {/* SAĞ: FOTOĞRAFLAR VE ARKADAŞLAR */}
+          <section className="flex min-h-[500px] min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm lg:min-h-0">
+            <div className="flex shrink-0 items-center justify-between border-b border-border px-4 sm:px-6">
+              <div className="flex min-w-0 gap-1">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
 
-                        {/* Arkadaşlar */}
-                        {activeTab === "friends" && (
-                            <>
-                                <div className="mb-5">
-                                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                                        <div>
-                                            <h2 className="text-lg font-bold text-[#043D30]">
-                                                Arkadaşlarım
-                                            </h2>
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`relative flex items-center gap-2 px-3 py-4 text-sm font-semibold transition sm:px-5 ${
+                        isActive
+                          ? "text-primary"
+                          : "text-text-secondary hover:text-primary"
+                      }`}
+                    >
+                      <Icon size={17} />
+                      <span>{tab.label}</span>
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[11px] ${
+                          isActive
+                            ? "bg-primary-soft text-primary"
+                            : "bg-background text-text-muted"
+                        }`}
+                      >
+                        {tab.count}
+                      </span>
+                      {isActive && (
+                        <span className="absolute inset-x-3 bottom-0 h-[3px] rounded-t-full bg-primary sm:inset-x-5" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
 
-                                            <p className="mt-1 text-sm text-slate-500">
-                                                Arkadaşlarınızı görüntüleyebilir ve profillerini ziyaret edebilirsiniz.
-                                            </p>
-                                        </div>
-
-                                        <span className="w-fit rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-[#075E45]">
-                                            {friends.length} arkadaş
-                                        </span>
-                                    </div>
-
-                                    <input
-                                        type="search"
-                                        value={searchFriends}
-                                        onChange={(event) =>
-                                            setSearchFriends(event.target.value)
-                                        }
-                                        placeholder="Arkadaş ara..."
-                                        className="mt-4 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#075E45] focus:bg-white focus:ring-2 focus:ring-emerald-100 sm:max-w-sm"
-                                    />
-                                </div>
-
-                                {friends.length === 0 ? (
-                                    <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-12 text-center">
-                                        <p className="font-semibold text-slate-700">
-                                            {searchFriends
-                                                ? "Aramanızla eşleşen arkadaş bulunamadı."
-                                                : "Henüz arkadaşınız bulunmuyor."}
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                                        {friends.map((friend, index) => {
-                                            const friendImage =
-                                                friend.image ||
-                                                friend.profileImage ||
-                                                DEFAULT_IMAGE;
-
-                                            const friendName =
-                                                friend.firstName ||
-                                                friend.name ||
-                                                friend.username ||
-                                                "Kullanıcı";
-
-                                            const friendLastname =
-                                                friend.lastName ||
-                                                friend.lastname ||
-                                                "";
-
-                                            return (
-                                                <button
-                                                    key={friend.id || friend._id || index}
-                                                    type="button"
-                                                    onClick={() => handleOpenFriendProfile(friend)}
-                                                    className="flex w-full items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:shadow-md"
-                                                >
-                                                    <img
-                                                        src={friendImage}
-                                                        alt={friendName}
-                                                        onError={(event) => {
-                                                            event.currentTarget.src = DEFAULT_IMAGE;
-                                                        }}
-                                                        className="h-14 w-14 shrink-0 rounded-full border-2 border-emerald-100 bg-slate-100 object-cover"
-                                                    />
-
-                                                    <div className="min-w-0 flex-1">
-                                                        <p className="truncate font-semibold text-[#043D30]">
-                                                            {friendName} {friendLastname}
-                                                        </p>
-
-                                                        <p className="truncate text-xs text-slate-500">
-                                                            {friend.email || ""}
-                                                        </p>
-
-                                                        <span className="mt-1 inline-block text-xs font-semibold text-[#075E45]">
-                                                            Profili görüntüle →
-                                                        </span>
-                                                    </div>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </>
-                        )}
-                    </div>
-                </section>
+              {activeTab === "photos" && (
+                <span className="hidden text-xs text-text-muted sm:inline">
+                  Fotoğraf galerisi
+                </span>
+              )}
             </div>
 
-            {/* Büyük fotoğraf görüntüleme */}
-            {selectedPhoto && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-[#021F18]/90 p-4 backdrop-blur-sm"
-                    onClick={() => setSelectedPhoto(null)}
-                >
-                    <button
-                        type="button"
-                        onClick={() => setSelectedPhoto(null)}
-                        className="absolute right-5 top-5 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-white transition hover:bg-white hover:text-[#043D30]"
-                    >
-                        Kapat
-                    </button>
+            <div className="min-h-0 flex-1 overflow-y-auto p-4 scrollbar-thin-green sm:p-6">
+              {activeTab === "photos" && (
+                <div>
+                  <div className="mb-5 flex items-center justify-between gap-3">
+                    <div>
+                      <h3 className="font-bold text-text">Fotoğraflarım</h3>
+                      <p className="mt-1 text-xs text-text-secondary">
+                        Profilinize eklediğiniz fotoğraflar.
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary">
+                      {galleryUrls.length} fotoğraf
+                    </span>
+                  </div>
 
-                    <img
-                        src={selectedPhoto}
-                        alt="Büyük fotoğraf"
-                        className="max-h-[85vh] max-w-full rounded-xl border-4 border-white object-contain shadow-2xl"
-                        onClick={(event) => event.stopPropagation()}
-                    />
+                  {galleryUrls.length === 0 ? (
+                    <div className="flex min-h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-background/70 px-5 text-center">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+                        <FiImage size={25} />
+                      </div>
+                      <h4 className="mt-4 font-semibold text-text">
+                        Henüz fotoğraf yok
+                      </h4>
+                      <p className="mt-1 max-w-xs text-sm text-text-secondary">
+                        Profilinize fotoğraf eklediğinizde burada görüntülenecek.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => navigate("/updateProfile")}
+                        className="mt-4 text-sm font-semibold text-primary hover:text-primary-dark"
+                      >
+                        Profilini düzenle
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                      {galleryUrls.map((photo) => (
+                        <button
+                          key={photo.id}
+                          type="button"
+                          onClick={() => setSelectedPhoto(photo.url)}
+                          className="group relative aspect-square min-w-0 overflow-hidden rounded-xl border border-border bg-background"
+                        >
+                          <img
+                            src={photo.url}
+                            alt="Galeri fotoğrafı"
+                            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                            onError={(event) => {
+                              event.currentTarget.onerror = null;
+                              event.currentTarget.src = DEFAULT_IMAGE;
+                            }}
+                          />
+                          <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-white opacity-0 transition group-hover:bg-black/25 group-hover:opacity-100">
+                            <FiArrowUpRight size={22} />
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-            )}
-        </main>
-    );
+              )}
+
+              {activeTab === "friends" && (
+                <div>
+                  <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h3 className="font-bold text-text">Arkadaşlarım</h3>
+                      <p className="mt-1 text-xs text-text-secondary">
+                        Arkadaşlarınızın profillerini görüntüleyin.
+                      </p>
+                    </div>
+
+                    <span className="w-fit rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary">
+                      {friends.length} kişi
+                    </span>
+                  </div>
+
+                  <div className="relative mb-5 max-w-md">
+                    <FiSearch
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted"
+                      size={17}
+                    />
+                    <input
+                      type="search"
+                      value={searchFriends}
+                      onChange={(event) => setSearchFriends(event.target.value)}
+                      placeholder="Arkadaşlarında ara..."
+                      className="w-full rounded-xl border border-border bg-background py-3 pl-10 pr-4 text-sm text-text outline-none transition placeholder:text-text-muted focus:border-primary focus:ring-4 focus:ring-primary/10"
+                    />
+                  </div>
+
+                  {friends.length === 0 ? (
+                    <div className="flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-background/70 px-5 text-center">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                        <FiUsers size={22} />
+                      </div>
+                      <p className="mt-3 font-semibold text-text">
+                        {searchFriends
+                          ? "Eşleşen arkadaş bulunamadı"
+                          : "Henüz arkadaşınız yok"}
+                      </p>
+                      <p className="mt-1 text-sm text-text-secondary">
+                        {searchFriends
+                          ? "Farklı bir isim veya arama kelimesi deneyin."
+                          : "Yeni arkadaşlar eklediğinizde burada görünecekler."}
+                      </p>
+                      {!searchFriends && (
+                        <button
+                          type="button"
+                          onClick={() => navigate("/discover-users")}
+                          className="mt-4 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark"
+                        >
+                          Arkadaş keşfet
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                      {friends.map((friend, index) => {
+                        const friendId = friend.id || friend._id || index;
+                        const friendName =
+                          friend.firstName ||
+                          friend.name ||
+                          friend.username ||
+                          "Kullanıcı";
+                        const friendLastname =
+                          friend.lastName || friend.lastname || "";
+
+                        const photo =
+                          friendImageUrls[friendId] ||
+                          (isDirectImageUrl(friend.image)
+                            ? friend.image
+                            : DEFAULT_IMAGE);
+
+                        return (
+                          <button
+                            key={friendId}
+                            type="button"
+                            onClick={() => handleOpenFriendProfile(friend)}
+                            className="group flex min-w-0 items-center gap-3 rounded-xl border border-border bg-surface p-3 text-left transition hover:border-primary/40 hover:bg-primary-soft/40"
+                          >
+                            <img
+                              src={photo}
+                              alt={friendName}
+                              onError={(event) => {
+                                event.currentTarget.onerror = null;
+                                event.currentTarget.src = DEFAULT_IMAGE;
+                              }}
+                              className="h-12 w-12 shrink-0 rounded-xl border border-border bg-background object-cover"
+                            />
+
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm font-semibold text-text group-hover:text-primary">
+                                {friendName} {friendLastname}
+                              </p>
+                              <p className="mt-1 truncate text-xs text-text-secondary">
+                                {friend.email || "Arkadaş"}
+                              </p>
+                            </div>
+
+                            <FiArrowUpRight
+                              className="shrink-0 text-text-muted transition group-hover:text-primary"
+                              size={17}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+      </div>
+
+      {selectedPhoto && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/90 p-4 backdrop-blur-sm"
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setSelectedPhoto(null)}
+            aria-label="Fotoğrafı kapat"
+            className="absolute right-5 top-5 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20"
+          >
+            <FiX size={22} />
+          </button>
+
+          <img
+            src={selectedPhoto}
+            alt="Büyük fotoğraf"
+            onClick={(event) => event.stopPropagation()}
+            className="max-h-[88vh] max-w-full rounded-2xl object-contain shadow-2xl"
+          />
+        </div>
+      )}
+    </main>
+  );
 };
 
 export default MyProfile;

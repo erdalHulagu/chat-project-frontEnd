@@ -19,6 +19,7 @@ import NotFoundPage from "../page/common/not-found-page";
 import Main from "../component/common/main/main";
 import ProtectedRoute from "./protected-route";
 import { useAppSelector } from "../redux/store/hooks";
+import DiscoverUsers from "../component/user/discover-users/discover-users";
 
 const GuestRoute = ({ children }) => {
   const isUserLogin = useAppSelector(
@@ -81,6 +82,7 @@ const CustomRouters = () => {
             path="/friendProfile"
             element={<FriendProfilePage />}
           />
+          <Route path="/discover-users" element={<DiscoverUsers />} />
 
           <Route path="/status" element={<StatusPage />} />
 

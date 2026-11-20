@@ -116,11 +116,11 @@ const Main = () => {
             </header>
 
             {/* PAGE CONTENT */}
-            <main className="relative flex min-h-0 w-full flex-1 flex-col  bg-background">
-                <div className="relative z-10 flex min-h-0 w-full flex-1 flex-colp-2 sm:p-3 md:p-4 lg:p-5">
+            <div className="flex h-screen min-h-0 flex-col overflow-hidden">
+                <main className="flex min-h-0 flex-1 overflow-hidden">
                     <Outlet />
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
     );
 };

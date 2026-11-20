@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -7,6 +6,7 @@ import {
   FiUser,
   FiHome,
   FiLogOut,
+  FiChevronDown,
 } from "react-icons/fi";
 
 import { useAppDispatch } from "../../../redux/store/hooks";
@@ -18,10 +18,8 @@ const ProfileSettingDropdownMenu = () => {
   const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
-
   const menuRef = useRef(null);
 
-  // Menü dışına tıklanınca kapat
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -30,17 +28,15 @@ const ProfileSettingDropdownMenu = () => {
     };
 
     const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-      }
+      if (event.key === "Escape") setIsOpen(false);
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-      window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
 
@@ -51,106 +47,84 @@ const ProfileSettingDropdownMenu = () => {
 
   const handleLogout = () => {
     setIsOpen(false);
-
     encryptedLocalStorage.removeItem("token");
     dispatch(logout());
-
     navigate("/login", { replace: true });
   };
 
-  const menuItemClass =
-    "group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-text-secondary transition-all duration-200 hover:bg-primary-soft hover:text-primary-dark";
+  const itemClass =
+    "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-text-secondary transition hover:bg-primary-soft hover:text-primary-dark";
 
   return (
     <div ref={menuRef} className="relative z-50">
-      {/* Dropdown button */}
       <button
         type="button"
         onClick={() => setIsOpen((previous) => !previous)}
-        aria-label="Ayarlar menüsünü aç"
+        aria-label="Profil ayarları"
         aria-expanded={isOpen}
-        aria-haspopup="true"
-        className={`flex items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
+        aria-haspopup="menu"
+        className={`inline-flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-semibold transition ${
           isOpen
-            ? "border-primary/20 bg-primary-soft text-primary-dark shadow-inner"
-            : "border-border bg-surface text-primary-dark shadow-sm hover:border-primary hover:bg-primary hover:text-white"
+            ? "border-primary/30 bg-primary-soft text-primary-dark"
+            : "border-border bg-surface text-text-secondary hover:border-primary/40 hover:text-primary"
         }`}
       >
-        <FiSettings size={18} />
-        <span>Ayarlar</span>
+        <FiSettings size={17} />
+        <span className="hidden sm:inline">Ayarlar</span>
+        <FiChevronDown
+          size={14}
+          className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {isOpen && (
-        <>
-          {/* Dropdown menu */}
-          <div
-            className="absolute right-0 top-full z-50 mt-3 w-60 overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl shadow-slate-900/10"
-            role="menu"
-          >
-            {/* Header */}
-            <div className="bg-gradient-to-r from-primary-dark via-primary to-primary-light px-4 py-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-white">
-                  <FiSettings size={20} />
-                </div>
-
-                <div>
-                  <p className="text-sm font-bold text-white">
-                    Hesap ayarları
-                  </p>
-                  <p className="mt-0.5 text-xs text-white/70">
-                    Profilini ve hesabını yönet
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Navigation items */}
-            <div className="space-y-1 p-2">
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => handleNavigate("/updateProfile")}
-                className={menuItemClass}
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-soft text-primary transition-colors group-hover:bg-primary group-hover:text-white">
-                  <FiUser size={18} />
-                </span>
-
-                <span>Profili düzenle</span>
-              </button>
-
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => handleNavigate("/")}
-                className={menuItemClass}
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-soft text-primary transition-colors group-hover:bg-primary group-hover:text-white">
-                  <FiHome size={18} />
-                </span>
-
-                <span>Ana sayfa</span>
-              </button>
-            </div>
-
-            {/* Logout */}
-            <div className="border-t border-border bg-background/70 p-2">
-              <button
-                type="button"
-                role="menuitem"
-                onClick={handleLogout}
-                className="group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-danger transition-all duration-200 hover:bg-red-50"
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-danger transition-colors group-hover:bg-danger group-hover:text-white">
-                  <FiLogOut size={18} />
-                </span>
-
-                <span>Çıkış yap</span>
-              </button>
-            </div>
+        <div
+          role="menu"
+          className="absolute right-0 top-full mt-2 w-60 overflow-hidden rounded-2xl border border-border bg-surface p-2 shadow-xl shadow-slate-900/10"
+        >
+          <div className="rounded-xl bg-primary-soft px-3 py-3">
+            <p className="text-sm font-bold text-primary-dark">
+              Hesap ayarları
+            </p>
+            <p className="mt-1 text-xs text-text-secondary">
+              Hesabınızı yönetin
+            </p>
           </div>
-        </>
+
+          <div className="mt-2 space-y-1">
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => handleNavigate("/updateProfile")}
+              className={itemClass}
+            >
+              <FiUser size={17} />
+              Profili düzenle
+            </button>
+
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => handleNavigate("/")}
+              className={itemClass}
+            >
+              <FiHome size={17} />
+              Ana sayfa
+            </button>
+          </div>
+
+          <div className="mt-2 border-t border-border pt-2">
+            <button
+              type="button"
+              role="menuitem"
+              onClick={handleLogout}
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-danger transition hover:bg-red-50"
+            >
+              <FiLogOut size={17} />
+              Çıkış yap
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,84 +1,269 @@
-import React, { useState } from 'react'
-import { BiSolidPencil } from 'react-icons/bi';
-import { MdPhotoCamera } from 'react-icons/md';
 
-import img from '../../../../../assets/img/user.webp'
-import { TfiCommentsSmiley } from 'react-icons/tfi';
-import { BsFillSave2Fill } from 'react-icons/bs';
+import React, { useEffect, useState } from "react";
 
-const CreateComminityGroup = () => {
+import {
+  FiCamera,
+  FiUsers,
+  FiGlobe,
+  FiSave,
+  FiImage,
+  FiX,
+} from "react-icons/fi";
 
-    const [isVisible, setIsVisible] = useState(true);
-    const [isActive, setIsActive] = useState(false);
-    const [createGroupChat, setCreateGroupChat] = useState(false);
+import defaultImage from "../../../../../assets/img/user.webp";
 
-    const handleToggleVisibility = () => {
-        setIsVisible(!isVisible);
+const CreateComminityGroup = ({ onSave }) => {
+  const [communityName, setCommunityName] = useState("");
+  const [description, setDescription] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [preview, setPreview] = useState(defaultImage);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Seçilen fotoğrafın geçici URL'sini temizle
+  useEffect(() => {
+    return () => {
+      if (preview?.startsWith("blob:")) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
+
+  const handleImageChange = (event) => {
+    const selectedFile = event.target.files?.[0];
+
+    if (!selectedFile) return;
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      setErrorMessage("Lütfen JPEG, PNG veya WEBP formatında bir fotoğraf seçin.");
+      event.target.value = "";
+      return;
     }
-    const handleInputVisible = () => {
-        setIsActive(!isActive)
+
+    if (selectedFile.size > 5 * 1024 * 1024) {
+      setErrorMessage("Fotoğraf boyutu en fazla 5 MB olabilir.");
+      event.target.value = "";
+      return;
     }
-    const handleCreateGroupChat = () => {
-        setCreateGroupChat(true);
 
+    setErrorMessage("");
+    setImageFile(selectedFile);
+    setPreview(URL.createObjectURL(selectedFile));
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setPreview(defaultImage);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!communityName.trim()) {
+      setErrorMessage("Lütfen topluluk adını girin.");
+      return;
     }
 
-    return (
-        <div className=' w-full h-full  rounded-b-lg'>
-            <div className='w-full h-full flex flex-col items-center'>
-            <div className='flex items-center justify-center w-full h-[40%] '>
-                <label htmlFor="imgInput">
-                    <div className='rounded w-36 h-36 flex items-center justify-center'>
-                        <img className='rounded cursor-pointer w-36 h-36 my-5 ' src={img} alt="" />
-                        <MdPhotoCamera className='absolute ml-20 text-gray-400 w-14 h-14 p-3 hover:opacity-30 hover:bg-slate-100 hover:text-blue-950 cursor-pointer rounded-full' />
-                    </div>
+    if (!onSave) {
+      setErrorMessage("Topluluk kayıt işlemi henüz bağlanmadı.");
+      return;
+    }
 
-                </label>
-                <input type="file" id='imgInput' className='hidden' />
-            </div>
-           
-            <div className='w-full h-[20%] rounded-bl-lg '>
-                <div className='w-[94%] flex   border-slate-400 border-b mx-[3%] '>
-                    <div className='w-full flex flex-col  '>
+    try {
+      setLoading(true);
+      setErrorMessage("");
 
-                        <div className='flex  w-full h-12'>
-                            {isActive ? (<input id='imgInput' className=' ml-3  text-slate-800 bottom-0 w-[90%] bg-slate-200  focus:outline-none ' type="text" alt='' autoFocus />) : <h5 className="ml-3 text-sm text-slate-500 w-[90%]" > Type in group name (optional) </h5>}
-                            <div className='w-[10] flex justify-end'>
-                                <BiSolidPencil onClick={handleInputVisible} id='imgInput' className={'rounded-full hover:opacity-50 hover:bg-white p-2 w-10 h-10 text-lg text-slate-500 hover:text-red-800 cursor-pointer '} />
+      await onSave({
+        communityName: communityName.trim(),
+        description: description.trim(),
+        image: imageFile,
+      });
 
-                            </div>
+      setCommunityName("");
+      setDescription("");
+      setImageFile(null);
+      setPreview(defaultImage);
+    } catch (error) {
+      setErrorMessage(
+        typeof error === "string"
+          ? error
+          : "Topluluk oluşturulurken bir hata oluştu."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                        </div>
-                    </div>
-
-
-                </div>
-                <div className='w-[94%] h-[90%] bg-slate-300 flex mt-20 mx-[3%]  '>
-                    <div className='w-full h-full flex flex-col '>
-                        <p className=" text-gray-600 ml-3 text-sm mt-3" > Group Description </p>
-                        {isVisible &&
-                            <p onClick={handleToggleVisibility} id="textarea" className=" text-gray-600  pl-2 text-sm" > ! click on and write something...  You can add rules for your group member to see</p>
-                        }
-                        {!isVisible && <textarea id="textarea" className='w-full h-[30%] resize-none overflow-clip hover:overflow-y-auto pl-2  pb-28 bg-slate-300 text-gray-600 mb-2 bottom-0 focus:outline-none' type="text" alt='' />}
-
-                    </div>
-
-                    <div className='flex justify-end '>
-
-                        <TfiCommentsSmiley className='mt-2 mr-2 text-gray-600 w-10 h-10 p-2 hover:opacity-60 hover:bg-slate-100 rounded-full hover:text-red-800 cursor-pointer' />
-                    </div>
-
-                </div>
-                <div className='mt-3  w-full flex items-center justify-center '>
-
-                    <button className='flex items-center bg-blue-900 py-2 px-3 text-gray-300 rounded'> <BsFillSave2Fill className='bg-blue-900 text-gray-300 pl-1 mr-2' />Save</button>
-                </div>
-            </div>
-            </div>
-           
-
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="mx-auto w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-surface shadow-sm"
+    >
+      {/* Header */}
+      <div className="flex items-center gap-3 border-b border-border bg-background/70 px-5 py-4 sm:px-6">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft text-primary">
+          <FiGlobe size={22} />
         </div>
-    )
-}
 
-export default CreateComminityGroup
+        <div>
+          <h2 className="text-base font-bold text-text sm:text-lg">
+            Create Community
+          </h2>
+          <p className="mt-0.5 text-xs text-text-muted">
+            Build a new community and bring people together.
+          </p>
+        </div>
+      </div>
+
+      {/* Form Content */}
+      <div className="space-y-6 p-5 sm:p-7">
+
+        {/* Community Image */}
+        <div className="flex flex-col items-center">
+          <div className="group relative">
+            <img
+              src={preview}
+              alt="Community preview"
+              className="h-32 w-32 rounded-2xl border-4 border-primary-soft object-cover shadow-sm sm:h-36 sm:w-36"
+            />
+
+            <label
+              htmlFor="community-image"
+              className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-2xl bg-black/0 text-white transition group-hover:bg-black/40"
+            >
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white opacity-90 shadow-lg transition group-hover:scale-105">
+                <FiCamera size={21} />
+              </span>
+            </label>
+
+            {imageFile && (
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                aria-label="Remove image"
+                className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-danger text-white shadow-md transition hover:bg-red-700"
+              >
+                <FiX size={15} />
+              </button>
+            )}
+          </div>
+
+          <input
+            id="community-image"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleImageChange}
+            className="hidden"
+          />
+
+          <p className="mt-3 text-xs font-medium text-text-secondary">
+            <FiImage className="mr-1 inline" size={14} />
+            Community photo
+          </p>
+
+          <p className="mt-1 text-xs text-text-muted">
+            JPEG, PNG or WEBP · Max 5 MB
+          </p>
+        </div>
+
+        {/* Community Name */}
+        <div>
+          <label
+            htmlFor="community-name"
+            className="mb-2 block text-sm font-semibold text-text"
+          >
+            Community Name
+            <span className="ml-1 text-danger">*</span>
+          </label>
+
+          <input
+            id="community-name"
+            type="text"
+            value={communityName}
+            onChange={(event) => setCommunityName(event.target.value)}
+            placeholder="Enter community name"
+            maxLength={60}
+            required
+            className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-text outline-none transition placeholder:text-text-muted focus:border-primary focus:ring-4 focus:ring-primary/10"
+          />
+
+          <p className="mt-1 text-right text-xs text-text-muted">
+            {communityName.length}/60
+          </p>
+        </div>
+
+        {/* Description */}
+        <div>
+          <label
+            htmlFor="community-description"
+            className="mb-2 block text-sm font-semibold text-text"
+          >
+            Community Description
+          </label>
+
+          <textarea
+            id="community-description"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            placeholder="Tell people what your community is about. You can also add rules and guidelines..."
+            rows={5}
+            maxLength={500}
+            className="w-full resize-y rounded-xl border border-border bg-surface px-4 py-3 text-sm leading-6 text-text outline-none transition placeholder:text-text-muted focus:border-primary focus:ring-4 focus:ring-primary/10"
+          />
+
+          <p className="mt-1 text-right text-xs text-text-muted">
+            {description.length}/500
+          </p>
+        </div>
+
+        {/* Information */}
+        <div className="flex gap-3 rounded-xl border border-primary/10 bg-primary-soft p-4">
+          <FiUsers className="mt-0.5 shrink-0 text-primary" size={19} />
+
+          <p className="text-xs leading-5 text-primary-dark">
+            Give your community a clear name and description so people
+            can understand its purpose and decide whether to join.
+          </p>
+        </div>
+
+        {/* Error */}
+        {errorMessage && (
+          <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-danger">
+            {errorMessage}
+          </p>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="flex flex-col-reverse gap-3 border-t border-border bg-background/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-7">
+        <button
+          type="button"
+          onClick={() => {
+            setCommunityName("");
+            setDescription("");
+            setImageFile(null);
+            setPreview(defaultImage);
+            setErrorMessage("");
+          }}
+          disabled={loading}
+          className="rounded-xl border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-text-secondary transition hover:bg-background disabled:opacity-50"
+        >
+          Clear
+        </button>
+
+        <button
+          type="submit"
+          disabled={loading || !communityName.trim()}
+          className="flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <FiSave size={17} />
+          {loading ? "Creating..." : "Create Community"}
+        </button>
+      </div>
+    </form>
+  );
+};
+
+export default CreateComminityGroup;

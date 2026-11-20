@@ -1,46 +1,51 @@
+
 import React from "react";
-import { BiSolidTrash } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
+import { BiUserPlus } from "react-icons/bi";
 
+const FriendsCard = ({
+  id,
+  name,
+  lastname,
+  image,
+  onAddFriend,
+  onViewProfile,
+  isAdded = false,
+  loading = false,
+}) => {
+  return (
+    <div className="w-full overflow-hidden rounded-2xl border border-border bg-surface shadow-md transition hover:-translate-y-1 hover:shadow-lg">
+      <button
+        type="button"
+        onClick={onViewProfile}
+        className="block h-52 w-full overflow-hidden bg-primary-soft"
+        aria-label={`${name} ${lastname} profilini görüntüle`}
+      >
+        <img
+          src={image}
+          alt={`${name} ${lastname}`}
+          className="h-full w-full object-cover transition duration-300 hover:scale-105"
+        />
+      </button>
 
-const FriendsCard = ({ name,lastname,image,handleFriendProfile }) => {
-   
-    const navigate = useNavigate();
-
-    // const handleNavigateProfile = () => {
-        
-    //     // Navigate to the '/profile' route
-    //     navigate('/friendProfile');
-    // }
-   
-   
-
-    return (
-        <div className="w-[94%] h-auto p-2 max-h-200 rounded m-3  bg-gradient-to-b from-purple-300 via-purple-100 to-white hover:border-2  shadow-2xl shadow-slate-800 cursor-pointer">
-            <div className="w-full h-60  flex items-center justify-center mb-1">
-                <img onClick={handleFriendProfile}  className="rounded m-0 w-full h-full " src={image} alt="" />
-            </div>
-
-
-
-            <div className="w-full h-[40%] flex items-center justify-center">
-                <div className=" w-full h-full flex items-cemter justify-center">
-                    <p className="mr-2 text-slate-950 ">{name}</p>
-                    <p className="text-slate-950 ">{lastname} </p>
-                </div>
-                <div className="w-full h-10 flex items-center justify-end">
-                    <BiSolidTrash className="hover:opacity-70 rounded-full w-8 h-8 p-2   hover:bg-purple-200 text-purple-950 hover:text-blue-950 cursor-pointer" />
-                </div>
-            </div>
-
-
-
-
-
-
-
+      <div className="flex items-center justify-between gap-2 p-3">
+        <div className="min-w-0">
+          <p className="truncate font-semibold text-text">
+            {name} {lastname}
+          </p>
         </div>
-    );
+
+        <button
+          type="button"
+          onClick={() => onAddFriend?.({ id, name, lastname, image })}
+          disabled={isAdded || loading || !id}
+          className="flex shrink-0 items-center gap-1 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <BiUserPlus size={18} />
+          {loading ? "Ekleniyor..." : isAdded ? "Eklendi" : "Ekle"}
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default FriendsCard;

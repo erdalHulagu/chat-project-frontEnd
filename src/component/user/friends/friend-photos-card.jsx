@@ -1,34 +1,41 @@
-import React, { useState } from 'react'
-import {  BiSolidLeftArrowSquare, BiSolidTrash } from 'react-icons/bi';
 
-const FriendPhotos = ({isEnlarged, handleToggleSize}) => {
+import React from "react";
+import { BiSolidLeftArrowSquare } from "react-icons/bi";
 
-  // const [isEnlarged, setIsEnlarged] = useState(false);
-
-  // const handleToggleSize = () => {
-  //   setIsEnlarged(!isEnlarged);
-  // };
-
-  
-  
-
-
-
+const FriendPhotos = ({
+  isEnlarged,
+  handleToggleSize,
+  image = "https://cdn.pixabay.com/photo/2012/10/14/11/20/koalas-61189_1280.jpg",
+}) => {
   return (
+    <div
+      className={`relative overflow-hidden rounded-xl border border-border bg-surface shadow-md ${
+        isEnlarged ? "fixed inset-4 z-50 flex items-center justify-center bg-black/90" : ""
+      }`}
+    >
+      <img
+        onClick={handleToggleSize}
+        className={`cursor-pointer object-cover transition hover:opacity-90 ${
+          isEnlarged
+            ? "max-h-full max-w-full"
+            : "h-56 w-full"
+        }`}
+        src={image}
+        alt="Arkadaş fotoğrafı"
+      />
 
-
-    <div className={`${isEnlarged ? ' w-full h-auto  flex justify-center items-center  ' : 'object-cover  m-2 w-[92%] h-auto rounded hover:w-[96%] hover:flex  shadow-2xl shadow-slate-800 cursor-pointer'}`}>
-    {/* <div className={`${isEnlarged ? 'object-fill h-48 w-96 z-10 mb-20 ' : 'flex items-center h-40 w-80 m-4 p-2'}`}> */}
-      <div className='w-full h-auto relative '>
-        <img onClick={handleToggleSize} className=' object-cover  max-h-[85vh] w-full h-auto rounded hover:opacity-90 cursor-pointer ' src="https://cdn.pixabay.com/photo/2012/10/14/11/20/koalas-61189_1280.jpg" alt="" />
-          <BiSolidLeftArrowSquare onClick={handleToggleSize}  className={`${!isEnlarged ? 'hidden' : 'hover:opacity-40 absolute rounded-full w-14 h-14 p-3 hover:bg-slate-100 top-1 left-1 text-slate-200 hover:text-red-800 cursor-pointer'}`} />
-          <BiSolidTrash className={`${isEnlarged ? 'hidden' : 'hover:opacity-40 absolute rounded-full w-14 h-14 p-3 hover:bg-slate-100 top-1 right-1 text-slate-200 hover:text-red-800 cursor-pointer'}`} />
-        {/* </div> */}
-      </div>
+      {isEnlarged && (
+        <button
+          type="button"
+          onClick={handleToggleSize}
+          className="absolute left-3 top-3 rounded-full bg-white/20 p-2 text-white hover:bg-white/40"
+          aria-label="Fotoğrafı küçült"
+        >
+          <BiSolidLeftArrowSquare size={28} />
+        </button>
+      )}
     </div>
+  );
+};
 
-
-  )
-}
-
-export default FriendPhotos
+export default FriendPhotos;

@@ -1,40 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import './progress-bar.css'
 
-
-const ProgressBar = ({index,activeIndex,duration}) => {
-  const isActive=(index===activeIndex)
-  const [progress, setProgress] = useState();
-
-  
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setProgress((prevProgress) => {
-        if (prevProgress < 100) {
-            return prevProgress + 1;
-        }
-        clearInterval(intervalId);
-        return prevProgress;
-      });
-
-    }, duration/100); 
-
-}, [duration, activeIndex]);
-
-useEffect(() => {
-    setProgress(0);
-
-}, [activeIndex])
+import React from "react";
+import "./progress-bar.css";
+const ProgressBar = ({
+  index,
+  activeIndex,
+  duration = 5000,
+}) => {
+  const isCompleted = index < activeIndex;
+  const isActive = index === activeIndex;
 
   return (
-    
-    <div className={`progress-bar-container ${isActive ? "active":""}`}>
-      <div 
-      className={`${isActive?"progress-bar":""}`} 
-      style={{ width: `${progress}%` }}></div>
+    <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/30">
+      <div
+        className={`h-full rounded-full ${
+          isCompleted
+            ? "w-full bg-white"
+            : isActive
+              ? "status-progress-fill bg-white"
+              : "w-0 bg-white"
+        }`}
+        style={
+          isActive
+            ? {
+                animationDuration: `${duration}ms`,
+              }
+            : undefined
+        }
+      />
     </div>
   );
 };
-export default ProgressBar
 
+export default ProgressBar;

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -9,6 +10,10 @@ import {
 import {
     setImageURL,
 } from "../../../redux/store/slices/user/auth/auth-slice";
+
+import {
+    setFriendProfile,
+} from "../../../redux/store/slices/profile/profile-slice";
 
 import {
     getImageById,
@@ -41,13 +46,13 @@ const MyProfile = () => {
 
         return list.filter((friend) => {
             const fullName = [
-                friend.firstName || "",
-                friend.lastName || "",
+                friend.firstName || friend.name || friend.username || "",
+                friend.lastName || friend.lastname || "",
             ].join(" ");
 
             return fullName
                 .toLowerCase()
-                .includes(searchFriends.toLowerCase());
+                .includes(searchFriends.toLowerCase().trim());
         });
     }, [user?.friends, searchFriends]);
 
@@ -55,6 +60,27 @@ const MyProfile = () => {
     const photos = useMemo(() => {
         return Array.isArray(user?.myImages) ? user.myImages : [];
     }, [user?.myImages]);
+
+    // Arkadaş profiline git
+    const handleOpenFriendProfile = (friend) => {
+        const selectedFriend = {
+            ...friend,
+            id: friend.id || friend._id,
+            name:
+                friend.firstName ||
+                friend.name ||
+                friend.username ||
+                "Kullanıcı",
+            lastname: friend.lastName || friend.lastname || "",
+            image:
+                friend.image ||
+                friend.profileImage ||
+                DEFAULT_IMAGE,
+        };
+
+        dispatch(setFriendProfile(selectedFriend));
+        navigate("/friendProfile");
+    };
 
     // Profil fotoğrafını yükle
     useEffect(() => {
@@ -349,9 +375,21 @@ const MyProfile = () => {
                         {activeTab === "friends" && (
                             <>
                                 <div className="mb-5">
-                                    <h2 className="text-lg font-bold text-[#043D30]">
-                                        Arkadaşlarım
-                                    </h2>
+                                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                        <div>
+                                            <h2 className="text-lg font-bold text-[#043D30]">
+                                                Arkadaşlarım
+                                            </h2>
+
+                                            <p className="mt-1 text-sm text-slate-500">
+                                                Arkadaşlarınızı görüntüleyebilir ve profillerini ziyaret edebilirsiniz.
+                                            </p>
+                                        </div>
+
+                                        <span className="w-fit rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-[#075E45]">
+                                            {friends.length} arkadaş
+                                        </span>
+                                    </div>
 
                                     <input
                                         type="search"
@@ -366,41 +404,63 @@ const MyProfile = () => {
 
                                 {friends.length === 0 ? (
                                     <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-12 text-center">
-                                        <p className="font-medium text-slate-700">
-                                            Arkadaş bulunamadı.
+                                        <p className="font-semibold text-slate-700">
+                                            {searchFriends
+                                                ? "Aramanızla eşleşen arkadaş bulunamadı."
+                                                : "Henüz arkadaşınız bulunmuyor."}
                                         </p>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                                        {friends.map((friend, index) => (
-                                            <div
-                                                key={friend.id || friend._id || index}
-                                                className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-emerald-200 hover:bg-emerald-50/50"
-                                            >
-                                                <img
-                                                    src={DEFAULT_IMAGE}
-                                                    alt=""
-                                                    className="h-12 w-12 rounded-full border-2 border-emerald-100 bg-slate-100 object-cover"
-                                                />
+                                        {friends.map((friend, index) => {
+                                            const friendImage =
+                                                friend.image ||
+                                                friend.profileImage ||
+                                                DEFAULT_IMAGE;
 
-                                                <div className="min-w-0">
-                                                    <p className="truncate font-semibold text-[#043D30]">
-                                                        {[
-                                                            friend.firstName,
-                                                            friend.lastName,
-                                                        ]
-                                                            .filter(Boolean)
-                                                            .join(" ") ||
-                                                            friend.username ||
-                                                            "Kullanıcı"}
-                                                    </p>
+                                            const friendName =
+                                                friend.firstName ||
+                                                friend.name ||
+                                                friend.username ||
+                                                "Kullanıcı";
 
-                                                    <p className="truncate text-xs text-slate-500">
-                                                        {friend.email || ""}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ))}
+                                            const friendLastname =
+                                                friend.lastName ||
+                                                friend.lastname ||
+                                                "";
+
+                                            return (
+                                                <button
+                                                    key={friend.id || friend._id || index}
+                                                    type="button"
+                                                    onClick={() => handleOpenFriendProfile(friend)}
+                                                    className="flex w-full items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:shadow-md"
+                                                >
+                                                    <img
+                                                        src={friendImage}
+                                                        alt={friendName}
+                                                        onError={(event) => {
+                                                            event.currentTarget.src = DEFAULT_IMAGE;
+                                                        }}
+                                                        className="h-14 w-14 shrink-0 rounded-full border-2 border-emerald-100 bg-slate-100 object-cover"
+                                                    />
+
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="truncate font-semibold text-[#043D30]">
+                                                            {friendName} {friendLastname}
+                                                        </p>
+
+                                                        <p className="truncate text-xs text-slate-500">
+                                                            {friend.email || ""}
+                                                        </p>
+
+                                                        <span className="mt-1 inline-block text-xs font-semibold text-[#075E45]">
+                                                            Profili görüntüle →
+                                                        </span>
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </>

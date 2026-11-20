@@ -13,6 +13,7 @@ import usersGroupChatReducer from "./slices/chat/chat-slices/users-group-chat-sl
 import userSearchReducer from "./slices/user/user/serachUser/user-search-slice";
 import updateUserReducer from "./slices/user/user/upDateUser/update-user-slice";
 
+import setFriendReducer from "./slices/friend/friendsProfileSlices";
 export const store = configureStore({
   reducer: {
     profile: profileReducer,
@@ -24,6 +25,7 @@ export const store = configureStore({
     usersSingleChat: singleUserChatReducer,
     usersGroupChats: usersGroupChatReducer,
     updateCurrentUser: updateUserReducer,
+  
   },
 });
 

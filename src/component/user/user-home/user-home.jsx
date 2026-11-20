@@ -226,47 +226,56 @@ const UserHome = () => {
   }, [isUserLogin, dispatch]);
 
   // Yeni sohbet aç
-  const handleCreateChat = async (selected) => {
+ const handleCreateChat = async (selected) => {
     if (!selected?.id) return;
 
     if (String(selected.id) === String(user?.id)) {
-      return;
+        return;
     }
 
     try {
-      setSelectedUser(selected);
-      setSelectedChat(null);
-      setActiveChatId(null);
+        console.log("SEÇİLEN KULLANICI:", selected);
 
-      setIsChatOpen(true);
-      setMessageText("");
+        setSelectedUser(selected);
+        setSelectedChat(null);
+        setActiveChatId(null);
 
-      dispatch(clearMessages());
+        setIsChatOpen(true);
+        setMessageText("");
 
-      const chat = await dispatch(
-        singleUserChat(selected.id)
-      ).unwrap();
+        dispatch(clearMessages());
 
-      const currentChatId = chat?.id ?? chat?.chatId;
+        const chat = await dispatch(
+            singleUserChat(selected.id)
+        ).unwrap();
 
-      if (!currentChatId) {
-        console.error("Chat ID not found:", chat);
-        return;
-      }
+        console.log("OLUŞAN SOHBET:", chat);
 
-      setSelectedChat(chat);
-      setActiveChatId(currentChatId);
+        const currentChatId = chat?.id ?? chat?.chatId;
 
-      await loadChatMessages(currentChatId);
+        if (!currentChatId) {
+            console.error("Chat ID not found:", chat);
+            return;
+        }
 
-      dispatch(getAllUsersChats());
+        setSelectedChat(chat);
+        setActiveChatId(currentChatId);
+
+        await loadChatMessages(currentChatId);
+
+        dispatch(getAllUsersChats());
     } catch (err) {
-      console.error("Could not create/open chat:", err);
+        console.error("Could not create/open chat:", err);
     }
-  };
+};
 
   // Var olan sohbeti aç
   const handleOpenExistingChat = async (chat) => {
+console.log(
+    "SOHBETİN TAM VERİSİ:",
+    JSON.stringify(chat, null, 2)
+);
+
     if (!chat?.id) return;
 
     const users = Array.isArray(chat.users)
@@ -690,6 +699,7 @@ const UserHome = () => {
 
                   <div className="min-w-0 flex-1">
                     <ChatDetail
+                    
                       selectedUser={selectedUser}
                       selectedChat={selectedChat}
                       currentUserId={user?.id}

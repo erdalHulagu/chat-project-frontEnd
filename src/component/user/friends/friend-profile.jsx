@@ -1,127 +1,187 @@
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   BiSolidLeftArrowSquare,
   BiSolidMessageDetail,
-  BiSolidVideo,
 } from "react-icons/bi";
 import { IoMdPhotos } from "react-icons/io";
 import { ImSearch } from "react-icons/im";
 import { FaUserFriends } from "react-icons/fa";
+import { HiOutlineUserCircle } from "react-icons/hi";
 import { useNavigate } from "react-router-dom";
-import { Col, Row } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import FriendsCard from "../friends/friends-card";
+import FriendsCard from "./friends-card";
 import FriendPhotos from "./friend-photos-card";
-import users from "../my-photos/friends.json";
-import { addUserAsFriend } from "../../../api/service/user-service";
 
-// addUserAsFriend fonksiyonunun gerçek dosya yolunu buraya ekle.
-// Örnek: import { addUserAsFriend } from "../../../api/service/user-service";
+import users from "../my-photos/friends.json";
+
+import { addUserAsFriend } from "../../../api/service/user-service";
+import { getImageById } from "../../../api/service/image-service";
+import { setFriendProfile } from "../../../redux/store/slices/friend/friendsProfileSlices";
+
+const DEFAULT_IMAGE = require("../../../assets/img/user.webp");
 
 const FriendProfile = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const profile = useSelector((state) => state.profile.friendProfile);
-  const reduxFriendList = useSelector(
-    (state) => state.auth.user?.friends
+  const profile = useSelector(
+    (state) => state.profile?.friendProfile
   );
 
-  const friendList = Array.isArray(reduxFriendList)
-    ? reduxFriendList
-    : [];
+  const friendList = useSelector(
+    (state) => state.auth?.user?.friends || []
+  );
 
-  const [friendsCard, setFriendsCard] = useState(true);
-  const [searchFriends, setSearchFriends] = useState("");
-  const [friendPhotos, setFriendPhotos] = useState(false);
+  const [activeTab, setActiveTab] = useState("friends");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [profileImage, setProfileImage] = useState(DEFAULT_IMAGE);
   const [isEnlarged, setIsEnlarged] = useState(false);
-  const [addingFriendId, setAddingFriendId] = useState(null);
-  const [addedFriendIds, setAddedFriendIds] = useState([]);
+  const [addedUsers, setAddedUsers] = useState([]);
+  const [loadingUserId, setLoadingUserId] = useState(null);
 
+  // Profil fotoğrafını yükle
+  useEffect(() => {
+    let objectUrl;
+
+    const loadProfileImage = async () => {
+      const image = profile?.image || profile?.profileImage;
+
+      if (!image) {
+        setProfileImage(DEFAULT_IMAGE);
+        return;
+      }
+
+      if (
+        typeof image === "string" &&
+        (image.startsWith("http") ||
+          image.startsWith("data:") ||
+          image.startsWith("blob:"))
+      ) {
+        setProfileImage(image);
+        return;
+      }
+
+      try {
+        const response = await getImageById(image);
+
+        const imageData =
+          response?.data?.data ||
+          response?.data ||
+          response;
+
+        if (imageData instanceof Blob) {
+          objectUrl = URL.createObjectURL(imageData);
+          setProfileImage(objectUrl);
+        } else if (typeof imageData === "string") {
+          setProfileImage(
+            imageData.startsWith("data:")
+              ? imageData
+              : `data:image/jpeg;base64,${imageData}`
+          );
+        } else {
+          setProfileImage(DEFAULT_IMAGE);
+        }
+      } catch (error) {
+        console.error("Profil fotoğrafı yüklenemedi:", error);
+        setProfileImage(DEFAULT_IMAGE);
+      }
+    };
+
+    loadProfileImage();
+
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [profile]);
+
+  // Arkadaş arama
   const filteredUsers = useMemo(() => {
-    const search = searchFriends.toLowerCase().trim();
+    const search = searchTerm.trim().toLocaleLowerCase("tr");
 
-    return users.filter((friend) =>
-      `${friend.name || ""} ${friend.lastname || ""}`
-        .toLowerCase()
-        .includes(search)
+    return (users || []).filter((user) => {
+      const fullName =
+        `${user.name || ""} ${user.lastname || ""}`.toLocaleLowerCase("tr");
+
+      return fullName.includes(search);
+    });
+  }, [searchTerm]);
+
+  // Mevcut arkadaşları kontrol et
+  const isAlreadyFriend = (id) => {
+    return friendList.some(
+      (friend) => String(friend.id) === String(id)
     );
-  }, [searchFriends]);
+  };
+
+  // Arkadaş ekleme
+  const handleAddFriend = async (id) => {
+    if (!id || isAlreadyFriend(id) || addedUsers.includes(id)) return;
+
+    try {
+      setLoadingUserId(id);
+
+      await addUserAsFriend(id);
+
+      setAddedUsers((previous) => [...previous, id]);
+
+      window.alert("Arkadaş başarıyla eklendi.");
+    } catch (error) {
+      console.error("Arkadaş eklenemedi:", error);
+      window.alert("Arkadaş eklenirken bir hata oluştu.");
+    } finally {
+      setLoadingUserId(null);
+    }
+  };
+
+  // Arkadaş profiline geçiş
+  const handleViewProfile = (friend) => {
+    dispatch(
+      setFriendProfile({
+        id: friend.id,
+        name: friend.name || friend.firstName || "",
+        lastname: friend.lastname || friend.lastName || "",
+        email: friend.email || "",
+        phone: friend.phone || "",
+        image: friend.image || friend.profileImage || null,
+      })
+    );
+
+    setActiveTab("friends");
+    setSearchTerm("");
+    setIsEnlarged(false);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   const handleNavigate = () => {
     navigate(-1);
   };
 
-  const handleAddFriend = async (friend) => {
-    if (!friend?.id || addingFriendId) return;
-
-    const alreadyAdded =
-      friendList.some(
-        (item) =>
-          String(item.id || item._id) === String(friend.id)
-      ) ||
-      addedFriendIds.some(
-        (id) => String(id) === String(friend.id)
-      );
-
-    if (alreadyAdded) return;
-
-    try {
-      setAddingFriendId(friend.id);
-
-      // API çağrısı: gerçek import yolunu eklemelisin.
-      await addUserAsFriend(friend.id);
-
-      setAddedFriendIds((previous) => [...previous, friend.id]);
-
-      alert(`${friend.name} arkadaş listene eklendi.`);
-    } catch (err) {
-      console.error("Arkadaş ekleme hatası:", err);
-
-      alert(
-        err.response?.data?.message ||
-        "Arkadaş eklenirken bir hata oluştu."
-      );
-    } finally {
-      setAddingFriendId(null);
-    }
-  };
-
-  const handleViewProfile = (friend) => {
-    navigate("/friendProfile", {
-      state: {
-        friend,
-      },
-    });
-  };
-
-  const handleFriendPhotos = () => {
-    setFriendPhotos(true);
-    setFriendsCard(false);
-  };
-
-  const handleFriendsCard = () => {
-    setFriendsCard(true);
-    setFriendPhotos(false);
-  };
-
-  const handleToggleSize = () => {
-    setIsEnlarged((previous) => !previous);
-  };
-
   if (!profile) {
     return (
-      <div className="flex h-full min-h-[300px] items-center justify-center bg-background p-6">
-        <div className="text-center">
-          <p className="mb-4 text-text-secondary">
+      <div className="flex min-h-full w-full items-center justify-center bg-background p-5">
+        <div className="w-full max-w-md rounded-2xl border border-border bg-surface p-8 text-center shadow-lg">
+          <HiOutlineUserCircle className="mx-auto text-primary" size={64} />
+
+          <h2 className="mt-4 text-xl font-bold text-text">
+            Profil bulunamadı
+          </h2>
+
+          <p className="mt-2 text-sm text-text-secondary">
             Görüntülenecek arkadaş profili bulunamadı.
           </p>
 
           <button
+            type="button"
             onClick={handleNavigate}
-            className="rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary-dark"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
           >
+            <BiSolidLeftArrowSquare size={19} />
             Geri dön
           </button>
         </div>
@@ -129,168 +189,208 @@ const FriendProfile = () => {
     );
   }
 
+  const fullName =
+    `${profile.name || ""} ${profile.lastname || ""}`.trim();
+
   return (
-    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background">
-      <header className="flex h-16 shrink-0 items-center gap-4 bg-primary px-4 text-white shadow-md">
-        <button
-          type="button"
-          onClick={handleNavigate}
-          className="rounded-full p-2 transition hover:bg-white/15"
-          aria-label="Geri dön"
-        >
-          <BiSolidLeftArrowSquare size={28} />
-        </button>
+    <div className="min-h-full w-full overflow-y-auto bg-background p-3 sm:p-5 lg:p-8">
+      <div className="mx-auto max-w-7xl space-y-6">
 
-        <h2 className="truncate text-lg font-semibold">
-          {profile.name} {profile.lastname} - Profile
-        </h2>
-      </header>
+        {/* Sayfa başlığı */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold tracking-[0.2em] text-primary">
+              FURQAN WORLDWIDE
+            </p>
 
-      <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-        <aside className="w-full shrink-0 border-b border-border bg-surface p-5 md:w-[300px] md:border-b-0 md:border-r">
-          <div className="flex flex-col items-center">
-            <img
-              src={profile.image}
-              alt={`${profile.name} ${profile.lastname}`}
-              className="h-32 w-32 rounded-full border-4 border-primary-soft object-cover shadow-md"
-            />
+            <h1 className="mt-1 text-2xl font-bold text-text sm:text-3xl">
+              Arkadaş Profili
+            </h1>
 
-            <h3 className="mt-3 text-lg font-bold text-text">
-              {profile.name} {profile.lastname}
-            </h3>
+            <p className="mt-1 text-sm text-text-secondary">
+              Arkadaşının profilini ve fotoğraflarını görüntüle.
+            </p>
+          </div>
 
-            <div className="mt-5 flex gap-5">
+          <button
+            type="button"
+            onClick={handleNavigate}
+            className="flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-text shadow-sm transition hover:border-primary hover:text-primary"
+          >
+            <BiSolidLeftArrowSquare size={20} />
+            Geri dön
+          </button>
+        </div>
+
+        {/* Profil kartı */}
+        <section className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+          <div className="h-28 bg-gradient-to-r from-primary-dark via-primary to-primary-light sm:h-36" />
+
+          <div className="px-5 pb-5 sm:px-7">
+            <div className="-mt-12 flex flex-col gap-4 sm:-mt-14 sm:flex-row sm:items-end sm:justify-between">
+              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-end">
+                <img
+                  src={profileImage}
+                  onError={(event) => {
+                    event.currentTarget.src = DEFAULT_IMAGE;
+                  }}
+                  alt={fullName || "Profil fotoğrafı"}
+                  className="h-24 w-24 rounded-2xl border-4 border-surface bg-surface object-cover shadow-lg sm:h-28 sm:w-28"
+                />
+
+                <div className="pb-1">
+                  <h2 className="text-xl font-bold text-text sm:text-2xl">
+                    {fullName || "İsimsiz kullanıcı"}
+                  </h2>
+
+                  {profile.email && (
+                    <p className="mt-1 text-sm text-text-secondary">
+                      {profile.email}
+                    </p>
+                  )}
+
+                  {profile.phone && (
+                    <p className="mt-1 text-sm text-text-secondary">
+                      {profile.phone}
+                    </p>
+                  )}
+                </div>
+              </div>
+
               <button
                 type="button"
-                className="rounded-full p-3 text-primary transition hover:bg-primary-soft"
-                aria-label="Video görüşmesi"
+                disabled
+                title="Mesajlaşma bağlantısı henüz eklenmedi"
+                className="flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white opacity-60 shadow-md"
               >
-                <BiSolidVideo size={24} />
-              </button>
-
-              <button
-                type="button"
-                className="rounded-full p-3 text-primary transition hover:bg-primary-soft"
-                aria-label="Mesaj gönder"
-              >
-                <BiSolidMessageDetail size={24} />
+                <BiSolidMessageDetail size={20} />
+                Mesaj gönder
               </button>
             </div>
           </div>
+        </section>
 
-          <div className="mt-5 space-y-3">
-            <div className="border-b border-border pb-2">
-              <p className="text-sm text-text-secondary">Name</p>
-              <p className="font-medium text-text">{profile.name}</p>
-            </div>
+        {/* Sekmeler */}
+        <div className="flex gap-2 rounded-2xl border border-border bg-surface p-2 shadow-sm">
+          <button
+            type="button"
+            onClick={() => setActiveTab("friends")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition-all duration-200 ${
+              activeTab === "friends"
+                ? "bg-primary text-white shadow-md"
+                : "text-text-secondary hover:bg-primary-soft hover:text-primary"
+            }`}
+          >
+            <FaUserFriends size={19} />
+            Arkadaşlar
+          </button>
 
-            <div className="border-b border-border pb-2">
-              <p className="text-sm text-text-secondary">Last name</p>
-              <p className="font-medium text-text">{profile.lastname}</p>
-            </div>
+          <button
+            type="button"
+            onClick={() => setActiveTab("photos")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold transition-all duration-200 ${
+              activeTab === "photos"
+                ? "bg-primary text-white shadow-md"
+                : "text-text-secondary hover:bg-primary-soft hover:text-primary"
+            }`}
+          >
+            <IoMdPhotos size={19} />
+            Fotoğraflar
+          </button>
+        </div>
 
-            <div className="border-b border-border pb-2">
-              <p className="text-sm text-text-secondary">Email address</p>
-              <p className="break-all font-medium text-text">
-                {profile.email || "Belirtilmemiş"}
-              </p>
-            </div>
-          </div>
-        </aside>
+        {/* Sekme içerikleri */}
+        <section className="rounded-2xl border border-border bg-surface p-4 shadow-sm sm:p-6">
 
-        <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <div className="flex min-h-16 shrink-0 items-center justify-between gap-3 bg-primary px-4 text-white">
-            <div className="flex min-w-0 flex-1 items-center gap-2">
-              <button
-                type="button"
-                onClick={handleFriendsCard}
-                className={`flex shrink-0 items-center gap-2 rounded-lg p-2 hover:bg-white/15 ${
-                  friendsCard ? "bg-white/15" : ""
-                }`}
-              >
-                <FaUserFriends size={20} />
-                <span className="hidden sm:inline">Friends</span>
-              </button>
+          {activeTab === "friends" && (
+            <>
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-text">
+                    Arkadaşlarını keşfet
+                  </h3>
 
-              {friendsCard && (
-                <div className="relative min-w-0 flex-1">
-                  <ImSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary" />
+                  <p className="mt-1 text-sm text-text-secondary">
+                    Yeni arkadaşlar bul ve listene ekle.
+                  </p>
+                </div>
+
+                <div className="relative w-full sm:max-w-sm">
+                  <ImSearch
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary"
+                    size={17}
+                  />
 
                   <input
                     type="text"
-                    value={searchFriends}
-                    onChange={(e) => setSearchFriends(e.target.value)}
-                    placeholder="Search friends..."
-                    className="w-full rounded-lg border-0 bg-white py-2 pl-9 pr-3 text-sm text-text outline-none focus:ring-2 focus:ring-primary-light"
+                    value={searchTerm}
+                    onChange={(event) => setSearchTerm(event.target.value)}
+                    placeholder="İsim veya soyisim ara..."
+                    className="w-full rounded-xl border border-border bg-background py-3 pl-11 pr-4 text-sm text-text outline-none transition placeholder:text-text-secondary focus:border-primary focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {filteredUsers.map((friend) => (
+                  <FriendsCard
+                    key={friend.id}
+                    id={friend.id}
+                    name={friend.name}
+                    lastname={friend.lastname}
+                    image={friend.image}
+                    onAddFriend={handleAddFriend}
+                    onViewProfile={() => handleViewProfile(friend)}
+                    isAdded={
+                      addedUsers.includes(friend.id) ||
+                      isAlreadyFriend(friend.id)
+                    }
+                    loading={loadingUserId === friend.id}
+                  />
+                ))}
+              </div>
+
+              {filteredUsers.length === 0 && (
+                <div className="rounded-2xl border border-dashed border-border bg-background px-4 py-12 text-center">
+                  <FaUserFriends
+                    size={38}
+                    className="mx-auto text-primary"
+                  />
+
+                  <h4 className="mt-3 font-bold text-text">
+                    Arkadaş bulunamadı
+                  </h4>
+
+                  <p className="mt-1 text-sm text-text-secondary">
+                    Farklı bir isim veya soyisim deneyebilirsin.
+                  </p>
+                </div>
               )}
-            </div>
+            </>
+          )}
 
-            <button
-              type="button"
-              onClick={handleFriendPhotos}
-              className={`flex shrink-0 items-center gap-2 rounded-lg p-2 hover:bg-white/15 ${
-                friendPhotos ? "bg-white/15" : ""
-              }`}
-            >
-              <IoMdPhotos size={22} />
-              <span className="hidden sm:inline">Photos</span>
-            </button>
-          </div>
+          {activeTab === "photos" && (
+            <>
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-text">
+                  Fotoğraflar
+                </h3>
 
-          <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-5">
-            {friendsCard && (
-              <Row className="g-3">
-                {filteredUsers.map((friend) => {
-                  const isAdded =
-                    friendList.some(
-                      (item) =>
-                        String(item.id || item._id) ===
-                        String(friend.id)
-                    ) ||
-                    addedFriendIds.some(
-                      (id) => String(id) === String(friend.id)
-                    );
+                <p className="mt-1 text-sm text-text-secondary">
+                  Arkadaşının fotoğraflarını görüntüle.
+                </p>
+              </div>
 
-                  return (
-                    <Col
-                      key={friend.id}
-                      xs={12}
-                      sm={6}
-                      lg={4}
-                      xl={3}
-                    >
-                      <FriendsCard
-                        {...friend}
-                        isAdded={isAdded}
-                        loading={addingFriendId === friend.id}
-                        onAddFriend={() => handleAddFriend(friend)}
-                        onViewProfile={() => handleViewProfile(friend)}
-                      />
-                    </Col>
-                  );
-                })}
-
-                {filteredUsers.length === 0 && (
-                  <Col xs={12}>
-                    <p className="py-10 text-center text-text-secondary">
-                      Arama kriterine uygun kullanıcı bulunamadı.
-                    </p>
-                  </Col>
-                )}
-              </Row>
-            )}
-
-            {friendPhotos && (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <FriendPhotos
                   isEnlarged={isEnlarged}
-                  handleToggleSize={handleToggleSize}
+                  handleToggleSize={() =>
+                    setIsEnlarged((previous) => !previous)
+                  }
                 />
               </div>
-            )}
-          </div>
+            </>
+          )}
         </section>
       </div>
     </div>

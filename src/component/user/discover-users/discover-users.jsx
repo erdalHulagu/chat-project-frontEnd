@@ -137,55 +137,95 @@ const DiscoverUsers = () => {
   };
 
   // Arkadaş ekleme
-  const handleAddFriend = async (person) => {
-    const personId = getPersonId(person);
+//   const handleAddFriend = async (person) => {
+//     const personId = getPersonId(person);
 
-    if (!personId || addingId) return;
+//     if (!personId || addingId) return;
 
-    // Zaten arkadaşsa tekrar istek gönderme
-    if (
-      existingFriendIds.includes(personId) ||
-      addedIds.includes(personId)
-    ) {
-      return;
-    }
+//     // Zaten arkadaşsa tekrar istek gönderme
+//     if (
+//       existingFriendIds.includes(personId) ||
+//       addedIds.includes(personId)
+//     ) {
+//       return;
+//     }
 
-    try {
-      setAddingId(personId);
+//     try {
+//       setAddingId(personId);
 
-      // 1. Arkadaş ekleme API isteği
-      await addUserAsFriend(personId);
+//       // 1. Arkadaş ekleme API isteği
+//       await addUserAsFriend(personId);
 
-      // 2. Güncel kullanıcı profilini getir
-      const response = await getUser();
+//       // 2. Güncel kullanıcı profilini getir
+//       const response = await getUser();
 
-      // 3. API'den gelen kullanıcı verisini al
-      const updatedUser = response.data;
+//       // 3. API'den gelen kullanıcı verisini al
+//       const updatedUser = response.data;
 
-      if (!updatedUser || typeof updatedUser !== "object") {
-        throw new Error("Güncel kullanıcı bilgileri alınamadı.");
-      }
+//       if (!updatedUser || typeof updatedUser !== "object") {
+//         throw new Error("Güncel kullanıcı bilgileri alınamadı.");
+//       }
 
-      // 4. Redux kullanıcı bilgisini güncelle
-      dispatch(loginSuccess(updatedUser));
+//       // 4. Redux kullanıcı bilgisini güncelle
+//       dispatch(loginSuccess(updatedUser));
 
-      // 5. Buton durumunu güncelle
-      setAddedIds((previous) =>
-        previous.includes(personId)
-          ? previous
-          : [...previous, personId]
-      );
+//       // 5. Buton durumunu güncelle
+//       setAddedIds((previous) =>
+//         previous.includes(personId)
+//           ? previous
+//           : [...previous, personId]
+//       );
 
-    } catch (error) {
-      console.error(
-        "Arkadaş eklenirken hata oluştu:",
-        error.response?.data || error
-      );
-    } finally {
-      setAddingId(null);
-    }
-  };
+//     } catch (error) {
+//       console.error(
+//         "Arkadaş eklenirken hata oluştu:",
+//         error.response?.data || error
+//       );
+//     } finally {
+//       setAddingId(null);
+//     }
+//   };
 
+const handleAddFriend = async (person) => {
+  const personId = person.id || person._id || person.userId;
+
+  if (!personId || addingId) return;
+
+  try {
+    setAddingId(String(personId));
+
+    console.log("Arkadaş eklenecek kullanıcı ID:", personId);
+
+    // Arkadaş ekleme isteği
+    const addResponse = await addUserAsFriend(personId);
+
+    console.log("Arkadaş ekleme API cevabı:", addResponse.data);
+
+    // Güncel kullanıcı bilgisi
+    const userResponse = await getUser();
+
+    console.log("Güncel profil API cevabı:", userResponse.data);
+
+    const updatedUser = userResponse.data;
+
+    console.log("Gelen arkadaş listesi:", updatedUser.friends);
+
+    // Redux güncelle
+    dispatch(loginSuccess(updatedUser));
+
+    // Buton güncelle
+    setAddedIds((prev) => [
+      ...prev,
+      String(personId),
+    ]);
+
+  } catch (error) {
+    console.error("ARKADAŞ EKLEME HATASI:", error);
+    console.error("API HATA CEVABI:", error.response?.data);
+  } finally {
+    setAddingId(null);
+  }
+};
   // Arkadaşlık kontrolü
   const isFriend = (person) => {
     const personId = getPersonId(person);

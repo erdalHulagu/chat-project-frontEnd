@@ -1,7 +1,8 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { HiUserGroup } from "react-icons/hi";
 import { FiChevronRight } from "react-icons/fi";
+import { getImageById } from "../../../api/service/image-service";;
 
 const DEFAULT_IMAGE = require("../../../assets/img/user.webp");
 
@@ -11,40 +12,103 @@ const ChatCard = ({
     active = false,
     currentUserId,
 }) => {
-    if (!item) return null;
-
-    const users = Array.isArray(item.users) ? item.users : [];
+    const users = Array.isArray(item?.users) ? item.users : [];
 
     const otherUsers = users.filter(
         (user) => String(user.id) !== String(currentUserId)
     );
 
-    const isGroup = Boolean(item.isGroup);
+    const isGroup = Boolean(item?.isGroup);
     const otherUser = otherUsers[0] || users[0] || {};
 
     const displayName = isGroup
-        ? item.chatName || "Group conversation"
+        ? item?.chatName || "Group conversation"
         : `${otherUser.firstName || ""} ${otherUser.lastName || ""}`.trim() || "User";
 
-    const image = isGroup
-        ? item.chatProfileImage || DEFAULT_IMAGE
-        : otherUser.profileImage || DEFAULT_IMAGE;
+    const imageId = isGroup
+        ? item?.chatProfileImage
+        : otherUser.profileImage;
+console.log("SOHBET:", item);
+console.log("SOHBET KULLANICILARI:", item?.users);
+console.log("DİĞER KULLANICI:", otherUser);
+console.log("FOTOĞRAF ID:", imageId);
+    const [imageUrl, setImageUrl] = useState(DEFAULT_IMAGE);
 
-    const messages = Array.isArray(item.messages) ? item.messages : [];
+    useEffect(() => {
+        let objectUrl;
+        let cancelled = false;
+
+        const loadImage = async () => {
+            if (!imageId) {
+                setImageUrl(DEFAULT_IMAGE);
+                return;
+            }
+
+            // ID yerine doğrudan URL gelmişse URL'yi kullan.
+            if (
+                typeof imageId === "string" &&
+                (
+                    imageId.startsWith("http://") ||
+                    imageId.startsWith("https://") ||
+                    imageId.startsWith("data:") ||
+                    imageId.startsWith("blob:")
+                )
+            ) {
+                setImageUrl(imageId);
+                return;
+            }
+
+            try {
+                const response = await getImageById(imageId);
+
+                if (cancelled) return;
+
+                const blob = new Blob([response.data], {
+                    type: response.headers?.["content-type"] || "image/jpeg",
+                });
+
+                objectUrl = URL.createObjectURL(blob);
+                setImageUrl(objectUrl);
+            } catch (error) {
+                if (!cancelled) {
+                    console.error("Sohbet fotoğrafı yüklenemedi:", error);
+                    setImageUrl(DEFAULT_IMAGE);
+                }
+            }
+        };
+
+        loadImage();
+
+        return () => {
+            cancelled = true;
+
+            if (objectUrl) {
+                URL.revokeObjectURL(objectUrl);
+            }
+        };
+    }, [imageId]);
+
+    const messages = Array.isArray(item?.messages)
+        ? item.messages
+        : [];
+
     const lastMessage = messages.length
         ? messages[messages.length - 1]
         : null;
 
     const preview = lastMessage?.content || "Henüz mesaj yok";
 
+    if (!item) return null;
+
     return (
         <button
             type="button"
             onClick={() => onClick?.(item)}
-            className={`group relative flex w-full items-center gap-3 border-b border-slate-100 px-3 py-3.5 text-left cursor-pointer transition-all duration-200 ${active
+            className={`group relative flex w-full items-center gap-3 border-b border-slate-100 px-3 py-3.5 text-left cursor-pointer transition-all duration-200 ${
+                active
                     ? "bg-emerald-100"
                     : "bg-white hover:!bg-emerald-50"
-                }`}
+            }`}
         >
             {active && (
                 <span className="absolute bottom-3 left-0 top-3 w-1 rounded-r-full bg-emerald-600" />
@@ -52,15 +116,19 @@ const ChatCard = ({
 
             <div className="relative shrink-0">
                 <img
-                    src={image}
+                    src={imageUrl}
                     alt={`${displayName} profile`}
-                    className={`h-12 w-12 rounded-full object-cover ring-2 sm:h-14 sm:w-14 ${active ? "bg-emerald-100" : "bg-white hover:bg-emerald-50"
-                        }`}
+                    className={`h-12 w-12 rounded-full object-cover ring-2 sm:h-14 sm:w-14 ${
+                        active
+                            ? "bg-emerald-100"
+                            : "bg-white hover:bg-emerald-50"
+                    }`}
                     onError={(event) => {
                         event.currentTarget.onerror = null;
                         event.currentTarget.src = DEFAULT_IMAGE;
                     }}
                 />
+
                 {isGroup && (
                     <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-emerald-600 text-white">
                         <HiUserGroup size={11} />
@@ -68,10 +136,15 @@ const ChatCard = ({
                 )}
             </div>
 
-            <div className="min-w-0 flex-1 ">
-                <div className="flex items-center justify-between gap-2  group-hover:text-emerald-600">
-                    <p className={`truncate text-sm font-semibold ${active ? "text-emerald-900 " : "text-slate-800"
-                        }`}>
+            <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2 group-hover:text-emerald-600">
+                    <p
+                        className={`truncate text-sm font-semibold ${
+                            active
+                                ? "text-emerald-900"
+                                : "text-slate-800"
+                        }`}
+                    >
                         {displayName}
                     </p>
 
@@ -88,18 +161,24 @@ const ChatCard = ({
                         : otherUser.phone || "Sohbet"}
                 </p>
 
-                <p className={`mt-1 truncate text-xs ${active ? "font-medium text-emerald-700" : "text-slate-500"
-                    }`}>
+                <p
+                    className={`mt-1 truncate text-xs ${
+                        active
+                            ? "font-medium text-emerald-700"
+                            : "text-slate-500"
+                    }`}
+                >
                     {preview}
                 </p>
             </div>
 
             <FiChevronRight
                 size={16}
-                className={`shrink-0 transition ${active
-                    ? "text-emerald-600"
-                    : "text-slate-300 opacity-0 group-hover:opacity-100"
-                    }`}
+                className={`shrink-0 transition ${
+                    active
+                        ? "text-emerald-600"
+                        : "text-slate-300 opacity-0 group-hover:opacity-100"
+                }`}
             />
         </button>
     );

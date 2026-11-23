@@ -83,6 +83,11 @@ const CustomRouters = () => {
             path="/friendProfile"
             element={<FriendProfilePage />}
           />
+          <Route
+            path="/friendProfile/:friendId"
+            element={<FriendProfilePage />}
+          />
+          
           <Route path="/discover-users" element={<DiscoverUsers />} />
 
           <Route path="/status" element={<StatusPage />} />

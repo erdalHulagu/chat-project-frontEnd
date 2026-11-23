@@ -116,18 +116,13 @@ export const addUserAsFriend = (friendId) => {
   );
 };
 
-// Görseli kişisel görsellere ekle
-export const addImageToYourImages = (imageId) => {
-  return axios.patch(
-    `${BASE_API_URL}/users/addImage/${imageId}`,
-    null,
-    { headers: authHeader() }
-  );
-};
-
-// Oturum açmış kullanıcının görsellerini getir
-export const getUsersImages = () => {
-  return axios.get(`${BASE_API_URL}/users/myImages`, {
-    headers: authHeader(),
-  });
+// Arkadaşın profil bilgilerini getir
+// Backend: GET /users/myFriend/{friendId}
+export const getMyFriend = (friendId) => {
+    return axios.get(
+        `${BASE_API_URL}/users/myFriend/${friendId}`,
+        {
+            headers: authHeader(),
+        }
+    );
 };

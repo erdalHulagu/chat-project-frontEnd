@@ -1,12 +1,12 @@
-import React from 'react'
-import FriendProfile from '../../component/user/friends/friend-profile'
+
+import React from "react";
+import { useParams } from "react-router-dom";
+import FriendProfile from "../../component/user/friends/friend-profile";
 
 const FriendProfilePage = () => {
-  return (
-    <div>
-      <FriendProfile/>
-    </div>
-  )
-}
+    const { friendId } = useParams();
 
-export default FriendProfilePage
+    return <><FriendProfile friendId={friendId} /></>;
+};
+
+export default FriendProfilePage;

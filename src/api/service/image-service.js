@@ -3,15 +3,13 @@ import axios from "axios";
 import { BASE_API_URL } from "../base-api-url";
 import authHeader from "../../helper/auth-token/auth-header";
 
-// JSON Content-Type başlığını kaldırıyoruz.
-// Axios, multipart/form-data için boundary bilgisini kendisi eklemeli.
 const getMultipartHeaders = () => {
     const headers = { ...authHeader() };
     delete headers["Content-Type"];
     return headers;
 };
 
-// Profil veya sohbet görseli yükleme
+// Görsel yükleme
 export const uploadImage = (file) => {
     const formData = new FormData();
     formData.append("imageFile", file);
@@ -27,16 +25,43 @@ export const uploadImage = (file) => {
 export const downloadImage = (imageId) => {
     return axios.get(
         `${BASE_API_URL}/images/download/${imageId}`,
-        { responseType: "arraybuffer" }
+        {
+            headers: authHeader(),
+            responseType: "arraybuffer",
+        }
     );
 };
 
-// Görseli görüntüleme
+// Görseli arraybuffer olarak getirme
 export const getImageById = (imageId) => {
+    if (!imageId) {
+        return Promise.reject(new Error("Görsel ID boş olamaz."));
+    }
+
     return axios.get(
         `${BASE_API_URL}/images/display/${imageId}`,
-        { responseType: "arraybuffer" }
+        {
+            headers: authHeader(),
+            responseType: "arraybuffer",
+        }
     );
+};
+
+// Görsel ID'sini img src içinde kullanılabilir URL'ye çevirme
+export const getImageObjectUrl = async (imageId) => {
+    if (!imageId) return null;
+
+    const response = await getImageById(imageId);
+
+    const contentType =
+        response.headers?.["content-type"] || "image/jpeg";
+
+    const blob = new Blob(
+        [response.data],
+        { type: contentType }
+    );
+
+    return URL.createObjectURL(blob);
 };
 
 // Görsel silme
@@ -61,5 +86,35 @@ export const uploadImageToFileSystem = (file) => {
 
 // Bütün görselleri getirme
 export const getAllImages = () => {
-    return axios.get(`${BASE_API_URL}/images/all`);
+    return axios.get(
+        `${BASE_API_URL}/images/all`,
+        { headers: authHeader() }
+    );
+};
+
+// Görseli kişisel görsellere ekleme
+export const addImageToYourImages = (imageId) => {
+    return axios.patch(
+        `${BASE_API_URL}/users/addImage/${imageId}`,
+        null,
+        { headers: authHeader() }
+    );
+};
+
+// Oturum açmış kullanıcının görsellerini getirme
+export const getUsersImages = () => {
+    return axios.get(
+        `${BASE_API_URL}/users/myImages`,
+        { headers: authHeader() }
+    );
+};
+
+// Arkadaşın fotoğraf ID'lerini getirme
+// Backend: GET /users/myFriendImages/{friendId}
+// Dönüş: String ID dizisi
+export const getMyFriendImages = (friendId) => {
+    return axios.get(
+        `${BASE_API_URL}/users/myFriendImages/${friendId}`,
+        { headers: authHeader() }
+    );
 };

@@ -23,9 +23,13 @@ const profileSlice = createSlice({
 
             if (!newFriend) return;
 
+            const newFriendId = newFriend.id ?? newFriend.userId;
+
+            if (!newFriendId) return;
+
             const alreadyExists = state.friendList.some(
                 (friend) =>
-                    String(friend.id) === String(newFriend.id)
+                    String(friend.id ?? friend.userId) === String(newFriendId)
             );
 
             if (!alreadyExists) {

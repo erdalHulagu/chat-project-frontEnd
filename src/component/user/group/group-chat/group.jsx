@@ -1,12 +1,5 @@
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-import GroupDropdownMenu from "../group-dropdown-menu";
-import CreateGroupCard from "./create-group/create-group-card";
-import CreateComminityGroup from "./comminity-group/create-comminity-group";
-import AddExsistingComminity from "./create-existing-group/add-existing-comminity";
-
+import React, { useEffect, useMemo, useState } from "react";
 import {
   FiArrowLeft,
   FiUsers,
@@ -16,326 +9,519 @@ import {
   FiLayers,
   FiMessageCircle,
   FiX,
+  FiSearch,
+  FiImage,
 } from "react-icons/fi";
 
+import GroupDropdownMenu from "../group-dropdown-menu";
+import CreateGroupCard from "./create-group/create-group-card";
+import CreateComminityGroup from "./comminity-group/create-comminity-group";
+import AddExsistingComminity from "./create-existing-group/add-existing-comminity";
+
+import defaultImage from "../../../../assets/img/user.webp";
+
+import { useAppSelector } from "../../../../redux/store/hooks";
+import { getImageObjectUrl } from "../../../../api/service/image-service";
+
 const Group = () => {
-  const navigate = useNavigate();
-
   const [activeView, setActiveView] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [groupImages, setGroupImages] = useState({});
 
-  const handleNavigate = () => {
-    navigate(-1);
-  };
+  const groupChatState = useAppSelector(
+    (state) => state.usersGroupChats?.groupChat
+  );
 
-  const handleCreateGroup = () => {
-    setActiveView("createGroup");
-  };
+  const createdGroup = groupChatState?.data;
 
-  const handleCreateCominityGroup = () => {
-    setActiveView("createCommunity");
-  };
-
-  const handleAddExistingComminity = () => {
-    setActiveView("addCommunity");
-  };
-
+  const handleCreateGroup = () => setActiveView("createGroup");
+  const handleCreateCominityGroup = () => setActiveView("createCommunity");
+  const handleAddExistingComminity = () => setActiveView("addCommunity");
+  const handleShowAllGroups = () => setActiveView("existingGroups");
   const handleCloseView = () => {
     setActiveView(null);
+    setSearchTerm("");
   };
 
   const viewDetails = {
     createGroup: {
       title: "Create New Group",
-      description: "Create a new group and invite people to join.",
-      icon: <FiUsers size={20} />,
+      description: "Create a group and invite your friends.",
     },
     createCommunity: {
       title: "Create Community",
-      description: "Create a community to bring people together.",
-      icon: <FiGlobe size={20} />,
+      description: "Build your own community.",
     },
     addCommunity: {
       title: "Add Existing Community",
-      description: "Connect an existing community to your groups.",
-      icon: <FiUserPlus size={20} />,
+      description: "Join an existing community.",
+    },
+    existingGroups: {
+      title: "Existing Groups",
+      description: "View and manage your group conversations.",
     },
   };
 
   const quickActions = [
     {
-      title: "Create a Group",
-      description: "Start a new group and connect with people.",
-      icon: <FiUsers size={24} />,
+      title: "Create Group",
+      description: "Start a group conversation with your friends.",
+      icon: FiUsers,
+      color: "bg-primary-soft text-primary",
       action: handleCreateGroup,
     },
     {
-      title: "Create a Community",
-      description: "Build a community around shared interests.",
-      icon: <FiGlobe size={24} />,
+      title: "Create Community",
+      description: "Create a space for people with shared interests.",
+      icon: FiGlobe,
+      color: "bg-blue-100 text-blue-600",
       action: handleCreateCominityGroup,
     },
     {
       title: "Add Existing Community",
-      description: "Add a community that already exists.",
-      icon: <FiUserPlus size={24} />,
+      description: "Connect with an existing community.",
+      icon: FiUserPlus,
+      color: "bg-purple-100 text-purple-600",
       action: handleAddExistingComminity,
+    },
+    {
+      title: "Existing Groups",
+      description: "See your existing group conversations.",
+      icon: FiLayers,
+      color: "bg-orange-100 text-orange-600",
+      action: handleShowAllGroups,
     },
   ];
 
+  const groups = useMemo(() => {
+    if (!createdGroup) return [];
+
+    if (Array.isArray(createdGroup)) {
+      return createdGroup.filter((chat) => chat?.isGroup === true);
+    }
+
+    const possibleLists = [
+      createdGroup?.content,
+      createdGroup?.data,
+      createdGroup?.chats,
+      createdGroup?.groups,
+    ];
+
+    const list = possibleLists.find(Array.isArray);
+
+    if (list) {
+      return list.filter((chat) => chat?.isGroup === true);
+    }
+
+    if (createdGroup?.isGroup === true) {
+      return [createdGroup];
+    }
+
+    return [];
+  }, [createdGroup]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const createdUrls = [];
+
+    const loadImages = async () => {
+      const entries = await Promise.all(
+        groups.map(async (group) => {
+          const imageId = group?.chatProfileImage;
+
+          if (!imageId) {
+            return [group.id, defaultImage];
+          }
+
+          try {
+            const imageUrl = await getImageObjectUrl(imageId);
+
+            if (imageUrl) {
+              createdUrls.push(imageUrl);
+              return [group.id, imageUrl];
+            }
+
+            return [group.id, defaultImage];
+          } catch (error) {
+            console.error("Group image could not be loaded:", error);
+            return [group.id, defaultImage];
+          }
+        })
+      );
+
+      if (!cancelled) {
+        setGroupImages((previous) => ({
+          ...previous,
+          ...Object.fromEntries(entries),
+        }));
+      } else {
+        createdUrls.forEach((url) => URL.revokeObjectURL(url));
+      }
+    };
+
+    loadImages();
+
+    return () => {
+      cancelled = true;
+      createdUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [groups]);
+
+  const filteredGroups = useMemo(() => {
+    const search = searchTerm.trim().toLowerCase();
+
+    if (!search) return groups;
+
+    return groups.filter((group) =>
+      (group?.chatName || "").toLowerCase().includes(search)
+    );
+  }, [groups, searchTerm]);
+
+  const getMemberCount = (group) => group?.users?.length ?? 0;
+
+  const handleOpenGroup = (group) => {
+    // Mevcut sohbet sayfasının route bilgisi paylaşılmadığı için
+    // burada tahmini bir yönlendirme yapılmıyor.
+    console.log("Selected group:", group);
+  };
+
   return (
-    <div className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden bg-background md:flex-row">
+    <div className="flex min-h-screen w-full items-center justify-center overflow-hidden bg-background p-3 sm:p-5 lg:p-6">
+      <div className="mx-auto flex h-[calc(100vh-24px)] min-h-0 w-full max-w-7xl flex-col gap-4 overflow-hidden lg:h-[calc(100vh-48px)] lg:max-h-[950px] lg:flex-row">
 
-      {/* LEFT SIDEBAR */}
-      <aside className="flex h-[300px] w-full shrink-0 flex-col border-b border-border bg-surface md:h-full md:w-[320px] md:border-b-0 md:border-r lg:w-[350px]">
-
-        {/* Sidebar Header */}
-        <div className="flex h-[76px] shrink-0 items-center justify-between border-b border-border bg-surface px-4">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleNavigate}
-              aria-label="Go back"
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-primary transition hover:bg-primary-soft hover:text-primary-dark"
-            >
-              <FiArrowLeft size={22} />
-            </button>
-
+        {/* LEFT SIDEBAR - SABİT, SCROLL YOK */}
+        <aside className="w-full shrink-0 overflow-hidden rounded-3xl border border-border bg-surface p-5 shadow-sm lg:flex lg:w-80 lg:flex-col">
+          <div className="mb-8 flex shrink-0 items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-text">
+              <p className="text-xs font-semibold uppercase tracking-widest text-text-muted">
+                Workspace
+              </p>
+              <h2 className="mt-1 text-xl font-bold text-text-primary">
                 Groups
               </h2>
-              <p className="text-xs text-text-muted">
-                Groups and communities
-              </p>
             </div>
+
+            <GroupDropdownMenu
+              handleShowAllGroups={handleShowAllGroups}
+              handleCreateGroup={handleCreateGroup}
+              handleCreateCominityGroup={handleCreateCominityGroup}
+              handleAddExistingComminity={handleAddExistingComminity}
+            />
           </div>
 
-          <GroupDropdownMenu
-            handleCreateGroup={handleCreateGroup}
-            handleCreateCominityGroup={handleCreateCominityGroup}
-            handleAddExistingComminity={handleAddExistingComminity}
-          />
-        </div>
-
-        {/* Sidebar Content */}
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-4">
-
-          <div className="mb-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-text-muted">
-              Workspace
-            </h3>
-          </div>
-
-          {/* All Groups */}
-          <div className="flex items-center gap-3 rounded-xl border border-primary/10 bg-primary-soft px-3 py-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white">
-              <FiLayers size={19} />
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-primary-dark">
-                All Groups
-              </p>
-              <p className="text-xs text-primary/70">
-                Manage your groups
-              </p>
-            </div>
-          </div>
-
-          {/* Empty Groups State */}
-          <div className="flex flex-1 flex-col items-center justify-center py-6 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-background text-text-muted">
-              <FiUsers size={30} />
-            </div>
-
-            <h3 className="text-sm font-semibold text-text">
-              Your groups will appear here
-            </h3>
-
-            <p className="mt-2 max-w-[230px] text-xs leading-5 text-text-muted">
-              Create a group or add an existing community to get started.
-            </p>
+          <div className="shrink-0">
+            <button
+              type="button"
+              onClick={handleCloseView}
+              className="flex w-full items-center gap-3 rounded-xl bg-primary-soft px-4 py-3 text-left text-sm font-semibold text-primary-dark"
+            >
+              <FiLayers size={18} />
+              All Groups
+            </button>
 
             <button
               type="button"
-              onClick={handleCreateGroup}
-              className="mt-5 flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-dark"
+              onClick={handleShowAllGroups}
+              className="mt-2 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-text-secondary transition hover:bg-primary-soft hover:text-primary-dark"
             >
-              <FiPlus size={17} />
-              Create Group
+              <FiUsers size={18} />
+              Existing Groups
+              <span className="ml-auto rounded-full bg-background px-2 py-1 text-xs">
+                {groups.length}
+              </span>
             </button>
           </div>
 
-          {/* Sidebar Footer */}
-          <div className="mt-auto rounded-xl border border-border bg-background p-3">
-            <div className="flex items-center gap-2">
-              <FiMessageCircle className="text-primary" size={18} />
-              <p className="text-xs font-semibold text-text">
-                Stay connected
-              </p>
+          <div className="mt-6 shrink-0 border-t border-border pt-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-text-primary">
+                Quick Actions
+              </h3>
+              <FiPlus className="text-text-muted" />
             </div>
 
-            <p className="mt-1 text-xs leading-5 text-text-muted">
-              Create communities and groups to connect with people.
-            </p>
-          </div>
-        </div>
-      </aside>
+            <div className="space-y-2">
+              {quickActions.map((item) => {
+                const Icon = item.icon;
 
-      {/* RIGHT MAIN CONTENT */}
-      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto bg-background">
-
-        {activeView ? (
-          <>
-            {/* Form Header */}
-            <div className="sticky top-0 z-20 flex min-h-[76px] shrink-0 items-center justify-between border-b border-border bg-surface/95 px-4 backdrop-blur sm:px-6 lg:px-8">
-              <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
-                  {viewDetails[activeView].icon}
-                </div>
-
-                <div className="min-w-0">
-                  <h1 className="truncate text-base font-bold text-text sm:text-lg">
-                    {viewDetails[activeView].title}
-                  </h1>
-                  <p className="truncate text-xs text-text-muted">
-                    {viewDetails[activeView].description}
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleCloseView}
-                aria-label="Close form"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-text-secondary transition hover:bg-red-50 hover:text-danger"
-              >
-                <FiX size={21} />
-              </button>
-            </div>
-
-            {/* Form Content */}
-            <div className="flex flex-1 justify-center p-4 sm:p-6 lg:p-8">
-              <div className="my-auto w-full max-w-3xl">
-
-                {activeView === "createGroup" && (
-                  <CreateGroupCard />
-                )}
-
-                {activeView === "createCommunity" && (
-                  <CreateComminityGroup />
-                )}
-
-                {activeView === "addCommunity" && (
-                  <AddExsistingComminity />
-                )}
-
-              </div>
-            </div>
-          </>
-        ) : (
-          /* Welcome Dashboard */
-          <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center p-5 sm:p-8 lg:p-12">
-
-            {/* Welcome Section */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-dark via-primary to-primary-light p-6 shadow-lg sm:p-10">
-              <div className="relative z-10 max-w-2xl">
-                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white">
-                  <FiUsers size={29} />
-                </div>
-
-                <p className="mb-2 text-sm font-medium text-white/70">
-                  YOUR COMMUNITY SPACE
-                </p>
-
-                <h1 className="text-2xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
-                  Connect, create and grow together.
-                </h1>
-
-                <p className="mt-4 max-w-xl text-sm leading-6 text-white/80 sm:text-base">
-                  Create groups, build communities and bring people
-                  together in one place. Start building your community today.
-                </p>
-
-                <button
-                  type="button"
-                  onClick={handleCreateGroup}
-                  className="mt-7 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-primary-dark shadow-md transition hover:bg-primary-soft"
-                >
-                  <FiPlus size={18} />
-                  Create Your First Group
-                </button>
-              </div>
-
-              {/* Decorative circles */}
-              <div className="pointer-events-none absolute -right-12 -top-16 h-64 w-64 rounded-full border-[35px] border-white/5" />
-              <div className="pointer-events-none absolute -bottom-28 right-24 h-64 w-64 rounded-full bg-white/5" />
-            </div>
-
-            {/* Quick Actions */}
-            <div className="mt-9">
-              <div className="mb-5">
-                <h2 className="text-lg font-bold text-text">
-                  Get started
-                </h2>
-                <p className="mt-1 text-sm text-text-muted">
-                  Choose what you want to do.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {quickActions.map((item) => (
+                return (
                   <button
                     key={item.title}
                     type="button"
                     onClick={item.action}
-                    className="group flex min-h-[170px] flex-col items-start rounded-2xl border border-border bg-surface p-5 text-left shadow-sm transition duration-200 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg"
+                    className="flex w-full items-center gap-3 rounded-xl p-3 text-left transition hover:bg-background"
                   >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-soft text-primary transition duration-200 group-hover:bg-primary group-hover:text-white">
-                      {item.icon}
-                    </div>
+                    <span
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${item.color}`}
+                    >
+                      <Icon size={19} />
+                    </span>
 
-                    <h3 className="mt-5 text-sm font-bold text-text transition group-hover:text-primary">
-                      {item.title}
-                    </h3>
-
-                    <p className="mt-2 text-xs leading-5 text-text-muted">
-                      {item.description}
-                    </p>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold text-text-primary">
+                        {item.title}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-text-muted">
+                        {item.description}
+                      </span>
+                    </span>
                   </button>
-                ))}
-              </div>
+                );
+              })}
             </div>
-
-            {/* Bottom Information */}
-            <div className="mt-8 flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
-                  <FiGlobe size={20} />
-                </div>
-
-                <div>
-                  <p className="text-sm font-semibold text-text">
-                    Build your community
-                  </p>
-                  <p className="mt-1 text-xs text-text-muted">
-                    Bring people together around shared interests.
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleCreateCominityGroup}
-                className="shrink-0 rounded-xl border border-primary/20 px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary hover:text-white"
-              >
-                Create Community
-              </button>
-            </div>
-
           </div>
-        )}
-      </main>
+
+          <div className="mt-auto shrink-0 rounded-2xl bg-primary-soft p-4">
+            <div className="mb-2 flex items-center gap-2 text-primary-dark">
+              <FiMessageCircle size={18} />
+              <span className="text-sm font-bold">Stay Connected</span>
+            </div>
+            <p className="text-xs leading-5 text-text-secondary">
+              Create groups and communities to stay connected with people.
+            </p>
+          </div>
+        </aside>
+
+        {/* RIGHT CONTENT - SADECE BU ALAN SCROLL */}
+        <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain rounded-3xl border border-border bg-surface p-5 shadow-sm sm:p-7">
+          {activeView ? (
+            <>
+              <div className="mb-7 flex items-center justify-between gap-4">
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleCloseView}
+                    className="mb-3 flex items-center gap-2 text-sm font-medium text-text-muted transition hover:text-primary"
+                  >
+                    <FiArrowLeft size={16} />
+                    Back
+                  </button>
+
+                  <h1 className="text-2xl font-bold text-text-primary">
+                    {viewDetails[activeView]?.title}
+                  </h1>
+
+                  <p className="mt-1 text-sm text-text-muted">
+                    {viewDetails[activeView]?.description}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleCloseView}
+                  aria-label="Close view"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-background text-text-secondary transition hover:bg-primary-soft hover:text-primary"
+                >
+                  <FiX size={20} />
+                </button>
+              </div>
+
+              {activeView === "createGroup" && <CreateGroupCard />}
+
+              {activeView === "createCommunity" && (
+                <CreateComminityGroup />
+              )}
+
+              {activeView === "addCommunity" && (
+                <AddExsistingComminity />
+              )}
+
+              {activeView === "existingGroups" && (
+                <section>
+                  <div className="mb-6">
+                    <div className="relative">
+                      <FiSearch
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted"
+                        size={18}
+                      />
+
+                      <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={(event) =>
+                          setSearchTerm(event.target.value)
+                        }
+                        placeholder="Search groups..."
+                        className="w-full rounded-xl border border-border bg-background py-3 pl-11 pr-4 text-sm text-text-primary outline-none transition focus:border-primary"
+                      />
+                    </div>
+                  </div>
+
+                  {filteredGroups.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4 pb-3 sm:grid-cols-2 xl:grid-cols-3">
+                      {filteredGroups.map((group) => (
+                        <button
+                          key={group.id}
+                          type="button"
+                          onClick={() => handleOpenGroup(group)}
+                          className="group flex min-w-0 items-center gap-4 rounded-2xl border border-border bg-surface p-4 text-left transition hover:border-primary/30 hover:shadow-md"
+                        >
+                          <img
+                            src={groupImages[group.id] || defaultImage}
+                            alt={group.chatName || "Group"}
+                            className="h-14 w-14 shrink-0 rounded-2xl object-cover"
+                            onError={(event) => {
+                              event.currentTarget.src = defaultImage;
+                            }}
+                          />
+
+                          <div className="min-w-0 flex-1">
+                            <h3 className="truncate text-sm font-bold text-text-primary transition group-hover:text-primary">
+                              {group.chatName || "Unnamed Group"}
+                            </h3>
+
+                            <p className="mt-1 text-xs text-text-muted">
+                              {getMemberCount(group)} members
+                            </p>
+                          </div>
+
+                          <FiUsers
+                            size={18}
+                            className="shrink-0 text-text-muted transition group-hover:text-primary"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl border border-dashed border-border px-6 py-14 text-center">
+                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-soft text-primary">
+                        <FiUsers size={30} />
+                      </div>
+
+                      <h3 className="text-lg font-bold text-text-primary">
+                        No Groups Found
+                      </h3>
+
+                      <p className="mx-auto mt-2 max-w-sm text-sm text-text-muted">
+                        {searchTerm
+                          ? "No groups match your search."
+                          : "You haven't created any groups yet. Create your first group to get started."}
+                      </p>
+
+                      {!searchTerm && (
+                        <button
+                          type="button"
+                          onClick={handleCreateGroup}
+                          className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                        >
+                          <FiPlus size={17} />
+                          Create Group
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </section>
+              )}
+            </>
+          ) : (
+            <>
+              <div className="mb-10">
+                <span className="inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary-dark">
+                  <FiUsers size={14} />
+                  Group Workspace
+                </span>
+
+                <h1 className="mt-5 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+                  Manage Your Groups
+                </h1>
+
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-text-muted">
+                  Create groups, build communities and manage your
+                  conversations in one place.
+                </p>
+              </div>
+
+              <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="rounded-2xl border border-border bg-background p-5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-text-muted">
+                      Existing Groups
+                    </span>
+                    <FiUsers className="text-primary" size={21} />
+                  </div>
+                  <p className="mt-3 text-3xl font-bold text-text-primary">
+                    {groups.length}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-border bg-background p-5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-text-muted">
+                      Group Management
+                    </span>
+                    <FiLayers className="text-primary" size={21} />
+                  </div>
+                  <p className="mt-3 text-sm font-semibold text-text-primary">
+                    All in one place
+                  </p>
+                </div>
+              </div>
+
+              <div className="mb-5 flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-bold text-text-primary">
+                    Quick Actions
+                  </h2>
+                  <p className="mt-1 text-sm text-text-muted">
+                    What would you like to do?
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {quickActions.map((item) => {
+                  const Icon = item.icon;
+
+                  return (
+                    <button
+                      key={item.title}
+                      type="button"
+                      onClick={item.action}
+                      className="group rounded-2xl border border-border bg-background p-5 text-left transition hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg"
+                    >
+                      <span
+                        className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.color}`}
+                      >
+                        <Icon size={23} />
+                      </span>
+
+                      <h3 className="mt-5 text-base font-bold text-text-primary transition group-hover:text-primary">
+                        {item.title}
+                      </h3>
+
+                      <p className="mt-2 text-sm leading-6 text-text-muted">
+                        {item.description}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-8 rounded-2xl border border-dashed border-border p-6 text-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                  <FiImage size={22} />
+                </div>
+
+                <h3 className="font-bold text-text-primary">
+                  Your Group Space
+                </h3>
+
+                <p className="mt-2 text-sm text-text-muted">
+                  Your group conversations will be available here.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={handleShowAllGroups}
+                  className="mt-4 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+                >
+                  View Existing Groups
+                </button>
+              </div>
+            </>
+          )}
+        </main>
+      </div>
     </div>
   );
 };

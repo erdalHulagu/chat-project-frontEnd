@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { BiSolidPencil } from "react-icons/bi";
 import { MdPhotoCamera } from "react-icons/md";
@@ -7,24 +7,58 @@ import { TfiCommentsSmiley } from "react-icons/tfi";
 import { BsFillSave2Fill } from "react-icons/bs";
 
 import defaultImage from "../../../../../assets/img/user.webp";
-import { useAppDispatch } from "../../../../../redux/store/hooks";
+
 import { createUserGroupChat } from "../../../../../redux/store/slices/chat/chat-thunks/create-user-group-chat";
+
 import { error, toast } from "../../../../../helper/swal";
 
-const CreateGroupCard = ({ onSave }) => {
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../../redux/store/hooks";
+
+import {
+  searchUsers,
+} from "../../../../../redux/store/slices/user/user/serachUser/user-search-action";
+
+import {
+  clearSearchResults,
+} from "../../../../../redux/store/slices/user/user/serachUser/user-search-slice";
+
+import { uploadImage } from "../../../../../api/service/image-service";
+
+const CreateGroupCard = ({ onSave, selectedUserIds = [] }) => {
   const fileInputRef = useRef(null);
+  const dispatch = useAppDispatch();
 
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState(defaultImage);
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [isEditingDescription, setIsEditingDescription] =
-    useState(false);
   const [loading, setLoading] = useState(false);
-  const dispatch = useAppDispatch();
 
-  // Fotoğraf seçimi
+  const [friendSearch, setFriendSearch] = useState("");
+  const [selectedUsers, setSelectedUsers] = useState([]);
+
+  const searchResults = useAppSelector(
+    (state) => state.userSearch.searchResults
+  );
+
+  const searchLoading = useAppSelector(
+    (state) => state.userSearch.loading
+  );
+
+  const { user } = useAppSelector(
+    (state) => state.auth
+  );
+
+  const displayedUsers = (
+    Array.isArray(searchResults) ? searchResults : []
+  ).filter(
+    (item) => String(item.id) !== String(user?.id)
+  );
+
+  // Fotoğraf seçme
   const handleImageChange = (event) => {
     const selectedFile = event.target.files?.[0];
 
@@ -37,13 +71,13 @@ const CreateGroupCard = ({ onSave }) => {
     ];
 
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("JPG, PNG veya WEBP formatında bir fotoğraf seçin.");
+      error("JPG, PNG veya WEBP formatında bir fotoğraf seçin.");
       event.target.value = "";
       return;
     }
 
     if (selectedFile.size > 5 * 1024 * 1024) {
-      alert("Fotoğraf en fazla 5 MB olabilir.");
+      error("Fotoğraf en fazla 5 MB olabilir.");
       event.target.value = "";
       return;
     }
@@ -52,52 +86,119 @@ const CreateGroupCard = ({ onSave }) => {
     setPreview(URL.createObjectURL(selectedFile));
   };
 
-  // Kaydetme
-  
-const handleSubmit = async (event) => {
-  event.preventDefault();
+  // Arkadaş arama
+  useEffect(() => {
+    if (!friendSearch.trim()) {
+      dispatch(clearSearchResults());
+      return;
+    }
 
-  if (!groupName.trim()) {
-    error("Lütfen grup adını girin.");
-    return;
-  }
+    const timer = setTimeout(() => {
+      dispatch(
+        searchUsers({
+          firstName: friendSearch.trim(),
+        })
+      );
+    }, 350);
 
-  const groupData = {
-    groupName: groupName.trim(),
-    description: description.trim(),
+    return () => clearTimeout(timer);
+  }, [friendSearch, dispatch]);
+
+  // Arkadaş seçme / seçimden çıkarma
+  const handleSelectUser = (selectedUser) => {
+    setSelectedUsers((previous) => {
+      const alreadySelected = previous.some(
+        (item) => String(item.id) === String(selectedUser.id)
+      );
+
+      if (alreadySelected) {
+        return previous.filter(
+          (item) => String(item.id) !== String(selectedUser.id)
+        );
+      }
+
+      return [...previous, selectedUser];
+    });
   };
 
-  try {
+  // Grup oluşturma ve fotoğraf yükleme
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!groupName.trim()) {
+      error("Lütfen grup adı girin.");
+      return;
+    }
+
     setLoading(true);
 
-    const result = await dispatch(
-      createUserGroupChat(groupData)
-    ).unwrap();
+    try {
+      let chatImage = null;
 
-    toast("Grup başarıyla oluşturuldu.");
+      // 1. Fotoğrafı önce sunucuya yükle
+      if (imageFile) {
+        const imageResponse = await uploadImage(imageFile);
 
-    console.log("Oluşturulan grup:", result);
+        chatImage = imageResponse.data?.imageId;
 
-  } catch (err) {
-    console.error("Grup oluşturma hatası:", err);
+        if (!chatImage) {
+          throw new Error("Fotoğraf yüklenemedi.");
+        }
+      }
 
-    error(
-      typeof err === "string"
-        ? err
-        : "Grup oluşturulamadı."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+      // 2. Grup bilgilerini hazırla
+      const groupData = {
+        chatName: groupName.trim(),
+        chatImage: chatImage,
+        userIds: selectedUsers.map((item) => Number(item.id)),
+      };
 
+      // 3. Grubu oluştur
+      await dispatch(
+        createUserGroupChat(groupData)
+      ).unwrap();
+
+      // 4. Başarı bildirimi
+      toast("Grup başarıyla oluşturuldu.");
+
+      // 5. Formu temizle
+      setGroupName("");
+      setDescription("");
+      setImageFile(null);
+      setPreview(defaultImage);
+      setSelectedUsers([]);
+      setFriendSearch("");
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      dispatch(clearSearchResults());
+
+      // 6. Önceki ekrana dönmek için callback
+      if (onSave) {
+        onSave();
+      }
+
+    } catch (err) {
+      console.error("Grup oluşturma hatası:", err);
+
+      error(
+        typeof err === "string"
+          ? err
+          : err?.message || "Grup oluşturulamadı."
+      );
+
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <form
       onSubmit={handleSubmit}
       className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-y-auto overflow-x-hidden rounded-2xl border border-border bg-surface shadow-lg"
     >
-      {/* Yeşil başlık */}
       <div className="shrink-0 bg-gradient-to-r from-primary-dark via-primary to-primary-light px-5 py-5 sm:px-7">
         <p className="text-xs font-semibold tracking-widest text-white/70">
           GRUP YÖNETİMİ
@@ -112,10 +213,9 @@ const handleSubmit = async (event) => {
         </p>
       </div>
 
-      {/* Form içeriği */}
       <div className="flex min-h-0 w-full flex-1 flex-col gap-6 p-5 sm:p-7">
 
-        {/* Fotoğraf alanı */}
+        {/* Grup fotoğrafı */}
         <div className="flex flex-col items-center">
           <div className="relative">
             <img
@@ -127,7 +227,8 @@ const handleSubmit = async (event) => {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-primary text-white shadow-md transition hover:bg-primary-dark"
+              disabled={loading}
+              className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-primary text-white shadow-md transition hover:bg-primary-dark disabled:opacity-50"
               aria-label="Grup fotoğrafı seç"
             >
               <MdPhotoCamera className="h-5 w-5" />
@@ -173,6 +274,7 @@ const handleSubmit = async (event) => {
               onChange={(event) => setGroupName(event.target.value)}
               placeholder="Grup adını girin"
               maxLength={80}
+              disabled={loading}
               className="w-full min-w-0 bg-transparent py-3 text-sm text-text outline-none placeholder:text-text-muted"
             />
 
@@ -182,6 +284,101 @@ const handleSubmit = async (event) => {
           <p className="mt-1 text-right text-xs text-text-muted">
             {groupName.length}/80
           </p>
+        </div>
+
+        {/* Arkadaş arama ve seçme */}
+        <div className="w-full min-w-0">
+
+          <label className="mb-2 block text-sm font-semibold text-text">
+            Gruba arkadaş ekle
+          </label>
+
+          <input
+            type="search"
+            value={friendSearch}
+            onChange={(event) => setFriendSearch(event.target.value)}
+            placeholder="Arkadaşının adını ara..."
+            disabled={loading}
+            className="w-full rounded-xl border border-border bg-white px-4 py-3 text-sm text-text outline-none focus:border-primary focus:ring-4 focus:ring-primary/10"
+          />
+
+          {friendSearch.trim() && (
+            <div className="mt-2 max-h-52 overflow-y-auto rounded-xl border border-border bg-white">
+
+              {searchLoading ? (
+                <p className="p-4 text-center text-sm text-text-secondary">
+                  Arkadaşlar aranıyor...
+                </p>
+              ) : displayedUsers.length > 0 ? (
+
+                displayedUsers.map((item) => {
+                  const isSelected = selectedUsers.some(
+                    (selected) =>
+                      String(selected.id) === String(item.id)
+                  );
+
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => handleSelectUser(item)}
+                      disabled={loading}
+                      className="flex w-full items-center gap-3 border-b border-border p-3 text-left transition last:border-0 hover:bg-primary-soft"
+                    >
+                      <img
+                        src={item.imageUrl || defaultImage}
+                        alt={item.firstName}
+                        className="h-10 w-10 rounded-full object-cover"
+                      />
+
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-text">
+                          {item.firstName} {item.lastName}
+                        </p>
+                      </div>
+
+                      <span
+                        className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${
+                          isSelected
+                            ? "bg-primary text-white"
+                            : "bg-primary-soft text-primary"
+                        }`}
+                      >
+                        {isSelected ? "Seçildi" : "Ekle"}
+                      </span>
+                    </button>
+                  );
+                })
+
+              ) : (
+                <p className="p-4 text-center text-sm text-text-secondary">
+                  Kullanıcı bulunamadı.
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Seçilen arkadaşlar */}
+          <div className="mt-3">
+            <p className="mb-2 text-xs font-semibold text-text-secondary">
+              Seçilen arkadaşlar ({selectedUsers.length})
+            </p>
+
+            <div className="flex flex-wrap gap-2">
+              {selectedUsers.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleSelectUser(item)}
+                  disabled={loading}
+                  className="flex items-center gap-2 rounded-full bg-primary-soft px-3 py-2 text-xs font-semibold text-primary"
+                >
+                  {item.firstName} {item.lastName}
+                  <span>×</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Grup açıklaması */}
@@ -204,6 +401,7 @@ const handleSubmit = async (event) => {
             placeholder="Grubunuzun amacını, kurallarını veya üyeler için önemli bilgileri yazın..."
             rows={5}
             maxLength={500}
+            disabled={loading}
             className="w-full resize-y rounded-xl border border-border bg-white px-4 py-3 text-sm text-text outline-none transition placeholder:text-text-muted focus:border-primary focus:ring-4 focus:ring-primary/10"
           />
 
@@ -211,10 +409,15 @@ const handleSubmit = async (event) => {
             {description.length}/500
           </p>
         </div>
+
+        <p className="text-sm text-text-secondary">
+          Seçilen arkadaş sayısı: {selectedUsers.length}
+        </p>
       </div>
 
-      {/* Alt buton alanı */}
+      {/* Kaydet */}
       <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-border bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+
         <p className="text-xs text-text-secondary">
           Grup bilgilerini istediğiniz zaman güncelleyebilirsiniz.
         </p>

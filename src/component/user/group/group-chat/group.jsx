@@ -12,35 +12,51 @@ import {
   FiSearch,
   FiImage,
 } from "react-icons/fi";
-
+import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import GroupDropdownMenu from "../group-dropdown-menu";
 import CreateGroupCard from "./create-group/create-group-card";
 import CreateComminityGroup from "./comminity-group/create-comminity-group";
 import AddExsistingComminity from "./create-existing-group/add-existing-comminity";
-
-import defaultImage from "../../../../assets/img/user.webp";
-
-import { useAppSelector } from "../../../../redux/store/hooks";
+import defaultImage from "../../../../assets/img/logo.png";
 import { getImageObjectUrl } from "../../../../api/service/image-service";
+import { getAllUsersChats } from "../../../../redux/store/slices/chat/chat-thunks/get-all-users-chats";
+import { useNavigate } from "react-router-dom";
 
 const Group = () => {
   const [activeView, setActiveView] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [groupImages, setGroupImages] = useState({});
 
+
+  const dispatch = useAppDispatch();
+  const allChatsState = useAppSelector(
+    (state) => state.allUsersChat?.allChats
+  );
+  const allChats = allChatsState?.data;
   const groupChatState = useAppSelector(
     (state) => state.usersGroupChats?.groupChat
   );
-
+const navigate = useNavigate();
   const createdGroup = groupChatState?.data;
 
   const handleCreateGroup = () => setActiveView("createGroup");
   const handleCreateCominityGroup = () => setActiveView("createCommunity");
   const handleAddExistingComminity = () => setActiveView("addCommunity");
-  const handleShowAllGroups = () => setActiveView("existingGroups");
+
+  const handleShowAllGroups = () => {
+    setSearchTerm("");
+    setActiveView("existingGroups");
+  };
+
   const handleCloseView = () => {
     setActiveView(null);
     setSearchTerm("");
+  };
+
+  // Grup oluşturulduğunda Existing Groups ekranını aç.
+  const handleGroupCreated = () => {
+    setSearchTerm("");
+    setActiveView("existingGroups");
   };
 
   const viewDetails = {
@@ -94,31 +110,13 @@ const Group = () => {
   ];
 
   const groups = useMemo(() => {
-    if (!createdGroup) return [];
+    if (!Array.isArray(allChats)) return [];
 
-    if (Array.isArray(createdGroup)) {
-      return createdGroup.filter((chat) => chat?.isGroup === true);
-    }
-
-    const possibleLists = [
-      createdGroup?.content,
-      createdGroup?.data,
-      createdGroup?.chats,
-      createdGroup?.groups,
-    ];
-
-    const list = possibleLists.find(Array.isArray);
-
-    if (list) {
-      return list.filter((chat) => chat?.isGroup === true);
-    }
-
-    if (createdGroup?.isGroup === true) {
-      return [createdGroup];
-    }
-
-    return [];
-  }, [createdGroup]);
+    return allChats.filter((chat) => chat?.isGroup === true);
+  }, [allChats]);
+  useEffect(() => {
+    dispatch(getAllUsersChats());
+  }, [dispatch]);
 
   useEffect(() => {
     let cancelled = false;
@@ -179,17 +177,19 @@ const Group = () => {
 
   const getMemberCount = (group) => group?.users?.length ?? 0;
 
-  const handleOpenGroup = (group) => {
-    // Mevcut sohbet sayfasının route bilgisi paylaşılmadığı için
-    // burada tahmini bir yönlendirme yapılmıyor.
-    console.log("Selected group:", group);
-  };
+  
+
+const handleOpenGroup = (group) => {
+    if (!group?.id) return;
+
+    navigate(`/userHome?chatId=${group.id}`);
+};
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center overflow-hidden bg-background p-3 sm:p-5 lg:p-6">
       <div className="mx-auto flex h-[calc(100vh-24px)] min-h-0 w-full max-w-7xl flex-col gap-4 overflow-hidden lg:h-[calc(100vh-48px)] lg:max-h-[950px] lg:flex-row">
 
-        {/* LEFT SIDEBAR - SABİT, SCROLL YOK */}
+        {/* LEFT SIDEBAR */}
         <aside className="w-full shrink-0 overflow-hidden rounded-3xl border border-border bg-surface p-5 shadow-sm lg:flex lg:w-80 lg:flex-col">
           <div className="mb-8 flex shrink-0 items-center justify-between">
             <div>
@@ -282,8 +282,9 @@ const Group = () => {
           </div>
         </aside>
 
-        {/* RIGHT CONTENT - SADECE BU ALAN SCROLL */}
+        {/* RIGHT CONTENT */}
         <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain rounded-3xl border border-border bg-surface p-5 shadow-sm sm:p-7">
+
           {activeView ? (
             <>
               <div className="mb-7 flex items-center justify-between gap-4">
@@ -316,7 +317,9 @@ const Group = () => {
                 </button>
               </div>
 
-              {activeView === "createGroup" && <CreateGroupCard />}
+              {activeView === "createGroup" && (
+                <CreateGroupCard onGroupCreated={handleGroupCreated} />
+              )}
 
               {activeView === "createCommunity" && (
                 <CreateComminityGroup />
@@ -328,13 +331,12 @@ const Group = () => {
 
               {activeView === "existingGroups" && (
                 <section>
-                  <div className="mb-6">
-                    <div className="relative">
+                  <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="relative flex-1">
                       <FiSearch
                         className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted"
                         size={18}
                       />
-
                       <input
                         type="text"
                         value={searchTerm}
@@ -345,16 +347,25 @@ const Group = () => {
                         className="w-full rounded-xl border border-border bg-background py-3 pl-11 pr-4 text-sm text-text-primary outline-none transition focus:border-primary"
                       />
                     </div>
+
+                    <button
+                      type="button"
+                      onClick={handleCreateGroup}
+                      className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                    >
+                      <FiPlus size={17} />
+                      Create Group
+                    </button>
                   </div>
 
                   {filteredGroups.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-4 pb-3 sm:grid-cols-2 xl:grid-cols-3">
+                    <div className="space-y-3">
                       {filteredGroups.map((group) => (
                         <button
                           key={group.id}
                           type="button"
                           onClick={() => handleOpenGroup(group)}
-                          className="group flex min-w-0 items-center gap-4 rounded-2xl border border-border bg-surface p-4 text-left transition hover:border-primary/30 hover:shadow-md"
+                          className="group flex w-full items-center gap-4 rounded-2xl border border-border bg-background p-4 text-left transition hover:border-primary/30 hover:bg-primary-soft/30 hover:shadow-sm"
                         >
                           <img
                             src={groupImages[group.id] || defaultImage}
@@ -369,7 +380,6 @@ const Group = () => {
                             <h3 className="truncate text-sm font-bold text-text-primary transition group-hover:text-primary">
                               {group.chatName || "Unnamed Group"}
                             </h3>
-
                             <p className="mt-1 text-xs text-text-muted">
                               {getMemberCount(group)} members
                             </p>
@@ -457,16 +467,9 @@ const Group = () => {
                 </div>
               </div>
 
-              <div className="mb-5 flex items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-lg font-bold text-text-primary">
-                    Quick Actions
-                  </h2>
-                  <p className="mt-1 text-sm text-text-muted">
-                    What would you like to do?
-                  </p>
-                </div>
-              </div>
+              <h2 className="mb-5 text-lg font-bold text-text-primary">
+                Quick Actions
+              </h2>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {quickActions.map((item) => {

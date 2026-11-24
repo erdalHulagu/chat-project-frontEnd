@@ -27,7 +27,7 @@ import {
 
 import { uploadImage } from "../../../../../api/service/image-service";
 
-const CreateGroupCard = ({ onSave, selectedUserIds = [] }) => {
+const CreateGroupCard = ({ onSave, selectedUserIds = [], onGroupCreated}) => {
   const fileInputRef = useRef(null);
   const dispatch = useAppDispatch();
 
@@ -123,76 +123,79 @@ const CreateGroupCard = ({ onSave, selectedUserIds = [] }) => {
 
   // Grup oluşturma ve fotoğraf yükleme
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!groupName.trim()) {
-      error("Lütfen grup adı girin.");
-      return;
+  if (!groupName.trim()) {
+    error("Lütfen grup adı girin.");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    let chatImage = null;
+
+    //* 1. Fotoğrafı önce sunucuya yükle
+    if (imageFile) {
+      const imageResponse = await uploadImage(imageFile);
+
+      chatImage = imageResponse.data?.imageId;
+
+      if (!chatImage) {
+        throw new Error("Fotoğraf yüklenemedi.");
+      }
     }
 
-    setLoading(true);
+    //* 2. Grup bilgilerini hazırla
+    const groupData = {
+      chatName: groupName.trim(),
+      chatImage: chatImage,
+      userIds: selectedUsers.map((item) => Number(item.id)),
+    };
 
-    try {
-      let chatImage = null;
+    //* 3. Grubu oluştur
+    await dispatch(
+      createUserGroupChat(groupData)
+    ).unwrap();
 
-      // 1. Fotoğrafı önce sunucuya yükle
-      if (imageFile) {
-        const imageResponse = await uploadImage(imageFile);
+    //* 4. Başarı bildirimi
+    toast("Grup başarıyla oluşturuldu.");
 
-        chatImage = imageResponse.data?.imageId;
+    //* 5. Formu temizle
+    setGroupName("");
+    setDescription("");
+    setImageFile(null);
+    setPreview(defaultImage);
+    setSelectedUsers([]);
+    setFriendSearch("");
 
-        if (!chatImage) {
-          throw new Error("Fotoğraf yüklenemedi.");
-        }
-      }
-
-      // 2. Grup bilgilerini hazırla
-      const groupData = {
-        chatName: groupName.trim(),
-        chatImage: chatImage,
-        userIds: selectedUsers.map((item) => Number(item.id)),
-      };
-
-      // 3. Grubu oluştur
-      await dispatch(
-        createUserGroupChat(groupData)
-      ).unwrap();
-
-      // 4. Başarı bildirimi
-      toast("Grup başarıyla oluşturuldu.");
-
-      // 5. Formu temizle
-      setGroupName("");
-      setDescription("");
-      setImageFile(null);
-      setPreview(defaultImage);
-      setSelectedUsers([]);
-      setFriendSearch("");
-
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-
-      dispatch(clearSearchResults());
-
-      // 6. Önceki ekrana dönmek için callback
-      if (onSave) {
-        onSave();
-      }
-
-    } catch (err) {
-      console.error("Grup oluşturma hatası:", err);
-
-      error(
-        typeof err === "string"
-          ? err
-          : err?.message || "Grup oluşturulamadı."
-      );
-
-    } finally {
-      setLoading(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
-  };
+
+    dispatch(clearSearchResults());
+
+    //* 6. Önceki ekran için mevcut callback
+    if (onSave) {
+      onSave();
+    }
+
+    //* 7. Grup oluşturulduktan sonra liste ekranına geç
+    onGroupCreated?.();
+
+  } catch (err) {
+    console.error("Grup oluşturma hatası:", err);
+
+    error(
+      typeof err === "string"
+        ? err
+        : err?.message || "Grup oluşturulamadı."
+    );
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <form

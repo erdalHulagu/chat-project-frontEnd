@@ -1,5 +1,11 @@
 
-import React, { useEffect, useState, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 
 import { HiUserGroup } from "react-icons/hi";
 import { SiInstatus } from "react-icons/si";
@@ -17,12 +23,15 @@ import {
   FiMessageCircle,
 } from "react-icons/fi";
 
-import { useNavigate } from "react-router-dom";
-
 import MessageCard from "../chat/message-card";
 import ChatCard from "../chat/chat-card";
 import ChatDetail from "../chat/chat-detail";
 import UserHomeDropDownMenu from "./user-home-dropdown-menu";
+
+import {
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 
 import {
   useAppDispatch,
@@ -100,6 +109,13 @@ const UserHome = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  // URL üzerinden gelen grup/sohbet ID
+  const [searchParams] = useSearchParams();
+  const requestedChatId = searchParams.get("chatId");
+
+  // Aynı sohbetin tekrar tekrar otomatik açılmasını önler
+  const autoOpenedChatIdRef = useRef(null);
+
   // Redux
   const { isUserLogin, user, imageUrl } = useAppSelector(
     (state) => state.auth
@@ -129,14 +145,20 @@ const UserHome = () => {
     (state) => state.allUsersChat.allChats
   );
 
-  const allChats = Array.isArray(allChatsState?.data)
-    ? allChatsState.data
-    : [];
+  // Sohbet listesini güvenli şekilde al
+  const allChats = useMemo(() => {
+    return Array.isArray(allChatsState?.data)
+      ? allChatsState.data
+      : [];
+  }, [allChatsState?.data]);
 
-  const sortedChats = [...allChats].sort(
-    (chatA, chatB) =>
-      getLatestChatTime(chatB) - getLatestChatTime(chatA)
-  );
+  // Sohbetleri son mesaja göre sırala
+  const sortedChats = useMemo(() => {
+    return [...allChats].sort(
+      (chatA, chatB) =>
+        getLatestChatTime(chatB) - getLatestChatTime(chatA)
+    );
+  }, [allChats]);
 
   // Local states
   const [search, setSearch] = useState("");
@@ -154,6 +176,7 @@ const UserHome = () => {
   const [sending, setSending] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
 
+
   // Sohbetleri yükle
   useEffect(() => {
     if (isUserLogin) {
@@ -161,10 +184,12 @@ const UserHome = () => {
     }
   }, [isUserLogin, dispatch]);
 
+
   // Aktif sohbet ID
   useEffect(() => {
     activeChatIdRef.current = activeChatId;
   }, [activeChatId]);
+
 
   // Kullanıcı arama
   useEffect(() => {
@@ -184,21 +209,23 @@ const UserHome = () => {
     return () => clearTimeout(timer);
   }, [search, isUserLogin, dispatch]);
 
+
   // Mesajları yükle
-  const loadChatMessages = async (chatId) => {
+  const loadChatMessages = useCallback(async (chatId) => {
     if (!chatId) return;
 
     try {
       setLoadingMessages(true);
       dispatch(clearMessages());
 
-      await dispatch(getAllMessage(chatId));
+      await dispatch(getAllMessage(chatId)).unwrap();
     } catch (err) {
       console.error("Messages could not be loaded:", err);
     } finally {
       setLoadingMessages(false);
     }
-  };
+  }, [dispatch]);
+
 
   // WebSocket
   useEffect(() => {
@@ -225,56 +252,59 @@ const UserHome = () => {
     };
   }, [isUserLogin, dispatch]);
 
-  // Yeni sohbet aç
- const handleCreateChat = async (selected) => {
+
+  // Yeni bireysel sohbet aç
+  const handleCreateChat = async (selected) => {
     if (!selected?.id) return;
 
     if (String(selected.id) === String(user?.id)) {
-        return;
+      return;
     }
 
     try {
-        console.log("SEÇİLEN KULLANICI:", selected);
+      console.log("SEÇİLEN KULLANICI:", selected);
 
-        setSelectedUser(selected);
-        setSelectedChat(null);
-        setActiveChatId(null);
+      setSelectedUser(selected);
+      setSelectedChat(null);
+      setActiveChatId(null);
 
-        setIsChatOpen(true);
-        setMessageText("");
+      setIsChatOpen(true);
+      setMessageText("");
 
-        dispatch(clearMessages());
+      dispatch(clearMessages());
 
-        const chat = await dispatch(
-            singleUserChat(selected.id)
-        ).unwrap();
+      const chat = await dispatch(
+        singleUserChat(selected.id)
+      ).unwrap();
 
-        console.log("OLUŞAN SOHBET:", chat);
+      console.log("OLUŞAN SOHBET:", chat);
 
-        const currentChatId = chat?.id ?? chat?.chatId;
+      const currentChatId = chat?.id ?? chat?.chatId;
 
-        if (!currentChatId) {
-            console.error("Chat ID not found:", chat);
-            return;
-        }
+      if (!currentChatId) {
+        console.error("Chat ID not found:", chat);
+        return;
+      }
 
-        setSelectedChat(chat);
-        setActiveChatId(currentChatId);
+      setSelectedChat(chat);
+      setActiveChatId(currentChatId);
 
-        await loadChatMessages(currentChatId);
+      await loadChatMessages(currentChatId);
 
-        dispatch(getAllUsersChats());
+      dispatch(getAllUsersChats());
     } catch (err) {
-        console.error("Could not create/open chat:", err);
+      console.error("Could not create/open chat:", err);
     }
-};
+  };
+
 
   // Var olan sohbeti aç
-  const handleOpenExistingChat = async (chat) => {
-console.log(
-    "SOHBETİN TAM VERİSİ:",
-    JSON.stringify(chat, null, 2)
-);
+  // Hem bireysel hem grup sohbetleri için kullanılır.
+  const handleOpenExistingChat = useCallback(async (chat) => {
+    console.log(
+      "SOHBETİN TAM VERİSİ:",
+      JSON.stringify(chat, null, 2)
+    );
 
     if (!chat?.id) return;
 
@@ -287,6 +317,7 @@ console.log(
     );
 
     setSelectedChat(chat);
+
     setSelectedUser(
       chat.isGroup ? null : otherUsers[0] || null
     );
@@ -296,7 +327,51 @@ console.log(
     setMessageText("");
 
     await loadChatMessages(chat.id);
-  };
+  }, [user?.id, loadChatMessages]);
+
+
+  // URL üzerinden gelen sohbeti otomatik aç
+  useEffect(() => {
+    if (!requestedChatId) {
+      autoOpenedChatIdRef.current = null;
+      return;
+    }
+
+    // Sohbet listesi henüz yükleniyorsa bekle
+    if (allChatsState?.loading) {
+      return;
+    }
+
+    // Aynı sohbet zaten otomatik açıldıysa tekrar açma
+    if (autoOpenedChatIdRef.current === requestedChatId) {
+      return;
+    }
+
+    // URL'deki ID'ye sahip sohbeti bul
+    const requestedChat = allChats.find(
+      (chat) => String(chat.id) === String(requestedChatId)
+    );
+
+    if (!requestedChat) {
+      console.warn(
+        "URL üzerinden istenen sohbet bulunamadı:",
+        requestedChatId
+      );
+      return;
+    }
+
+    // ID kaydedilir ve mevcut sohbet açma fonksiyonu çağrılır
+    autoOpenedChatIdRef.current = requestedChatId;
+
+    handleOpenExistingChat(requestedChat);
+
+  }, [
+    requestedChatId,
+    allChats,
+    allChatsState?.loading,
+    handleOpenExistingChat,
+  ]);
+
 
   // Mesaj gönder
   const handleSendMessage = async (event) => {
@@ -315,10 +390,11 @@ console.log(
           chatId: currentChatId,
           content,
         })
-      );
+      ).unwrap();
 
       setMessageText("");
       dispatch(getAllUsersChats());
+
     } catch (err) {
       console.error("Message sending failed:", err);
     } finally {
@@ -326,16 +402,19 @@ console.log(
     }
   };
 
+
   // Arama alanı
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
     setShowUserList(false);
   };
 
+
   const handleClearSearch = () => {
     setSearch("");
     dispatch(clearSearchResults());
   };
+
 
   // Kişi arama listesini göster
   const handleShowChatList = () => {
@@ -344,16 +423,19 @@ console.log(
     setShowUserList((previous) => !previous);
   };
 
+
   // Mobil geri dönüş
   const handleBackToChats = () => {
     setIsChatOpen(false);
   };
+
 
   // Navigasyon
   const handleProfile = () => navigate("/profile");
   const handleGroup = () => navigate("/group");
   const handleStatus = () => navigate("/status");
   const handleDiscoverUsers = () => navigate("/discover-users");
+
 
   // Arama sonuçları
   const displayedUsers = (
@@ -368,6 +450,7 @@ console.log(
   const safeMessages = Array.isArray(messages)
     ? messages
     : [];
+
 
   return (
     <div className="flex h-full min-h-0 w-full min-w-0 flex-1 items-center justify-center overflow-hidden bg-background p-2 sm:p-4 lg:p-5">
@@ -454,6 +537,7 @@ console.log(
           </nav>
         </header>
 
+
         {/* CHAT BODY */}
         <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
 
@@ -466,7 +550,7 @@ console.log(
             `}
           >
 
-            {/* SIDEBAR HEADER - SABİT */}
+            {/* SIDEBAR HEADER */}
             <div className="shrink-0 border-b border-border px-4 pb-4 pt-5">
 
               <div className="mb-4 flex items-center justify-between">
@@ -483,6 +567,7 @@ console.log(
                   <BsFillChatLeftDotsFill size={18} />
                 </div>
               </div>
+
 
               {/* SEARCH */}
               <div className="relative">
@@ -512,22 +597,23 @@ console.log(
                 )}
               </div>
 
+
               {/* CHAT PEOPLE SEARCH */}
               <button
                 type="button"
                 onClick={handleShowChatList}
                 className={`
                   mt-3 flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition
-                  ${
-                    showUserList
-                      ? "bg-primary text-white shadow-md shadow-primary/15"
-                      : "bg-primary-soft text-primary hover:bg-primary hover:text-white"
+                  ${showUserList
+                    ? "bg-primary text-white shadow-md shadow-primary/15"
+                    : "bg-primary-soft text-primary hover:bg-primary hover:text-white"
                   }
                 `}
               >
                 <PiUserListFill size={19} />
                 <span>Find people to chat</span>
               </button>
+
 
               {/* DISCOVER FRIENDS */}
               <button
@@ -540,7 +626,8 @@ console.log(
               </button>
             </div>
 
-            {/* LİSTE ALANI - SADECE BURASI SCROLL */}
+
+            {/* LİSTE ALANI */}
             <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain custom-scrollbar">
 
               <div className="px-3 py-4">
@@ -558,6 +645,7 @@ console.log(
                       : sortedChats.length}
                   </span>
                 </div>
+
 
                 {isSearching || showUserList ? (
 
@@ -674,6 +762,7 @@ console.log(
             </div>
           </aside>
 
+
           {/* SAĞ SOHBET PANELİ */}
           <main
             className={`
@@ -685,7 +774,8 @@ console.log(
             {hasActiveChat ? (
 
               <>
-                {/* CHAT HEADER - SABİT */}
+
+                {/* CHAT HEADER */}
                 <div className="relative z-10 flex shrink-0 items-center gap-3 border-b border-border bg-surface px-3 py-3 sm:px-5">
 
                   <button
@@ -699,7 +789,6 @@ console.log(
 
                   <div className="min-w-0 flex-1">
                     <ChatDetail
-                    
                       selectedUser={selectedUser}
                       selectedChat={selectedChat}
                       currentUserId={user?.id}
@@ -707,10 +796,26 @@ console.log(
                   </div>
                 </div>
 
-                {/* MESAJLAR - SADECE BU ALAN SCROLL */}
+
+                {/* MESAJLAR */}
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-contain custom-scrollbar px-3 py-5 sm:px-6">
 
                   <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4">
+
+                    {/* GRUPLARA GERİ DÖN */}
+                    {selectedChat?.isGroup && (
+                      <div className="mb-2 flex justify-start">
+                        <button
+                          type="button"
+                          onClick={() => navigate("/group")}
+                          className="flex items-center gap-2 rounded-xl border border-primary/20 bg-primary-soft px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary/10"
+                        >
+                          <span>←</span>
+                          Gruplara Geri Dön
+                        </button>
+                      </div>
+                    )}
+
 
                     {loadingMessages || chatState?.loading ? (
 
@@ -754,7 +859,8 @@ console.log(
                   </div>
                 </div>
 
-                {/* MESSAGE COMPOSER - SABİT */}
+
+                {/* MESSAGE COMPOSER */}
                 <form
                   onSubmit={handleSendMessage}
                   className="relative z-10 flex shrink-0 items-center gap-2 border-t border-border bg-surface px-3 py-3 sm:gap-3 sm:px-5"

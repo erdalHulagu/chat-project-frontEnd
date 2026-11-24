@@ -77,7 +77,7 @@ const CustomRouters = () => {
             path="/updateProfile"
             element={<UpdateProfilePage />}
           />
-          
+
 
           <Route
             path="/friendProfile"
@@ -87,7 +87,7 @@ const CustomRouters = () => {
             path="/friendProfile/:friendId"
             element={<FriendProfilePage />}
           />
-          
+
           <Route path="/discover-users" element={<DiscoverUsers />} />
 
           <Route path="/status" element={<StatusPage />} />

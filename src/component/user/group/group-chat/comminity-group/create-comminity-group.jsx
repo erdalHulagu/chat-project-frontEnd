@@ -1,6 +1,5 @@
 
 import React, { useEffect, useState } from "react";
-
 import {
   FiCamera,
   FiUsers,
@@ -20,10 +19,9 @@ const CreateComminityGroup = ({ onSave }) => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Seçilen fotoğrafın geçici URL'sini temizle
   useEffect(() => {
     return () => {
-      if (preview?.startsWith("blob:")) {
+      if (typeof preview === "string" && preview.startsWith("blob:")) {
         URL.revokeObjectURL(preview);
       }
     };
@@ -31,7 +29,6 @@ const CreateComminityGroup = ({ onSave }) => {
 
   const handleImageChange = (event) => {
     const selectedFile = event.target.files?.[0];
-
     if (!selectedFile) return;
 
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
@@ -58,6 +55,17 @@ const CreateComminityGroup = ({ onSave }) => {
     setPreview(defaultImage);
   };
 
+  const resetForm = () => {
+    setCommunityName("");
+    setDescription("");
+    setImageFile(null);
+    setPreview(defaultImage);
+    setErrorMessage("");
+
+    const input = document.getElementById("community-image");
+    if (input) input.value = "";
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -81,15 +89,13 @@ const CreateComminityGroup = ({ onSave }) => {
         image: imageFile,
       });
 
-      setCommunityName("");
-      setDescription("");
-      setImageFile(null);
-      setPreview(defaultImage);
+      resetForm();
     } catch (error) {
       setErrorMessage(
-        typeof error === "string"
+        error?.response?.data?.message ||
+        (typeof error === "string"
           ? error
-          : "Topluluk oluşturulurken bir hata oluştu."
+          : "Topluluk oluşturulurken bir hata oluştu.")
       );
     } finally {
       setLoading(false);
@@ -101,12 +107,10 @@ const CreateComminityGroup = ({ onSave }) => {
       onSubmit={handleSubmit}
       className="mx-auto w-full max-w-2xl overflow-hidden rounded-2xl border border-border bg-surface shadow-sm"
     >
-      {/* Header */}
       <div className="flex items-center gap-3 border-b border-border bg-background/70 px-5 py-4 sm:px-6">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft text-primary">
           <FiGlobe size={22} />
         </div>
-
         <div>
           <h2 className="text-base font-bold text-text sm:text-lg">
             Create Community
@@ -117,10 +121,7 @@ const CreateComminityGroup = ({ onSave }) => {
         </div>
       </div>
 
-      {/* Form Content */}
       <div className="space-y-6 p-5 sm:p-7">
-
-        {/* Community Image */}
         <div className="flex flex-col items-center">
           <div className="group relative">
             <img
@@ -162,13 +163,11 @@ const CreateComminityGroup = ({ onSave }) => {
             <FiImage className="mr-1 inline" size={14} />
             Community photo
           </p>
-
           <p className="mt-1 text-xs text-text-muted">
             JPEG, PNG or WEBP · Max 5 MB
           </p>
         </div>
 
-        {/* Community Name */}
         <div>
           <label
             htmlFor="community-name"
@@ -194,7 +193,6 @@ const CreateComminityGroup = ({ onSave }) => {
           </p>
         </div>
 
-        {/* Description */}
         <div>
           <label
             htmlFor="community-description"
@@ -207,7 +205,7 @@ const CreateComminityGroup = ({ onSave }) => {
             id="community-description"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="Tell people what your community is about. You can also add rules and guidelines..."
+            placeholder="Tell people what your community is about..."
             rows={5}
             maxLength={500}
             className="w-full resize-y rounded-xl border border-border bg-surface px-4 py-3 text-sm leading-6 text-text outline-none transition placeholder:text-text-muted focus:border-primary focus:ring-4 focus:ring-primary/10"
@@ -218,17 +216,14 @@ const CreateComminityGroup = ({ onSave }) => {
           </p>
         </div>
 
-        {/* Information */}
         <div className="flex gap-3 rounded-xl border border-primary/10 bg-primary-soft p-4">
           <FiUsers className="mt-0.5 shrink-0 text-primary" size={19} />
-
           <p className="text-xs leading-5 text-primary-dark">
-            Give your community a clear name and description so people
-            can understand its purpose and decide whether to join.
+            Give your community a clear name and description so people can
+            understand its purpose.
           </p>
         </div>
 
-        {/* Error */}
         {errorMessage && (
           <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-danger">
             {errorMessage}
@@ -236,17 +231,10 @@ const CreateComminityGroup = ({ onSave }) => {
         )}
       </div>
 
-      {/* Footer */}
       <div className="flex flex-col-reverse gap-3 border-t border-border bg-background/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-7">
         <button
           type="button"
-          onClick={() => {
-            setCommunityName("");
-            setDescription("");
-            setImageFile(null);
-            setPreview(defaultImage);
-            setErrorMessage("");
-          }}
+          onClick={resetForm}
           disabled={loading}
           className="rounded-xl border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-text-secondary transition hover:bg-background disabled:opacity-50"
         >

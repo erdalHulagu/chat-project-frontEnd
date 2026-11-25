@@ -7,10 +7,11 @@ const ExistingGroupCard = ({
   selected = false,
   onSelect,
 }) => {
-  const groupName =
-    group.groupName || group.name || "İsimsiz grup";
+ const groupName =
+    group.chatName || group.groupName || group.name || "İsimsiz grup";
 
   const memberCount =
+    group.users?.length ??
     group.members?.length ??
     group.memberCount ??
     group.membersCount ??

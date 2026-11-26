@@ -1,6 +1,25 @@
-
 import React from "react";
 import { FiClock } from "react-icons/fi";
+
+const DEFAULT_IMAGE =
+  "https://placehold.co/100x100/E6F2ED/075E45?text=User";
+
+const formatStatusTime = (dateValue) => {
+  if (!dateValue) return "Recent update";
+
+  const date = new Date(dateValue);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Recent update";
+  }
+
+  return date.toLocaleString(undefined, {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
 const FriendStatusCard = ({
   friend = {},
@@ -9,6 +28,9 @@ const FriendStatusCard = ({
 }) => {
   const name =
     friend.name ||
+    [friend.firstName, friend.lastName]
+      .filter(Boolean)
+      .join(" ") ||
     friend.username ||
     friend.fullName ||
     "Unknown User";
@@ -17,12 +39,11 @@ const FriendStatusCard = ({
     friend.profileImage ||
     friend.image ||
     friend.avatar ||
-    "https://placehold.co/100x100/E6F2ED/075E45?text=User";
+    DEFAULT_IMAGE;
 
-  const time =
-    friend.statusTime ||
-    friend.updatedAt ||
-    "Recent update";
+  const time = formatStatusTime(
+    friend.statusTime || friend.createdAt || friend.updatedAt
+  );
 
   const handleClick = () => {
     onClick?.(friend);
@@ -50,8 +71,8 @@ const FriendStatusCard = ({
           src={image}
           alt={name}
           onError={(event) => {
-            event.currentTarget.src =
-              "https://placehold.co/100x100/E6F2ED/075E45?text=User";
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = DEFAULT_IMAGE;
           }}
           className="h-full w-full rounded-full border-2 border-surface object-cover"
         />

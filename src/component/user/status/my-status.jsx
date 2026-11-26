@@ -22,6 +22,7 @@ import {
   getMyStatuses,
   getFriendsStatuses,
   deleteStatus,
+  reshareStatus,
 } from "../../../api/service/status-service";
 
 import {
@@ -132,6 +133,31 @@ const MyStatus = () => {
     return result;
   };
 
+  const handleReshareStatus = async (statusId) => {
+    if (!statusId) return;
+
+    setError("");
+
+    try {
+      await reshareStatus(statusId);
+
+      // Kendi statuslarımız ve arkadaşların statusları yenilensin.
+      await loadStatuses();
+
+      // Görüntüleyiciyi kapat.
+      setSelectedStatus(null);
+      setShowMyStatus(false);
+    } catch (err) {
+      console.error("Status reshare error:", err);
+
+      setError(
+        err.response?.data?.message ||
+        "Status yeniden paylaşılırken bir hata oluştu."
+      );
+
+      throw err;
+    }
+  };
   // Statusları backend'den yükle
   const loadStatuses = useCallback(async () => {
     setLoading(true);
@@ -201,17 +227,32 @@ const MyStatus = () => {
       event.target.value = "";
       return;
     }
+    if (isVideo) {
+      const videoUrl = URL.createObjectURL(file);
+      const video = document.createElement("video");
 
-    const maxSize = isVideo
-      ? 50 * 1024 * 1024
-      : 5 * 1024 * 1024;
+      video.preload = "metadata";
 
-    if (file.size > maxSize) {
-      alert(
-        isVideo
-          ? "Video boyutu 50 MB'dan küçük olmalıdır."
-          : "Fotoğraf boyutu 5 MB'dan küçük olmalıdır."
-      );
+      video.onloadedmetadata = () => {
+        URL.revokeObjectURL(videoUrl);
+
+        if (video.duration > 90) {
+          alert("Video süresi en fazla 1 dakika 30 saniye olabilir.");
+          return;
+        }
+
+        setSelectedFile(file);
+        setPreview(URL.createObjectURL(file));
+        setSelectedStatus(null);
+        setShowMyStatus(true);
+      };
+
+      video.onerror = () => {
+        URL.revokeObjectURL(videoUrl);
+        alert("Video okunamadı.");
+      };
+
+      video.src = videoUrl;
       event.target.value = "";
       return;
     }
@@ -541,6 +582,7 @@ const MyStatus = () => {
                   setShowMyStatus(false);
                   setSelectedStatus(null);
                 }}
+                onReshare={handleReshareStatus}
               />
             </>
           ) : showMyStatus && (preview || myStatus) ? (

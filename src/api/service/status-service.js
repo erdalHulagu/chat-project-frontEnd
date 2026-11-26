@@ -38,3 +38,10 @@ export const deleteStatus = (statusId) => {
     headers: authHeader(),
   });
 };
+
+export const reshareStatus = (statusId) =>
+  axios.post(
+    `${STATUS_URL}/${statusId}/reshare`,
+    null,
+    { headers: authHeader() }
+  );

@@ -1,10 +1,12 @@
 
 import React from "react";
 import "./progress-bar.css";
+
 const ProgressBar = ({
   index,
   activeIndex,
   duration = 5000,
+  isPaused = false,
 }) => {
   const isCompleted = index < activeIndex;
   const isActive = index === activeIndex;
@@ -23,6 +25,7 @@ const ProgressBar = ({
           isActive
             ? {
                 animationDuration: `${duration}ms`,
+                animationPlayState: isPaused ? "paused" : "running",
               }
             : undefined
         }

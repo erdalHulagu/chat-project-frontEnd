@@ -10,7 +10,6 @@ import {
 
 import {
   error,
-  toast,
 } from "../../../../../helper/swal";
 
 import {
@@ -72,9 +71,6 @@ export const loginProfile = (values) => async (dispatch) => {
     } else {
       dispatch(setImageURL(getDefaultImage()));
     }
-
-    // 6. Başarılı giriş
-    toast("Login successful");
 
     return true;
 

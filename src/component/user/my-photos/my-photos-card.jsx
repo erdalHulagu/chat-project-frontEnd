@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 
 import {
@@ -7,14 +8,8 @@ import {
     HiOutlineArrowLeft,
 } from "react-icons/hi2";
 
-import {
-    deleteImage,
-    getImageById,
-} from "../../../api/service/image-service";
-
-import {
-    deleteUsersImage,
-} from "../../../api/service/user-service";
+import { getImageById } from "../../../api/service/image-service";
+import { deleteUsersImage } from "../../../api/service/user-service";
 
 import {
     getImageId,
@@ -25,9 +20,10 @@ const MyPhotos = ({ myImages = [] }) => {
     const [imageUrls, setImageUrls] = useState([]);
     const [selectedPhoto, setSelectedPhoto] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [deleting, setDeleting] = useState(false);
+    const [deletingPhotoId, setDeletingPhotoId] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
 
+    // Fotoğrafları yükle
     useEffect(() => {
         let cancelled = false;
         const createdUrls = [];
@@ -47,6 +43,7 @@ const MyPhotos = ({ myImages = [] }) => {
                     myImages.map(async (image, index) => {
                         const imageId = getImageId(image);
 
+                        // URL olarak gelen görseller
                         if (
                             typeof image === "string" &&
                             (
@@ -85,7 +82,11 @@ const MyPhotos = ({ myImages = [] }) => {
                                 isObjectUrl: true,
                             };
                         } catch (error) {
-                            console.error("Fotoğraf yüklenemedi:", imageId, error);
+                            console.error(
+                                "Fotoğraf yüklenemedi:",
+                                imageId,
+                                error
+                            );
                             return null;
                         }
                     })
@@ -98,10 +99,14 @@ const MyPhotos = ({ myImages = [] }) => {
                 console.error("Fotoğraflar yüklenemedi:", error);
 
                 if (!cancelled) {
-                    setErrorMessage("Fotoğraflar yüklenirken bir hata oluştu.");
+                    setErrorMessage(
+                        "Fotoğraflar yüklenirken bir hata oluştu."
+                    );
                 }
             } finally {
-                if (!cancelled) setLoading(false);
+                if (!cancelled) {
+                    setLoading(false);
+                }
             }
         };
 
@@ -113,38 +118,44 @@ const MyPhotos = ({ myImages = [] }) => {
         };
     }, [myImages]);
 
-    const handleDeletePhoto = async () => {
-        if (!selectedPhoto || deleting) return;
+    // Fotoğrafı sil
+    const handleDeletePhoto = async (photo) => {
+        if (!photo || deletingPhotoId !== null) return;
 
-        if (!selectedPhoto.imageId) {
-            setErrorMessage("Bu fotoğraf için geçerli bir görsel ID'si bulunamadı.");
+        if (!photo.imageId) {
+            setErrorMessage(
+                "Bu fotoğraf için geçerli bir görsel ID'si bulunamadı."
+            );
             return;
         }
 
         const confirmed = window.confirm(
-            "Bu fotoğrafı kalıcı olarak silmek istediğinize emin misiniz?"
+            "Bu fotoğrafı kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
         );
 
         if (!confirmed) return;
 
-        setDeleting(true);
+        setDeletingPhotoId(photo.id);
         setErrorMessage("");
 
         try {
-            const imageId = selectedPhoto.imageId;
+            // Backend üzerinden fotoğrafı sil
+            await deleteUsersImage(photo.imageId);
 
-            await deleteUsersImage(imageId);
-            await deleteImage(imageId);
-
+            // Fotoğrafı galeriden kaldır
             setImageUrls((previous) =>
-                previous.filter((photo) => photo.id !== selectedPhoto.id)
+                previous.filter((item) => item.id !== photo.id)
             );
 
-            if (selectedPhoto.isObjectUrl) {
-                revokeImageObjectUrl(selectedPhoto.url);
-            }
+            // Açık fotoğraf aynı fotoğrafsa modalı kapat
+            setSelectedPhoto((previous) =>
+                previous?.id === photo.id ? null : previous
+            );
 
-            setSelectedPhoto(null);
+            // Geçici URL'yi temizle
+            if (photo.isObjectUrl) {
+                revokeImageObjectUrl(photo.url);
+            }
         } catch (error) {
             console.error("Fotoğraf silinemedi:", error);
 
@@ -153,12 +164,13 @@ const MyPhotos = ({ myImages = [] }) => {
                 "Fotoğraf silinirken bir hata oluştu. Lütfen tekrar deneyin."
             );
         } finally {
-            setDeleting(false);
+            setDeletingPhotoId(null);
         }
     };
 
+    // Fotoğraf penceresini kapat
     const closePhoto = () => {
-        if (deleting) return;
+        if (deletingPhotoId !== null) return;
         setSelectedPhoto(null);
     };
 
@@ -198,6 +210,7 @@ const MyPhotos = ({ myImages = [] }) => {
             {loading ? (
                 <div className="flex flex-col items-center justify-center rounded-xl bg-slate-50 py-16">
                     <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-300 border-t-[#075E45]" />
+
                     <p className="mt-4 text-sm font-medium text-slate-600">
                         Fotoğraflar yükleniyor...
                     </p>
@@ -218,28 +231,61 @@ const MyPhotos = ({ myImages = [] }) => {
                 </div>
             ) : (
                 <div className="grid grid-cols-2 gap-3 rounded-xl bg-[#F1F5F9] p-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                    {imageUrls.map((photo) => (
-                        <button
-                            key={photo.id}
-                            type="button"
-                            onClick={() => setSelectedPhoto(photo)}
-                            className="group relative aspect-square overflow-hidden rounded-xl border-2 border-white bg-slate-200 text-left shadow-md transition duration-300 hover:-translate-y-1 hover:border-[#075E45] hover:shadow-xl"
-                        >
-                            <img
-                                src={photo.url}
-                                alt="Galeri fotoğrafı"
-                                className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
-                            />
 
-                            <div className="absolute inset-0 flex items-center justify-center bg-[#043D30]/0 transition duration-300 group-hover:bg-[#043D30]/60">
-                                <HiOutlinePhoto className="h-8 w-8 text-white opacity-0 transition duration-300 group-hover:opacity-100" />
+                    {imageUrls.map((photo) => (
+                        <div
+                            key={photo.id}
+                            className="group relative aspect-square overflow-hidden rounded-xl border-2 border-white bg-slate-200 shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+                        >
+                            {/* Fotoğrafı açma alanı */}
+                            <div
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => setSelectedPhoto(photo)}
+                                onKeyDown={(event) => {
+                                    if (
+                                        event.key === "Enter" ||
+                                        event.key === " "
+                                    ) {
+                                        event.preventDefault();
+                                        setSelectedPhoto(photo);
+                                    }
+                                }}
+                                className="absolute inset-0 z-0 cursor-pointer"
+                            >
+                                <img
+                                    src={photo.url}
+                                    alt="Galeri fotoğrafı"
+                                    className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+                                />
+
+                                <div className="absolute inset-0 flex items-center justify-center bg-[#043D30]/0 transition duration-300 group-hover:bg-[#043D30]/30">
+                                    <HiOutlinePhoto className="h-8 w-8 text-white opacity-0 transition duration-300 group-hover:opacity-100" />
+                                </div>
                             </div>
-                        </button>
+
+                            {/* Her fotoğrafın kendi çöp kutusu */}
+                            <button
+                                type="button"
+                                onClick={() => handleDeletePhoto(photo)}
+                                disabled={deletingPhotoId !== null}
+                                title="Fotoğrafı sil"
+                                aria-label="Fotoğrafı sil"
+                                className="absolute right-2 top-2 z-30 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-red-600 text-white opacity-100 shadow-xl transition duration-200 hover:scale-110 hover:bg-red-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                                {deletingPhotoId === photo.id ? (
+                                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                                ) : (
+                                    <HiOutlineTrash className="h-5 w-5" />
+                                )}
+                            </button>
+                        </div>
                     ))}
+
                 </div>
             )}
 
-            {/* Fotoğraf modalı */}
+            {/* Fotoğraf detay penceresi */}
             {selectedPhoto && (
                 <div
                     className="fixed inset-0 z-50 flex items-center justify-center bg-[#021F18]/90 p-4 backdrop-blur-md"
@@ -253,6 +299,7 @@ const MyPhotos = ({ myImages = [] }) => {
                         <div className="flex items-center justify-between border-b border-slate-200 bg-[#F1F5F9] px-4 py-4 sm:px-6">
                             <div className="flex items-center gap-2">
                                 <HiOutlinePhoto className="h-5 w-5 text-[#075E45]" />
+
                                 <h3 className="font-bold text-[#043D30]">
                                     Fotoğraf Detayı
                                 </h3>
@@ -261,8 +308,7 @@ const MyPhotos = ({ myImages = [] }) => {
                             <button
                                 type="button"
                                 onClick={closePhoto}
-                                disabled={deleting}
-                                className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-slate-600 transition hover:bg-[#075E45] hover:text-white disabled:opacity-50"
+                                className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-slate-600 transition hover:bg-[#075E45] hover:text-white"
                             >
                                 <HiOutlineXMark className="h-6 w-6" />
                             </button>
@@ -287,8 +333,8 @@ const MyPhotos = ({ myImages = [] }) => {
                                 <button
                                     type="button"
                                     onClick={closePhoto}
-                                    disabled={deleting}
-                                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-[#075E45] hover:bg-[#E2E8F0] hover:text-[#043D30] disabled:opacity-50 sm:flex-none"
+                                    disabled={deletingPhotoId !== null}
+                                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-[#075E45] hover:bg-[#E2E8F0] hover:text-[#043D30] disabled:opacity-60 sm:flex-none"
                                 >
                                     <HiOutlineArrowLeft className="h-5 w-5" />
                                     Geri dön
@@ -296,11 +342,11 @@ const MyPhotos = ({ myImages = [] }) => {
 
                                 <button
                                     type="button"
-                                    onClick={handleDeletePhoto}
-                                    disabled={deleting}
+                                    onClick={() => handleDeletePhoto(selectedPhoto)}
+                                    disabled={deletingPhotoId !== null}
                                     className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60 sm:flex-none"
                                 >
-                                    {deleting ? (
+                                    {deletingPhotoId === selectedPhoto.id ? (
                                         <>
                                             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
                                             Siliniyor...

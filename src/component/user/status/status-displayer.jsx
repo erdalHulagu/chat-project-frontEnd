@@ -27,7 +27,12 @@ const StatusDisplayer = ({
   const videoRef = useRef(null);
 
   const currentStory = stories?.[currentStoryIndex];
-
+  console.log("STATUS DISPLAY TEST:", {
+    currentStory,
+    imageType: currentStory?.imageType,
+    media: currentStory?.image,
+    isVideo: currentStory?.imageType?.startsWith("video/"),
+  });
   const userName =
     user.name ||
     user.username ||
@@ -52,12 +57,19 @@ const StatusDisplayer = ({
   const handleNextStory = () => {
     setIsVideoPaused(false);
 
+    
+
     if (currentStoryIndex < stories.length - 1) {
       setCurrentStoryIndex((previous) => previous + 1);
     } else {
       onClose?.();
     }
   };
+
+  const handleSelectStory = (index) => {
+      setIsVideoPaused(false);
+      setCurrentStoryIndex(index);
+    };
 
   const handlePreviousStory = () => {
     if (currentStoryIndex > 0) {
@@ -129,14 +141,28 @@ const StatusDisplayer = ({
       {/* Story progress bars */}
       <div className="absolute left-0 right-0 top-0 z-20 flex gap-1 px-3 pt-3">
         {stories.map((story, index) => (
-          <ProgressBar
+          <button
             key={story.id || story._id || index}
-            index={index}
-            activeIndex={currentStoryIndex}
-            duration={isVideo ? videoDuration * 1000 : STORY_DURATION}
-            isPaused={isVideo && isVideoPaused}
-          />
-
+            type="button"
+            onClick={() => handleSelectStory(index)}
+            aria-label={`${index + 1}. duruma geç`}
+            className="min-w-0 flex-1 cursor-pointer"
+          >
+            <ProgressBar
+              index={index}
+              activeIndex={currentStoryIndex}
+              duration={
+                stories[index]?.imageType?.startsWith("video/")
+                  ? videoDuration * 1000
+                  : STORY_DURATION
+              }
+              isPaused={
+                index === currentStoryIndex &&
+                isVideo &&
+                isVideoPaused
+              }
+            />
+          </button>
         ))}
 
       </div>
@@ -205,6 +231,13 @@ const StatusDisplayer = ({
                   if (Number.isFinite(duration) && duration > 0) {
                     setVideoDuration(Math.min(duration, 90));
                   }
+                }}
+                onCanPlay={() => {
+                  console.log("Video oynatılmaya hazır:", media);
+                }}
+                onError={(event) => {
+                  console.error("Video yükleme hatası:", event.currentTarget.error);
+                  console.error("Video URL:", event.currentTarget.src);
                 }}
                 onEnded={handleNextStory}
                 onPlay={() => setIsVideoPaused(false)}
